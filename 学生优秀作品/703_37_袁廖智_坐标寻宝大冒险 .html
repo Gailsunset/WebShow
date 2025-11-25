@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>坐标寻宝大冒险</title>
+    <style>
+        body {
+            font-family: '微软雅黑', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .start-screen, .end-screen {
+            padding: 40px;
+        }
+        
+        .game-screen {
+            display: none;
+        }
+        
+        .coordinate-system {
+            position: relative;
+            width: 600px;
+            height: 500px;
+            margin: 20px auto;
+            border: 3px solid #2d3748;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+        
+        .axis {
+            position: absolute;
+            background: #2d3748;
+        }
+        
+        .x-axis {
+            bottom: 0;
+            left: 50px;
+            width: 500px;
+            height: 3px;
+        }
+        
+        .y-axis {
+            left: 0;
+            top: 50px;
+            width: 3px;
+            height: 400px;
+        }
+        
+        .grid-line {
+            position: absolute;
+            background: #e2e8f0;
+        }
+        
+        .grid-line.horizontal {
+            width: 500px;
+            height: 1px;
+            left: 50px;
+        }
+        
+        .grid-line.vertical {
+            width: 1px;
+            height: 400px;
+            top: 50px;
+        }
+        
+        .coordinate-label {
+            position: absolute;
+            font-size: 12px;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        
+        .x-label {
+            bottom: -20px;
+            left: -8px;
+        }
+        
+        .y-label {
+            left: -15px;
+            top: -15px;
+        }
+        
+        .treasure {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #ffd700;
+            border: 3px solid #ff6b35;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            animation: sparkle 2s infinite;
+            z-index: 10;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+        
+        .click-area {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px dashed transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            transition: all 0.2s;
+        }
+        
+        .click-area:hover {
+            border-color: #4299e1;
+            background: rgba(66, 153, 225, 0.1);
+        }
+        
+        .hint-box {
+            background: #e6fffa;
+            border: 2px solid #38b2ac;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .feedback {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .feedback.correct {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #38a169;
+        }
+        
+        .feedback.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #e53e3e;
+        }
+        
+        .button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        
+        .button:hover {
+            background: #3182ce;
+        }
+        
+        .button.secondary {
+            background: #ed8936;
+        }
+        
+        .button.secondary:hover {
+            background: #dd6b20;
+        }
+        
+        .score {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4a5568;
+            margin: 20px 0;
+        }
+        
+        .coordinates-display {
+            font-size: 16px;
+            color: #4a5568;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🗺️ 坐标寻宝大冒险 🗺️</h1>
+        
+        <!-- 开始界面 -->
+        <div class="start-screen" id="startScreen">
+            <p style="font-size: 18px; color: #4a5568; line-height: 1.6;">
+                欢迎来到坐标寻宝世界！<br>
+                在这个有趣的游戏中，你需要根据给出的坐标提示，<br>
+                在坐标系中找到隐藏的宝藏！<br>
+                通过游戏来学习坐标知识，让数学变得更有趣！
+            </p>
+            <button class="button" onclick="startGame()">🚀 开始游戏</button>
+        </div>
+        
+        <!-- 游戏界面 -->
+        <div class="game-screen" id="gameScreen">
+            <div class="score">🏆 已找到宝藏: <span id="scoreCount">0</span> 个</div>
+            
+            <div class="hint-box">
+                🔍 宝藏坐标提示: X = <span id="treasureX">?</span>, Y = <span id="treasureY">?</span>
+            </div>
+            
+            <div class="coordinates-display" id="clickCoords">
+                点击坐标系上的位置来寻找宝藏 (点击位置会显示坐标)
+            </div>
+            
+            <div class="coordinate-system" id="coordinateSystem">
+                <div class="axis x-axis"></div>
+                <div class="axis y-axis"></div>
+            </div>
+            
+            <div class="feedback" id="feedback" style="display: none;"></div>
+            
+            <button class="button" onclick="continueGame()">🎯 继续挑战</button>
+            <button class="button secondary" onclick="endGame()">🏁 结束游戏</button>
+        </div>
+        
+        <!-- 结束界面 -->
+        <div class="end-screen" id="endScreen" style="display: none;">
+            <h2>🎉 游戏结束！</h2>
+            <div class="score" style="font-size: 24px; color: #2d3748;">
+                🏆 恭喜你！总共找到了 <span id="finalScore">0</span> 个宝藏！
+            </div>
+            <p style="font-size: 16px; color: #4a5568; margin: 20px 0;">
+                你已经掌握了坐标的基本概念！<br>
+                多多练习，你会越来越棒的！
+            </p>
+            <button class="button" onclick="restartGame()">🔄 重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let currentTreasureX = 0;
+        let currentTreasureY = 0;
+        let treasureElement = null;
+        let isGameActive = false;
+
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            document.getElementById('endScreen').style.display = 'none';
+            
+            initializeGame();
+            generateNewTreasure();
+        }
+
+        function initializeGame() {
+            score = 0;
+            updateScore();
+            createCoordinateGrid();
+            isGameActive = true;
+        }
+
+        function createCoordinateGrid() {
+            const coordinateSystem = document.getElementById('coordinateSystem');
+            
+            // 清除现有的网格线（保留坐标轴）
+            const existingLines = coordinateSystem.querySelectorAll('.grid-line, .coordinate-label');
+            existingLines.forEach(line => line.remove());
+            
+            // 创建网格线 (X轴: 50-550, 每50px一条线，对应坐标1-10)
+            for (let i = 1; i <= 10; i++) {
+                const x = 50 + (i - 1) * 50; // X坐标位置
+                const y = 50 + (i - 1) * 50; // Y坐标位置
+                
+                // 水平网格线
+                const hLine = document.createElement('div');
+                hLine.className = 'grid-line horizontal';
+                hLine.style.top = y + 'px';
+                coordinateSystem.appendChild(hLine);
+                
+                // 垂直网格线
+                const vLine = document.createElement('div');
+                vLine.className = 'grid-line vertical';
+                vLine.style.left = x + 'px';
+                coordinateSystem.appendChild(vLine);
+                
+                // X轴坐标标签
+                if (i <= 10) {
+                    const xLabel = document.createElement('div');
+                    xLabel.className = 'coordinate-label x-label';
+                    xLabel.textContent = i;
+                    xLabel.style.left = x + 'px';
+                    coordinateSystem.appendChild(xLabel);
+                }
+                
+                // Y轴坐标标签
+                if (i <= 10) {
+                    const yLabel = document.createElement('div');
+                    yLabel.className = 'coordinate-label y-label';
+                    yLabel.textContent = i;
+                    yLabel.style.top = y + 'px';
+                    coordinateSystem.appendChild(yLabel);
+                }
+            }
+        }
+
+        function generateNewTreasure() {
+            // 生成1-10范围内的随机坐标
+            currentTreasureX = Math.floor(Math.random() * 10) + 1;
+            currentTreasureY = Math.floor(Math.random() * 10) + 1;
+            
+            // 显示坐标提示
+            document.getElementById('treasureX').textContent = currentTreasureX;
+            document.getElementById('treasureY').textContent = currentTreasureY;
+            
+            // 隐藏之前的反馈
+            document.getElementById('feedback').style.display = 'none';
+            
+            // 清除之前的宝藏
+            if (treasureElement) {
+                treasureElement.remove();
+            }
+            
+            // 隐藏点击坐标显示
+            document.getElementById('clickCoords').textContent = '点击坐标系上的位置来寻找宝藏 (点击位置会显示坐标)';
+            
+            // 创建宝藏（先隐藏，等用户点击后再显示或给出提示）
+            treasureElement = document.createElement('div');
+            treasureElement.className = 'treasure';
+            treasureElement.style.display = 'none';
+            
+            const treasureXPos = 50 + (currentTreasureX - 1) * 50;
+            const treasureYPos = 50 + (currentTreasureY - 1) * 50;
+            
+            treasureElement.style.left = treasureXPos + 'px';
+            treasureElement.style.top = treasureYPos + 'px';
+            
+            document.getElementById('coordinateSystem').appendChild(treasureElement);
+        }
+
+        // 为坐标系添加点击事件监听
+        document.getElementById('coordinateSystem').addEventListener('click', function(e) {
+            if (!isGameActive) return;
+            
+            const rect = this.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+            
+            // 计算最近的网格点
+            const gridX = Math.round((clickX - 50) / 50) * 50 + 50;
+            const gridY = Math.round((clickY - 50) / 50) * 50 + 50;
+            
+            // 确保在有效范围内
+            if (gridX >= 50 && gridX <= 550 && gridY >= 50 && gridY <= 450) {
+                const coordX = Math.round((gridX - 50) / 50) + 1;
+                const coordY = Math.round((gridY - 50) / 50) + 1;
+                
+                // 显示点击的坐标
+                document.getElementById('clickCoords').textContent = 
+                    `你点击的位置: X = ${coordX}, Y = ${coordY}`;
+                
+                checkAnswer(coordX, coordY, gridX, gridY);
+            }
+        });
+
+        function checkAnswer(userX, userY, clickX, clickY) {
+            const feedback = document.getElementById('feedback');
+            feedback.style.display = 'block';
+            
+            if (userX === currentTreasureX && userY === currentTreasureY) {
+                // 正确答案
+                score++;
+                updateScore();
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = `🎉 恭喜你找到了宝藏！<br>正确坐标: X=${userX}, Y=${userY}<br>你真棒！`;
+                
+                // 显示宝藏
+                treasureElement.style.display = 'block';
+                
+                setTimeout(() => {
+                    feedback.innerHTML += '<br><br>点击"继续挑战"寻找下一个宝藏！';
+                }, 2000);
+                
+            } else {
+                // 错误答案
+                const xDiff = Math.abs(userX - currentTreasureX);
+                const yDiff = Math.abs(userY - currentTreasureY);
+                let hint = '';
+                
+                if (xDiff > 0 || yDiff > 0) {
+                    if (xDiff > 0 && yDiff > 0) {
+                        hint = `🤔 很接近了！但坐标有点偏差<br>X差${xDiff}，Y差${yDiff}<br>再试试看！`;
+                    } else if (xDiff > 0) {
+                        hint = `🤔 X坐标不对哦<br>差${xDiff}个单位<br>再试试看！`;
+                    } else {
+                        hint = `🤔 Y坐标不对哦<br>差${yDiff}个单位<br>再试试看！`;
+                    }
+                }
+                
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = `❌ 这里没有宝藏<br>你选择: X=${userX}, Y=${userY}<br>${hint}`;
+            }
+        }
+
+        function continueGame() {
+            if (isGameActive) {
+                generateNewTreasure();
+            }
+        }
+
+        function endGame() {
+            isGameActive = false;
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('endScreen').style.display = 'block';
+        }
+
+        function restartGame() {
+            document.getElementById('endScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+        }
+
+        function updateScore() {
+            document.getElementById('scoreCount').textContent = score;
+        }
+    </script>
+</body>
+</html>

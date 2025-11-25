@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI魔法师——用网页演绎学科奥秘</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: { 500: '#3b82f6', 600: '#2563eb' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: color 0.3s, background-color 0.3s;
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .fade-in.appear {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      border-color: #3b82f6;
+    }
+    .btn-hover {
+      transition: all 0.2s ease;
+    }
+    .btn-hover:hover {
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+  <!-- Theme Toggle Button -->
+  <button id="theme-toggle" class="fixed top-4 right-4 z-50 p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 shadow-md btn-hover">
+    <i id="theme-icon" class="fas fa-moon"></i>
+  </button>
+
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <!-- Header -->
+    <header class="text-center mb-16 fade-in">
+      <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mt-6">
+        AI魔法师——用网页演绎学科奥秘
+      </h1>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">让学科知识在互动网页中“活”起来</p>
+    </header>
+
+    <!-- Author Intro -->
+    <section class="mb-20 fade-in">
+      <div class="flex flex-col md:flex-row items-center gap-6 bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-sm">
+        <img src="https://imgtu.com/uploads/j2fbyln9/r-01_2.webp" alt="吴铭英" class="w-24 h-24 rounded-full object-cover shadow-md" loading="lazy" />
+        <div class="text-center md:text-left">
+          <h2 class="text-2xl font-semibold">吴铭英</h2>
+          <p class="mt-1 text-gray-600 dark:text-gray-300">深圳市龙岗区仙田外国语学校 · 信息科技教师</p>
+          <p class="text-gray-600 dark:text-gray-300">深圳市教育信息技术中心 · 人工智能专员</p>
+          <div class="mt-2 flex flex-wrap justify-center md:justify-start gap-2">
+            <span class="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 rounded-full text-sm">龙岗区信息科技基本功大赛一等奖</span>
+            
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 1: 探秘AI网页制作 -->
+    <section class="mb-20 fade-in">
+      <h2 class="text-3xl font-bold mb-6 flex items-center gap-2">
+        <i class="fas fa-wand-magic-sparkles text-blue-500"></i> 一、探秘AI网页制作
+      </h2>
+      <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+        “今天的物理课真是太难了！”——学习困境普遍存在。而<strong>游戏化学习</strong>正是破局关键。通过AI生成互动网页，让抽象知识变得直观、有趣。
+      </p>
+    </section>
+
+    <!-- Section 2: 神奇咒语——提示词 -->
+    <section class="mb-20 fade-in">
+      <h2 class="text-3xl font-bold mb-6 flex items-center gap-2">
+        <i class="fas fa-spell-check text-indigo-500"></i> 二、神奇咒语——提示词
+      </h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-red-50 dark:bg-red-900/20 p-5 rounded-lg">
+          <h3 class="font-semibold text-red-700 dark:text-red-300">模糊提示词</h3>
+          <p class="mt-2">“帮我做个网站”</p>
+        </div>
+        <div class="bg-green-50 dark:bg-green-900/20 p-5 rounded-lg">
+          <h3 class="font-semibold text-green-700 dark:text-green-300">精确提示词</h3>
+          <p class="mt-2">创建⼀个蓝⽩⾊调的技术博客⽹站，主要分享Python编程教程，⾸⻚展示最新5篇⽂章的摘要
+和封⾯图⽚，⽂章⽀持代码⾼亮显示，右侧边栏包含⽂章分类、标签和作者简介，底部有评论功能。</p>
+        </div>
+      </div>
+      <div class="mt-8 space-y-4">
+        <h3 class="font-semibold text-lg"><i class="fas fa-list-ol mr-2 text-blue-500"></i> 5W1H 描述法</h3>
+        <ul class="list-disc pl-5 text-gray-700 dark:text-gray-300">
+          <li><strong>Who</strong>：用户是谁？</li>
+          <li><strong>What</strong>：做什么功能？</li>
+          <li><strong>When/Where</strong>：何时何地使用？</li>
+          <li><strong>Why</strong>：为什么需要？</li>
+          <li><strong>How</strong>：如何实现？</li>
+        </ul>
+        <h3 class="font-semibold text-lg mt-6"><i class="fas fa-layer-group mr-2 text-indigo-500"></i> 万能提示词模板</h3>
+        <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-sm">
+          背景信息 + 具体任务 + 输出要求 + 约束条件
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: 实战词义射击游戏 -->
+    <section class="mb-20 fade-in">
+      <h2 class="text-3xl font-bold mb-6 flex items-center gap-2">
+        <i class="fas fa-gamepad text-purple-500"></i> 三、实战：词义射击游戏
+      </h2>
+      <div class="space-y-6">
+        <div>
+          <h3 class="font-semibold">🎯 用户画像</h3>
+          <p>一名中学生，需记忆英语单词，但觉得传统背诵枯燥。</p>
+        </div>
+        <div>
+          <h3 class="font-semibold">🎮 场景故事</h3>
+          <p>小明通过射击标有正确释义的气球来巩固单词记忆，学习更愉快。</p>
+        </div>
+        <div>
+          <h3 class="font-semibold">⚙️ 核心功能（MVP）</h3>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>屏幕上方显示目标单词</li>
+            <li>气球随机升起，含正确/错误释义</li>
+            <li>点击射击，即时反馈</li>
+            <li>得分系统 + 开始/结束界面</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold">🔄 交互流程图</h3>
+          <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-xs overflow-x-auto">
+            <pre class="whitespace-pre">flowchart TB
+A[开始界面] --> B[玩家点击开始游戏]
+B --> C[初始化游戏]
+C --> D[显示当前单词和生成气球]
+D --> E[玩家射击气球]
+E --> F{{检查射击正确性}}
+F -->|正确| G[更新得分]
+F -->|错误| H[无得分更新]
+G --> I[检查是否游戏结束]
+H --> I
+I -->|否| D
+I -->|是| J[显示游戏结束界面]
+J --> K[玩家点击重新开始]
+K --> A</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: 学科可视化项目库 -->
+    <section class="mb-20 fade-in">
+      <h2 class="text-3xl font-bold mb-6 flex items-center gap-2">
+        <i class="fas fa-project-diagram text-teal-500"></i> 四、学科可视化项目库
+      </h2>
+      <p class="mb-6 text-gray-700 dark:text-gray-300">
+        精选各学科最具代表性的10个互动项目，适合学生用 HTML/CSS/JS 开发实践。
+      </p>
+
+      <!-- Subject Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Math -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 card-hover bg-white dark:bg-gray-800">
+          <div class="flex items-center gap-3 mb-3">
+            <i class="fas fa-calculator text-blue-500 text-xl"></i>
+            <h3 class="font-bold">🧮 数学（中学）</h3>
+          </div>
+          <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+            <li>• 勾股定理验证</li>
+            <li>• 二次函数图像绘制</li>
+            <li>• 掷骰子概率模拟</li>
+            <li>• 质数筛法可视化</li>
+          </ul>
+        </div>
+
+        <!-- Chinese -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 card-hover bg-white dark:bg-gray-800">
+          <div class="flex items-center gap-3 mb-3">
+            <i class="fas fa-book-open text-red-500 text-xl"></i>
+            <h3 class="font-bold">📚 语文</h3>
+          </div>
+          <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+            <li>• 多音字选择题</li>
+            <li>• 汉字笔顺动画</li>
+            <li>• 古诗填空</li>
+            <li>• 成语接龙游戏</li>
+          </ul>
+        </div>
+
+        <!-- English -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 card-hover bg-white dark:bg-gray-800">
+          <div class="flex items-center gap-3 mb-3">
+            <i class="fas fa-language text-green-500 text-xl"></i>
+            <h3 class="font-bold">🌐 英语</h3>
+          </div>
+          <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+            <li>• 单词卡片翻转</li>
+            <li>• 听音选图</li>
+            <li>• 时态时间轴拖拽</li>
+            <li>• 单词拼写贪吃蛇</li>
+          </ul>
+        </div>
+
+        <!-- Physics -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 card-hover bg-white dark:bg-gray-800">
+          <div class="flex items-center gap-3 mb-3">
+            <i class="fas fa-atom text-orange-500 text-xl"></i>
+            <h3 class="font-bold">⚛️ 物理</h3>
+          </div>
+          <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+            <li>• 斜面滑块实验</li>
+            <li>• 电路搭建实验室</li>
+            <li>• 凸透镜成像规律</li>
+            <li>• 动量守恒碰撞</li>
+          </ul>
+        </div>
+
+        <!-- Chemistry -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 card-hover bg-white dark:bg-gray-800">
+          <div class="flex items-center gap-3 mb-3">
+            <i class="fas fa-flask text-pink-500 text-xl"></i>
+            <h3 class="font-bold">🧪 化学</h3>
+          </div>
+          <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+            <li>• 3D分子模型构建</li>
+            <li>• 化学方程式配平</li>
+            <li>• pH值彩虹条实验</li>
+            <li>• 焰色反应模拟</li>
+          </ul>
+        </div>
+
+        <!-- Biology -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 card-hover bg-white dark:bg-gray-800">
+          <div class="flex items-center gap-3 mb-3">
+            <i class="fas fa-dna text-emerald-500 text-xl"></i>
+            <h3 class="font-bold">🔬 生物</h3>
+          </div>
+          <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+            <li>• 3D细胞模型拆解</li>
+            <li>• DNA双螺旋搭建</li>
+            <li>• 光合作用模拟</li>
+            <li>• 食物链生态系统</li>
+          </ul>
+        </div>
+      </div>
+      <p class="mt-6 text-center text-gray-500 dark:text-gray-400 text-sm">
+        还包含地理、历史、美术、音乐、体育、小学科学等学科项目，涵盖交互动画、3D建模、AR/VR等多种形式。
+      </p>
+    </section>
+
+    <!-- Footer / Author Info -->
+    <footer class="pt-8 border-t border-gray-200 dark:border-gray-700 fade-in">
+      <div class="text-center space-y-2">
+        <p class="font-medium">作者姓名：吴铭英</p>
+        <p>单位：深圳市龙岗区仙田外国语学校</p>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">
+          © 2025 版权所有。保留所有权利。
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Intersection Observer for fade-in -->
+  <script>
+    // Theme toggle
+    const toggleButton = document.getElementById('theme-toggle');
+    const icon = document.getElementById('theme-icon');
+    const htmlEl = document.documentElement;
+
+    // Check system preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('theme');
+
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      htmlEl.classList.add('dark');
+      icon.className = 'fas fa-sun';
+    } else {
+      htmlEl.classList.remove('dark');
+      icon.className = 'fas fa-moon';
+    }
+
+    toggleButton.addEventListener('click', () => {
+      htmlEl.classList.toggle('dark');
+      const isDark = htmlEl.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    });
+
+    // Fade-in on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('appear');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

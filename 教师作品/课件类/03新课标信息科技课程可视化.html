@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>义务教育信息科技教学指南 | 七八年级课程体系</title>
+    
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        /* 深色模式变量 */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --accent-primary: #5b21b6;
+            --accent-secondary: #7c3aed;
+            --shadow: rgba(0, 0, 0, 0.05);
+            --card-hover-shadow: rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-card: #1a1a1a;
+            --text-primary: #f5f5f5;
+            --text-secondary: #9ca3af;
+            --border-color: #2a2a2a;
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #a78bfa;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --card-hover-shadow: rgba(139, 92, 246, 0.2);
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        .bg-primary { background-color: var(--bg-primary); }
+        .bg-secondary { background-color: var(--bg-secondary); }
+        .bg-card { background-color: var(--bg-card); }
+        .text-primary { color: var(--text-primary); }
+        .text-secondary { color: var(--text-secondary); }
+        .border-custom { border-color: var(--border-color); }
+        
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 渐变背景 */
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+        }
+        
+        /* 卡片悬停效果 */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px var(--card-hover-shadow);
+            border-color: var(--accent-primary);
+        }
+        
+        /* 按钮效果 */
+        .btn {
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* 淡入动画 */
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 进度条 */
+        .progress-bar {
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            transition: width 0.1s ease;
+        }
+        
+        /* 单元标签 */
+        .unit-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+        }
+        
+        /* 课程卡片网格 */
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .course-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 导航栏 */
+        .navbar {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .dark .navbar {
+            background-color: rgba(10, 10, 10, 0.8);
+        }
+        
+        /* 数字徽章 */
+        .number-badge {
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+        
+        /* 统计卡片 */
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+        }
+        
+        /* 时间线 */
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            border-left: 2px solid var(--border-color);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+        }
+        
+        /* 标签云 */
+        .tag {
+            display: inline-block;
+            padding: 0.375rem 0.75rem;
+            margin: 0.25rem;
+            border-radius: 0.375rem;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        
+        .tag:hover {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <!-- 进度条 -->
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="navbar fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-graduation-cap text-2xl" style="color: var(--accent-primary);"></i>
+                    <span class="text-xl font-bold">信息科技教学指南</span>
+                </div>
+                
+                <div class="flex items-center space-x-6">
+                    <a href="#grade7" class="text-secondary hover:text-primary transition">七年级</a>
+                    <a href="#grade8" class="text-secondary hover:text-primary transition">八年级</a>
+                    
+                    <!-- 主题切换按钮 -->
+                    <button id="themeToggle" class="btn p-2 rounded-lg bg-secondary">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 主标题区域 -->
+    <header class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-secondary">
+        <div class="max-w-7xl mx-auto text-center fade-in">
+            <h1 class="text-5xl sm:text-6xl font-black mb-6 bg-clip-text text-transparent gradient-bg" style="background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));">
+                义务教育信息科技教学指南
+            </h1>
+            <p class="text-xl text-secondary mb-8 max-w-3xl mx-auto">
+                培养数字素养与技能，构建信息社会责任，发展计算思维，推动数字化学习与创新
+            </p>
+            
+            <!-- 统计概览 -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto mt-12">
+                <div class="stat-card card p-6 rounded-xl">
+                    <div class="text-3xl font-bold gradient-bg bg-clip-text" style="background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));">2</div>
+                    <div class="text-sm text-secondary mt-2">年级课程</div>
+                </div>
+                <div class="stat-card card p-6 rounded-xl">
+                    <div class="text-3xl font-bold gradient-bg bg-clip-text" style="background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));">12</div>
+                    <div class="text-sm text-secondary mt-2">教学单元</div>
+                </div>
+                <div class="stat-card card p-6 rounded-xl">
+                    <div class="text-3xl font-bold gradient-bg bg-clip-text" style="background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));">60</div>
+                    <div class="text-sm text-secondary mt-2">精品课程</div>
+                </div>
+                <div class="stat-card card p-6 rounded-xl">
+                    <div class="text-3xl font-bold gradient-bg bg-clip-text" style="background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));">∞</div>
+                    <div class="text-sm text-secondary mt-2">创新可能</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 主内容区 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        
+        <!-- 七年级课程 -->
+        <section id="grade7" class="mb-24 fade-in">
+            <div class="mb-12">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="number-badge">7</div>
+                    <h2 class="text-4xl font-bold">七年级 · 互联网应用与创新</h2>
+                </div>
+                <p class="text-secondary text-lg ml-14">探索互联网世界，掌握网络原理，创建数字作品，培养信息社会责任感</p>
+            </div>
+            
+            <!-- 核心素养 -->
+            <div class="card p-8 rounded-2xl mb-12">
+                <h3 class="text-2xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-lightbulb mr-3" style="color: var(--accent-primary);"></i>
+                    数字素养与技能培养
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-6 bg-secondary rounded-xl">
+                        <h4 class="font-semibold text-lg mb-3 flex items-center">
+                            <i class="fas fa-eye mr-2" style="color: var(--accent-primary);"></i>
+                            信息意识
+                        </h4>
+                        <ul class="text-secondary space-y-2 text-sm">
+                            <li>• 观察、探究、理解互联网对社会各领域的影响</li>
+                            <li>• 了解人工智能对信息社会发展的作用</li>
+                            <li>• 增强数据安全意识，进行安全防护</li>
+                        </ul>
+                    </div>
+                    <div class="p-6 bg-secondary rounded-xl">
+                        <h4 class="font-semibold text-lg mb-3 flex items-center">
+                            <i class="fas fa-brain mr-2" style="color: var(--accent-primary);"></i>
+                            计算思维
+                        </h4>
+                        <ul class="text-secondary space-y-2 text-sm">
+                            <li>• 熟悉网络平台中的技术工具与软件系统</li>
+                            <li>• 设计和搭建简单的小型视频直播网络</li>
+                            <li>• 理解网络中信息编码、传输和呈现的原理</li>
+                        </ul>
+                    </div>
+                    <div class="p-6 bg-secondary rounded-xl">
+                        <h4 class="font-semibold text-lg mb-3 flex items-center">
+                            <i class="fas fa-rocket mr-2" style="color: var(--accent-primary);"></i>
+                            数字化学习与创新
+                        </h4>
+                        <ul class="text-secondary space-y-2 text-sm">
+                            <li>• 有效搜索所需学习资源，提高学习质量</li>
+                            <li>• 选择恰当的数字设备支持学习</li>
+                            <li>• 借助在线平台协作设计和创作作品</li>
+                        </ul>
+                    </div>
+                    <div class="p-6 bg-secondary rounded-xl">
+                        <h4 class="font-semibold text-lg mb-3 flex items-center">
+                            <i class="fas fa-shield-alt mr-2" style="color: var(--accent-primary);"></i>
+                            信息社会责任
+                        </h4>
+                        <ul class="text-secondary space-y-2 text-sm">
+                            <li>• 利用用户标识、密码和身份验证做好安全防护</li>
+                            <li>• 保护个人隐私，尊重他人隐私</li>
+                            <li>• 了解自主可控对国家安全的重要意义</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 教学单元 -->
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold mb-6">六大教学单元</h3>
+            </div>
+            
+            <!-- 单元1 -->
+            <div class="card p-8 rounded-2xl mb-6">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <span class="unit-badge mb-3">第一单元</span>
+                        <h3 class="text-2xl font-bold mt-3">探寻互联网新世界</h3>
+                        <p class="text-secondary mt-2">了解互联网发展历程，感受创新力量，体验互联网的深远影响</p>
+                    </div>
+                    <i class="fas fa-globe text-4xl" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="grid sm:grid-cols-3 gap-4">
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第1课</div>
+                        <div class="text-sm text-secondary">互联网发展靠创新</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第2课</div>
+                        <div class="text-sm text-secondary">互联网应用新特征</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第3课</div>
+                        <div class="text-sm text-secondary">互联网影响新体验</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 单元2 -->
+            <div class="card p-8 rounded-2xl mb-6">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <span class="unit-badge mb-3">第二单元</span>
+                        <h3 class="text-2xl font-bold mt-3">直播网络我来建</h3>
+                        <p class="text-secondary mt-2">深入学习网络协议、IP地址、域名解析、路由算法等核心技术</p>
+                    </div>
+                    <i class="fas fa-network-wired text-4xl" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="grid sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第4课</div>
+                        <div class="text-sm text-secondary">数据分包灵活传</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第5课</div>
+                        <div class="text-sm text-secondary">网络协议分层设</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第6课</div>
+                        <div class="text-sm text-secondary">数字身份辨设备</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第7课</div>
+                        <div class="text-sm text-secondary">域名解析换编码</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第8课</div>
+                        <div class="text-sm text-secondary">路由路径靠算法</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第9课</div>
+                        <div class="text-sm text-secondary">数据传输有新意</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第10课</div>
+                        <div class="text-sm text-secondary">综合所学建网络</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 单元3 -->
+            <div class="card p-8 rounded-2xl mb-6">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <span class="unit-badge mb-3">第三单元</span>
+                        <h3 class="text-2xl font-bold mt-3">便捷的互联网服务</h3>
+                        <p class="text-secondary mt-2">探索万维网服务、HTTP/HTTPS协议、网络搜索技术发展</p>
+                    </div>
+                    <i class="fas fa-server text-4xl" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="grid sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第11课</div>
+                        <div class="text-sm text-secondary">互联网服务应用广</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第12课</div>
+                        <div class="text-sm text-secondary">万维网服务大揭秘</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第13课</div>
+                        <div class="text-sm text-secondary">万维网安全新协议</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第14课</div>
+                        <div class="text-sm text-secondary">互联网搜索新发展</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第15课</div>
+                        <div class="text-sm text-secondary">互联网实验齐发现</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 单元4 -->
+            <div class="card p-8 rounded-2xl mb-6">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <span class="unit-badge mb-3">第四单元</span>
+                        <h3 class="text-2xl font-bold mt-3">校园活动线上展</h3>
+                        <p class="text-secondary mt-2">学习HTML、CSS网页制作，掌握多人协同和网站建设技能</p>
+                    </div>
+                    <i class="fas fa-code text-4xl" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="grid sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第16课</div>
+                        <div class="text-sm text-secondary">探秘网页与代码</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第17课</div>
+                        <div class="text-sm text-secondary">制作网页展活动</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第18课</div>
+                        <div class="text-sm text-secondary">美化网页方法多</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第19课</div>
+                        <div class="text-sm text-secondary">多人协同效率高</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第20课</div>
+                        <div class="text-sm text-secondary">组建网站跟我做</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 单元5 -->
+            <div class="card p-8 rounded-2xl mb-6">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <span class="unit-badge mb-3">第五单元</span>
+                        <h3 class="text-2xl font-bold mt-3">互联网创新应用</h3>
+                        <p class="text-secondary mt-2">体验移动互联、在线学习、云服务等创新应用场景</p>
+                    </div>
+                    <i class="fas fa-mobile-alt text-4xl" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="grid sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第21课</div>
+                        <div class="text-sm text-secondary">移动互联新发展</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第22课</div>
+                        <div class="text-sm text-secondary">在线学习新变革</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第23课</div>
+                        <div class="text-sm text-secondary">在线生活创意多</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第24课</div>
+                        <div class="text-sm text-secondary">在线交流新气象</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第25课</div>
+                        <div class="text-sm text-secondary">网络创新云服务</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第26课</div>
+                        <div class="text-sm text-secondary">创意展示我家乡</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 单元6 -->
+            <div class="card p-8 rounded-2xl mb-6">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <span class="unit-badge mb-3">第六单元</span>
+                        <h3 class="text-2xl font-bold mt-3">共同守护互联网</h3>
+                        <p class="text-secondary mt-2">培养网络安全意识，学习信息保护，共建良好网络生态</p>
+                    </div>
+                    <i class="fas fa-user-shield text-4xl" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第27课</div>
+                        <div class="text-sm text-secondary">个人信息防泄露</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第28课</div>
+                        <div class="text-sm text-secondary">数字版权要保护</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第29课</div>
+                        <div class="text-sm text-secondary">企业责任勇担当</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第30课</div>
+                        <div class="text-sm text-secondary">网络生态建设好</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 八年级课程 -->
+        <section id="grade8" class="mb-24 fade-in">
+            <div class="mb-12">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="number-badge">8</div>
+                    <h2 class="text-4xl font-bold">八年级 · 物联网实践与探索</h2>
+                </div>
+                <p class="text-secondary text-lg ml-14">探索万物互联，搭建物联系统，体验智能感知，掌握自主可控技术</p>
+            </div>
+            
+            <!-- 核心素养 -->
+            <div class="card p-8 rounded-2xl mb-12">
+                <h3 class="text-2xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-lightbulb mr-3" style="color: var(--accent-primary);"></i>
+                    数字素养与技能培养
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-6 bg-secondary rounded-xl">
+                        <h4 class="font-semibold text-lg mb-3 flex items-center">
+                            <i class="fas fa-eye mr-2" style="color: var(--accent-primary);"></i>
+                            信息意识
+                        </h4>
+                        <ul class="text-secondary space-y-2 text-sm">
+                            <li>• 体验物联网的数据交互方式</li>
+                            <li>• 了解万物互联和智能感知对信息社会的作用</li>
+                            <li>• 加强虚拟身份识别和数据安全意识</li>
+                        </ul>
+                    </div>
+                    <div class="p-6 bg-secondary rounded-xl">
+                        <h4 class="font-semibold text-lg mb-3 flex items-center">
+                            <i class="fas fa-brain mr-2" style="color: var(--accent-primary);"></i>
+                            计算思维
+                        </h4>
+                        <ul class="text-secondary space-y-2 text-sm">
+                            <li>• 熟悉数字平台中技术工具和软件系统</li>
+                            <li>• 设计和搭建简单的物联系统原型</li>
+                            <li>• 结合项目活动采集、分析和呈现数据</li>
+                        </ul>
+                    </div>
+                    <div class="p-6 bg-secondary rounded-xl">
+                        <h4 class="font-semibold text-lg mb-3 flex items-center">
+                            <i class="fas fa-rocket mr-2" style="color: var(--accent-primary);"></i>
+                            数字化学习与创新
+                        </h4>
+                        <ul class="text-secondary space-y-2 text-sm">
+                            <li>• 了解物联网"大场景""小应用"的特点</li>
+                            <li>• 搭建系统原型探究新方法、新模式</li>
+                            <li>• 认识原始创新对可持续发展的重要性</li>
+                        </ul>
+                    </div>
+                    <div class="p-6 bg-secondary rounded-xl">
+                        <h4 class="font-semibold text-lg mb-3 flex items-center">
+                            <i class="fas fa-shield-alt mr-2" style="color: var(--accent-primary);"></i>
+                            信息社会责任
+                        </h4>
+                        <ul class="text-secondary space-y-2 text-sm">
+                            <li>• 了解网络空间中物品标识和虚拟身份的意义</li>
+                            <li>• 知道数据安全防护的常用方法和策略</li>
+                            <li>• 了解自主可控对国家安全的重要意义</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 教学单元 -->
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold mb-6">六大教学单元</h3>
+            </div>
+            
+            <!-- 单元1 -->
+            <div class="card p-8 rounded-2xl mb-6">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <span class="unit-badge mb-3">第一单元</span>
+                        <h3 class="text-2xl font-bold mt-3">从感知到物联</h3>
+                        <p class="text-secondary mt-2">认识物联网基本概念，了解传感器原理，体验物联功能</p>
+                    </div>
+                    <i class="fas fa-wifi text-4xl" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="grid sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第1课</div>
+                        <div class="text-sm text-secondary">开启物联网之门</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第2课</div>
+                        <div class="text-sm text-secondary">传感之古今未来</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第3课</div>
+                        <div class="text-sm text-secondary">环境数据要感知</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第4课</div>
+                        <div class="text-sm text-secondary">物物相连有价值</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第5课</div>
+                        <div class="text-sm text-secondary">物联功能趣体验</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 单元2 -->
+            <div class="card p-8 rounded-2xl mb-6">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <span class="unit-badge mb-3">第二单元</span>
+                        <h3 class="text-2xl font-bold mt-3">万物互联有协议</h3>
+                        <p class="text-secondary mt-2">学习RFID、蓝牙、HTTP、MQTT等多种物联网通信协议</p>
+                    </div>
+                    <i class="fas fa-broadcast-tower text-4xl" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="grid sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第6课</div>
+                        <div class="text-sm text-secondary">数据传输方式多</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第7课</div>
+                        <div class="text-sm text-secondary">电子标签我揭秘</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第8课</div>
+                        <div class="text-sm text-secondary">巧用蓝牙做工具</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第9课</div>
+                        <div class="text-sm text-secondary">互联协议仍沿用</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第10课</div>
+                        <div class="text-sm text-secondary">物物互通有新径</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 单元3 -->
+            <div class="card p-8 rounded-2xl mb-6">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <span class="unit-badge mb-3">第三单元</span>
+                        <h3 class="text-2xl font-bold mt-3">简单物联功能实践</h3>
+                        <p class="text-secondary mt-2">以物联门锁为案例，实践刷卡开锁、远程通知、面容识别等功能</p>
+                    </div>
+                    <i class="fas fa-door-open text-4xl" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="grid sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第11课</div>
+                        <div class="text-sm text-secondary">物联功能细分解</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第12课</div>
+                        <div class="text-sm text-secondary">刷卡开锁易实现</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第13课</div>
+                        <div class="text-sm text-secondary">门铃通知即时到</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第14课</div>
+                        <div class="text-sm text-secondary">远程控制更便捷</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第15课</div>
+                        <div class="text-sm text-secondary">面容钥匙显智能</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 单元4 -->
+            <div class="card p-8 rounded-2xl mb-6">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <span class="unit-badge mb-3">第四单元</span>
+                        <h3 class="text-2xl font-bold mt-3">简易物联系统实践</h3>
+                        <p class="text-secondary mt-2">完整搭建物联系统，实现数据采集、分析、可视化和反馈控制</p>
+                    </div>
+                    <i class="fas fa-project-diagram text-4xl" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="grid sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第16课</div>
+                        <div class="text-sm text-secondary">模块功能先划分</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第17课</div>
+                        <div class="text-sm text-secondary">物联数据需采集</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第18课</div>
+                        <div class="text-sm text-secondary">数据分析与处理</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第19课</div>
+                        <div class="text-sm text-secondary">数据呈现可视化</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第20课</div>
+                        <div class="text-sm text-secondary">反馈控制有算法</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 单元5 -->
+            <div class="card p-8 rounded-2xl mb-6">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <span class="unit-badge mb-3">第五单元</span>
+                        <h3 class="text-2xl font-bold mt-3">物联网应用探索</h3>
+                        <p class="text-secondary mt-2">探索物联网在文物保护、健康生活、医疗、农业、学习等领域的应用</p>
+                    </div>
+                    <i class="fas fa-lightbulb text-4xl" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="grid sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第21课</div>
+                        <div class="text-sm text-secondary">文物保护新手段</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第22课</div>
+                        <div class="text-sm text-secondary">健康生活新设备</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第23课</div>
+                        <div class="text-sm text-secondary">医疗设施新功能</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第24课</div>
+                        <div class="text-sm text-secondary">农业生产新模式</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第25课</div>
+                        <div class="text-sm text-secondary">学习探究新工具</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 单元6 -->
+            <div class="card p-8 rounded-2xl mb-6">
+                <div class="flex items-start justify-between mb-6">
+                    <div>
+                        <span class="unit-badge mb-3">第六单元</span>
+                        <h3 class="text-2xl font-bold mt-3">物联网安全</h3>
+                        <p class="text-secondary mt-2">学习虚拟身份、安全防范策略，理解自主可控的重要意义</p>
+                    </div>
+                    <i class="fas fa-lock text-4xl" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="grid sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第26课</div>
+                        <div class="text-sm text-secondary">数字世界有身份</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第27课</div>
+                        <div class="text-sm text-secondary">安全事件与风险</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第28课</div>
+                        <div class="text-sm text-secondary">安全防范讲策略</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第29课</div>
+                        <div class="text-sm text-secondary">自主可控意义大</div>
+                    </div>
+                    <div class="p-4 bg-secondary rounded-lg">
+                        <div class="font-semibold mb-1">第30课</div>
+                        <div class="text-sm text-secondary">系统安全需升级</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 课程特色 -->
+        <section class="mb-24 fade-in">
+            <h2 class="text-4xl font-bold mb-12 text-center">课程特色与亮点</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card p-8 rounded-2xl text-center">
+                    <div class="w-16 h-16 mx-auto mb-6 gradient-bg rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-hands-helping text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">实践导向</h3>
+                    <p class="text-secondary">通过搭建网络、制作网页、构建物联系统等实践活动，让学生在动手中学习，在实践中成长</p>
+                </div>
+                <div class="card p-8 rounded-2xl text-center">
+                    <div class="w-16 h-16 mx-auto mb-6 gradient-bg rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-atom text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">创新思维</h3>
+                    <p class="text-secondary">培养学生的计算思维和创新意识，鼓励原始创新，理解技术发展的重要性</p>
+                </div>
+                <div class="card p-8 rounded-2xl text-center">
+                    <div class="w-16 h-16 mx-auto mb-6 gradient-bg rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-balance-scale text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">责任担当</h3>
+                    <p class="text-secondary">强调信息社会责任，培养网络安全意识，理解自主可控对国家安全的意义</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 关键技术词云 -->
+        <section class="mb-24 fade-in">
+            <h2 class="text-4xl font-bold mb-12 text-center">核心技术关键词</h2>
+            <div class="card p-12 rounded-2xl text-center">
+                <div class="flex flex-wrap justify-center">
+                    <span class="tag">互联网协议</span>
+                    <span class="tag">TCP/IP</span>
+                    <span class="tag">IPv6</span>
+                    <span class="tag">域名解析</span>
+                    <span class="tag">路由算法</span>
+                    <span class="tag">HTTP/HTTPS</span>
+                    <span class="tag">HTML/CSS</span>
+                    <span class="tag">云计算</span>
+                    <span class="tag">云存储</span>
+                    <span class="tag">物联网</span>
+                    <span class="tag">传感器</span>
+                    <span class="tag">RFID</span>
+                    <span class="tag">蓝牙</span>
+                    <span class="tag">MQTT</span>
+                    <span class="tag">人工智能</span>
+                    <span class="tag">大数据</span>
+                    <span class="tag">数据可视化</span>
+                    <span class="tag">网络安全</span>
+                    <span class="tag">信息加密</span>
+                    <span class="tag">自主可控</span>
+                    <span class="tag">数字素养</span>
+                    <span class="tag">计算思维</span>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="bg-secondary py-12 px-4 sm:px-6 lg:px-8 border-t border-custom">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4 flex items-center">
+                        <i class="fas fa-graduation-cap mr-2" style="color: var(--accent-primary);"></i>
+                        关于课程
+                    </h3>
+                    <p class="text-secondary text-sm">
+                        义务教育信息科技教学指南，培养学生的数字素养与技能，为信息社会培养创新人才。
+                    </p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">快速导航</h3>
+                    <ul class="space-y-2 text-sm text-secondary">
+                        <li><a href="#grade7" class="hover:text-primary transition">七年级课程</a></li>
+                        <li><a href="#grade8" class="hover:text-primary transition">八年级课程</a></li>
+                        <li><a href="#" class="hover:text-primary transition">教学资源</a></li>
+                        <li><a href="#" class="hover:text-primary transition">实验指导</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">作者信息</h3>
+                    <div class="space-y-3">
+                        <p class="text-sm">
+                            <span class="font-semibold">作者：</span>
+                            <span class="text-secondary">吴铭英</span>
+                        </p>
+                        <div class="flex items-center space-x-4">
+                            <a href="https://x.com/WuMingying78519" target="_blank" rel="noopener noreferrer" class="btn text-secondary hover:text-primary transition">
+                                <i class="fab fa-x-twitter text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pt-8 border-t border-custom text-center text-sm text-secondary">
+                <p>&copy; 2025 义务教育信息科技教学指南 · 保留所有权利</p>
+                <p class="mt-2">致力于培养具有数字素养与创新能力的新时代人才</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // 主题切换功能
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const html = document.documentElement;
+        
+        // 检查系统主题偏好
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        // 初始化主题
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && prefersDark)) {
+            html.classList.add('dark');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+        
+        // 主题切换事件
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            
+            if (html.classList.contains('dark')) {
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+        
+        // 滚动进度条
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+        
+        // 平滑滚动到锚点
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // 添加滚动淡入效果
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        document.querySelectorAll('.card').forEach((el) => {
+            observer.observe(el);
+        });
+        
+        // 为标签添加点击效果
+        document.querySelectorAll('.tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
+

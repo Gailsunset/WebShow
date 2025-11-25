@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>凸透镜成像规律模拟器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans p-5 flex flex-col items-center">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">凸透镜成像规律模拟器</h1>
+    
+    <div class="w-full max-w-4xl bg-white rounded-lg shadow-md p-6 mb-6">
+        <!-- 参数控制区 -->
+        <div class="flex flex-wrap gap-5 mb-8">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block mb-2 font-semibold text-gray-700" for="focalLength">焦距 f (cm)</label>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="focalLength" min="5" max="30" value="10" step="1"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <span id="focalLengthValue" class="min-w-[60px] text-center font-medium">10 cm</span>
+                </div>
+            </div>
+            
+            <div class="flex-1 min-w-[200px]">
+                <label class="block mb-2 font-semibold text-gray-700" for="objectDistance">物距 u (cm)</label>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="objectDistance" min="1" max="100" value="30" step="1"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <span id="objectDistanceValue" class="min-w-[60px] text-center font-medium">30 cm</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 成像模拟区 -->
+        <div id="lensContainer" class="relative w-full h-[400px] border border-gray-300 rounded-lg overflow-hidden bg-gray-50 mb-6">
+            <div class="absolute top-1/2 left-0 w-full h-[1px] bg-gray-400 transform -translate-y-1/2"></div>
+            <div id="lens" class="absolute top-1/2 left-1/2 w-[60px] h-[200px] transform -translate-x-1/2 -translate-y-1/2">
+                <div class="absolute top-0 left-0 w-full h-full border-l-2 border-r-2 border-blue-500 rounded-l-full rounded-r-full"></div>
+                <div class="absolute top-1/2 left-0 w-full h-[1px] bg-red-500 transform -translate-y-1/2"></div>
+            </div>
+            <div id="object" class="absolute bottom-1/2 w-[30px] h-[60px] bg-yellow-400 rounded-sm transform -translate-y-1/2">
+                <div class="absolute -top-5 left-1/2 text-xs transform -translate-x-1/2">物</div>
+            </div>
+            <div id="image" class="absolute bottom-1/2 w-[30px] h-[60px] bg-red-400/70 rounded-sm transform -translate-y-1/2 hidden">
+                <div class="absolute -top-5 left-1/2 text-xs transform -translate-x-1/2">像</div>
+            </div>
+            <div id="ray1" class="absolute top-0 left-0 h-[1px] bg-green-500/60 origin-top-left z-10"></div>
+            <div id="ray2" class="absolute top-0 left-0 h-[1px] bg-orange-500/60 origin-top-left z-10"></div>
+            <div id="ray3" class="absolute top-0 left-0 h-[1px] bg-purple-500/60 origin-top-left z-10"></div>
+        </div>
+        
+        <!-- 结果展示区 -->
+        <div id="result" class="p-4 bg-blue-50 border border-blue-100 rounded-lg">
+            <h3 class="text-lg font-semibold text-blue-800 mb-2">成像结果</h3>
+            <p id="resultText" class="text-gray-700">调整参数查看成像结果...</p>
+        </div>
+    </div>
+    
+    <button id="resetBtn" class="px-5 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+        重置参数
+    </button>
+
+    <script>
+        // 获取DOM元素
+        const focalLengthSlider = document.getElementById('focalLength');
+        const focalLengthValue = document.getElementById('focalLengthValue');
+        const objectDistanceSlider = document.getElementById('objectDistance');
+        const objectDistanceValue = document.getElementById('objectDistanceValue');
+        const lensContainer = document.getElementById('lensContainer');
+        const object = document.getElementById('object');
+        const image = document.getElementById('image');
+        const ray1 = document.getElementById('ray1');
+        const ray2 = document.getElementById('ray2');
+        const ray3 = document.getElementById('ray3');
+        const resultText = document.getElementById('resultText');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        // 容器中心点坐标
+        const containerCenterX = lensContainer.offsetWidth / 2;
+        const containerCenterY = lensContainer.offsetHeight / 2;
+        
+        // 物体高度（像素）
+        const objectHeightPx = 60;
+        
+        // 初始化
+        updateSimulation();
+        
+        // 事件监听
+        focalLengthSlider.addEventListener('input', function() {
+            focalLengthValue.textContent = `${this.value} cm`;
+            updateSimulation();
+        });
+        
+        objectDistanceSlider.addEventListener('input', function() {
+            objectDistanceValue.textContent = `${this.value} cm`;
+            updateSimulation();
+        });
+        
+        resetBtn.addEventListener('click', function() {
+            focalLengthSlider.value = 10;
+            focalLengthValue.textContent = '10 cm';
+            objectDistanceSlider.value = 30;
+            objectDistanceValue.textContent = '30 cm';
+            updateSimulation();
+        });
+        
+        // 更新模拟
+        function updateSimulation() {
+            // 获取参数
+            const f = parseFloat(focalLengthSlider.value);
+            const u = parseFloat(objectDistanceSlider.value);
+            
+            // 清空之前的光线
+            clearRays();
+            
+            // 物距不能为0，且当u≈f时无法成像
+            if (u <= 0 || Math.abs(u - f) < 0.1) {
+                image.classList.add('hidden');
+                resultText.innerHTML = `
+                    <strong>参数：</strong>焦距 f = ${f} cm，物距 u = ${u} cm<br>
+                    <strong>结果：</strong>无法成像（物距过近或等于焦距）
+                `;
+                return;
+            }
+            
+            // 计算像距 v (1/u + 1/v = 1/f)
+            const v = (u * f) / (u - f);
+            
+            // 计算像的高度（放大率 m = v/u）
+            const magnification = v / u;
+            const imageHeightPx = Math.abs(magnification) * objectHeightPx;
+            
+            // 更新物体位置（物距是物体到透镜的距离，转换为像素）
+            // 缩放比例：1cm = 5px（可调整）
+            const scale = 5;
+            const objectPositionX = containerCenterX - u * scale;
+            object.style.left = `${objectPositionX}px`;
+            
+            // 更新像的位置和大小
+            let imagePositionX = containerCenterX + v * scale;
+            image.style.left = `${imagePositionX}px`;
+            image.style.height = `${imageHeightPx}px`;
+            
+            // 实像/虚像判断：v>0为实像（光屏可接收），v<0为虚像（光屏不可接收）
+            if (v > 0) {
+                image.classList.remove('hidden');
+                image.style.bottom = '50%';
+                image.style.transform = 'translateY(50%)'; // 倒立实像
+                image.style.backgroundColor = 'rgba(239, 68, 68, 0.7)';
+            } else {
+                image.classList.remove('hidden');
+                imagePositionX = containerCenterX + v * scale;
+                image.style.left = `${imagePositionX}px`;
+                image.style.top = '50%';
+                image.style.transform = 'translateY(-50%)'; // 正立虚像
+                image.style.backgroundColor = 'rgba(168, 85, 247, 0.7)';
+            }
+            
+            // 绘制三条典型光线
+            drawRays(u, f, v, scale);
+            
+            // 更新结果文本
+            updateResultText(u, f, v, magnification);
+        }
+        
+        // 绘制三条典型光线
+        function drawRays(u, f, v, scale) {
+            const objectX = containerCenterX - u * scale;
+            const objectTopY = containerCenterY - objectHeightPx / 2;
+            const objectBottomY = containerCenterY + objectHeightPx / 2;
+            const lensX = containerCenterX;
+            
+            // 光线1：从物体顶端平行于主光轴，经透镜后过焦点
+            const ray1StartX = objectX + object.offsetWidth;
+            const ray1StartY = objectTopY;
+            const focalPointRightX = lensX + f * scale;
+            
+            ray1.style.display = 'block';
+            ray1.style.left = `${ray1StartX}px`;
+            ray1.style.top = `${ray1StartY}px`;
+            ray1.style.width = `${lensX - ray1StartX}px`;
+            ray1.style.transform = 'rotate(0deg)';
+            
+            const ray1Refracted = document.createElement('div');
+            ray1Refracted.className = 'absolute top-0 left-0 h-[1px] bg-green-500/60 origin-top-left z-10';
+            ray1Refracted.style.left = `${lensX}px`;
+            ray1Refracted.style.top = `${ray1StartY}px`;
+            
+            const angle = Math.atan2((containerCenterY - ray1StartY), (focalPointRightX - lensX));
+            const length = Math.sqrt(Math.pow(focalPointRightX - lensX, 2) + Math.pow(containerCenterY - ray1StartY, 2)) * 2;
+            ray1Refracted.style.width = `${length}px`;
+            ray1Refracted.style.transform = `rotate(${angle}rad)`;
+            lensContainer.appendChild(ray1Refracted);
+            
+            // 光线2：从物体顶端过光心，方向不变
+            ray2.style.display = 'block';
+            ray2.style.left = `${ray1StartX}px`;
+            ray2.style.top = `${ray1StartY}px`;
+            
+            const angle2 = Math.atan2((containerCenterY - ray1StartY), (containerCenterX - ray1StartX));
+            const length2 = Math.sqrt(Math.pow(containerCenterX - ray1StartX, 2) + Math.pow(containerCenterY - ray1StartY, 2)) * 2;
+            ray2.style.width = `${length2}px`;
+            ray2.style.transform = `rotate(${angle2}rad)`;
+            
+            // 光线3：从物体顶端过焦点，经透镜后平行于主光轴
+            ray3.style.display = 'block';
+            ray3.style.left = `${ray1StartX}px`;
+            ray3.style.top = `${ray1StartY}px`;
+            
+            const focalPointLeftX = lensX - f * scale;
+            const angle3 = Math.atan2((containerCenterY - ray1StartY), (focalPointLeftX - ray1StartX));
+            const length3 = Math.sqrt(Math.pow(focalPointLeftX - ray1StartX, 2) + Math.pow(containerCenterY - ray1StartY, 2));
+            ray3.style.width = `${length3}px`;
+            ray3.style.transform = `rotate(${angle3}rad)`;
+            
+            const ray3Refracted = document.createElement('div');
+            ray3Refracted.className = 'absolute top-0 left-0 h-[1px] bg-purple-500/60 origin-top-left z-10';
+            ray3Refracted.style.left = `${lensX}px`;
+            ray3Refracted.style.top = `${containerCenterY}px`;
+            ray3Refracted.style.width = `${lensContainer.offsetWidth - lensX}px`;
+            ray3Refracted.style.transform = 'rotate(0deg)';
+            lensContainer.appendChild(ray3Refracted);
+        }
+        
+        // 清空光线
+        function clearRays() {
+            ray1.style.display = 'none';
+            ray2.style.display = 'none';
+            ray3.style.display = 'none';
+            
+            // 移除折射光线
+            const refractedRays = document.querySelectorAll('.bg-green-500\\/60, .bg-purple-500\\/60');
+            refractedRays.forEach(ray => ray.remove());
+        }
+        
+        // 更新结果文本
+        function updateResultText(u, f, v, magnification) {
+            let imageType = '';
+            let application = '';
+            
+            if (v > 0) {
+                // 实像
+                if (u > 2 * f) {
+                    imageType = '倒立、缩小的实像';
+                    application = '照相机原理';
+                } else if (u === 2 * f) {
+                    imageType = '倒立、等大的实像';
+                    application = '精确测量焦距';
+                } else if (f < u && u < 2 * f) {
+                    imageType = '倒立、放大的实像';
+                    application = '投影仪原理';
+                }
+            } else {
+                // 虚像
+                imageType = '正立、放大的虚像';
+                application = '放大镜原理';
+            }
+            
+            resultText.innerHTML = `
+                <strong>参数：</strong>焦距 f = ${f} cm，物距 u = ${u} cm<br>
+                <strong>计算结果：</strong>像距 v = ${Math.abs(v).toFixed(1)} cm（${v > 0 ? '实像' : '虚像'}）<br>
+                <strong>成像性质：</strong>${imageType}（放大率 |m| = ${Math.abs(magnification).toFixed(2)}）<br>
+                <strong>应用场景：</strong>${application}
+            `;
+        }
+        
+        // 窗口大小改变时重新计算
+        window.addEventListener('resize', function() {
+            updateSimulation();
+        });
+    </script>
+</body>
+</html>

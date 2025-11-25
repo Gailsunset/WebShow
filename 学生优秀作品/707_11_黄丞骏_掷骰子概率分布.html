@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>掷骰子概率模拟</title>
+    <style>
+        canvas { border: 1px solid #ccc; margin: 20px; }
+        .controls { margin: 20px; }
+        .info { font-family: Arial; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <label for="rollCount">掷骰子次数: <span id="rollCountValue">100</span></label>
+        <input type="range" id="rollCount" min="10" max="1000" value="100" style="width: 300px;">
+        <button onclick="rollDice()">开始模拟</button>
+        <button onclick="resetStats()">重置</button>
+    </div>
+    <canvas id="diceCanvas" width="600" height="400"></canvas>
+    <div class="info">
+        <div id="stats"></div>
+    </div>
+
+<script>
+const canvas = document.getElementById('diceCanvas');
+const ctx = canvas.getContext('2d');
+const rollCountSlider = document.getElementById('rollCount');
+const rollCountValue = document.getElementById('rollCountValue');
+const statsDiv = document.getElementById('stats');
+
+let rollHistory = [];
+
+function rollDice() {
+    const totalRolls = parseInt(rollCountSlider.value);
+    rollHistory = [];
+    
+    // 模拟掷骰子
+    for (let i = 0; i < totalRolls; i++) {
+        rollHistory.push(Math.floor(Math.random() * 6) + 1);
+    }
+    
+    rollCountValue.textContent = totalRolls;
+    drawResults();
+}
+
+function drawResults() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const counts = [0, 0, 0, 0, 0, 0];
+    rollHistory.forEach(roll => counts[roll - 1]++);
+    
+    const total = rollHistory.length;
+    const barWidth = 80;
+    const barSpacing = 20;
+    const startX = 50;
+    const maxHeight = 300;
+    
+    // 绘制柱状图
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'];
+    
+    for (let i = 0; i < 6; i++) {
+        const count = counts[i];
+        const height = (count / total) * maxHeight;
+        const x = startX + i * (barWidth + barSpacing);
+        const y = canvas.height - height - 50;
+        
+        // 绘制柱子
+        ctx.fillStyle = colors[i];
+        ctx.fillRect(x, y, barWidth, height);
+        
+        // 绘制边框
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x, y, barWidth, height);
+        
+        // 绘制数字标签
+        ctx.fillStyle = '#333';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(i + 1, x + barWidth/2, canvas.height - 20);
+        
+        // 绘制频次
+        ctx.fillText(count, x + barWidth/2, y - 5);
+        
+        // 绘制概率
+        const probability = (count / total * 100).toFixed(1);
+        ctx.fillText(`(${probability}%)`, x + barWidth/2, y + height/2);
+    }
+    
+    // 绘制标题和统计信息
+    ctx.fillStyle = '#333';
+    ctx.font = '18px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('掷骰子概率分布', canvas.width/2, 30);
+    
+    let statsText = `总次数: ${total} | `;
+    const theoretical = 100 / 6;
+    counts.forEach((count, i) => {
+        const actual = (count / total * 100).toFixed(1);
+        statsText += `点数${i + 1}: ${actual}% (理论${theoretical}%) `;
+    });
+    
+    statsDiv.innerHTML = statsText;
+}
+
+function resetStats() {
+    rollHistory = [];
+    rollCountValue.textContent = '100';
+    rollCountSlider.value = '100';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    statsDiv.innerHTML = '';
+}
+
+// 初始化
+rollDice();
+</script>
+</body>
+</html>

@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="探索AI时代信息教师的道与术 - Vibe Coding教学指南">
+    <meta name="keywords" content="Vibe Coding, AI教学, 信息教师, 编程教育">
+    <meta name="author" content="吴铭英">
+    <title>探索AI时代信息教师的"道"与"术"</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 自定义配置 -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .dark ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #0ea5e9;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0284c7;
+        }
+        
+        /* 卡片悬停效果 */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* 视频容器 */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* 代码块样式 */
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+        }
+        
+        .dark pre {
+            background: #0f172a;
+        }
+        
+        /* 表格样式 */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .dark th, .dark td {
+            border-bottom-color: #374151;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+        
+        .dark th {
+            background: #1f2937;
+        }
+        
+        /* 导航固定 */
+        .nav-fixed {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    
+    <!-- 导航栏 -->
+    <nav class="nav-fixed bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-graduation-cap text-2xl text-primary-500"></i>
+                    <span class="font-bold text-xl">AI时代信息教师</span>
+                </div>
+                
+                <!-- 导航菜单 -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#intro" class="hover:text-primary-500 transition-colors">介绍</a>
+                    <a href="#dao" class="hover:text-primary-500 transition-colors">道</a>
+                    <a href="#shu" class="hover:text-primary-500 transition-colors">术</a>
+                    <a href="#tips" class="hover:text-primary-500 transition-colors">技巧</a>
+                    <a href="#summary" class="hover:text-primary-500 transition-colors">总结</a>
+                </div>
+                
+                <!-- 主题切换按钮 -->
+                <button id="themeToggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:inline"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 主要内容 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <!-- 标题部分 -->
+        <header class="text-center mb-16 animate-fade-in">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-blue-600 bg-clip-text text-transparent">
+                探索AI时代信息教师的"道"与"术"
+            </h1>
+            <p class="text-xl text-gray-600 dark:text-gray-400">
+                Vibe Coding - 重新定义编程教育
+            </p>
+        </header>
+        
+        <!-- 自我介绍 -->
+        <section id="intro" class="mb-20 animate-slide-up">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 card-hover">
+                <h2 class="text-3xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-user-circle text-primary-500 mr-3"></i>
+                    自我介绍
+                </h2>
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <img src="https://imgtu.com/uploads/j2fbyln9/r-01_2.webp" 
+                         alt="吴铭英" 
+                         class="w-32 h-32 rounded-full object-cover shadow-lg"
+                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22128%22 height=%22128%22%3E%3Crect fill=%22%230ea5e9%22 width=%22128%22 height=%22128%22 rx=%2264%22/%3E%3Ctext fill=%22%23fff%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2240%22 font-weight=%22bold%22%3E吴%3C/text%3E%3C/svg%3E'">
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold mb-4 text-primary-600 dark:text-primary-400">吴铭英</h3>
+                        <div class="space-y-2 text-gray-700 dark:text-gray-300">
+                            <p><i class="fas fa-school w-6 text-primary-500"></i> 深圳市龙岗区仙田外国语学校 信息科技教师</p>
+                            <p><i class="fas fa-robot w-6 text-primary-500"></i> 深圳市教育信息技术中心 人工智能专员</p>
+                            <p><i class="fas fa-trophy w-6 text-primary-500"></i> 龙岗区信息技术青年教师基本功大赛一等奖</p>
+                            <p><i class="fas fa-award w-6 text-primary-500"></i> 广东省中小学幼儿园教育信息化教学研究成果特等奖</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 道：是什么 -->
+        <section id="dao" class="mb-20">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">
+                    <span class="bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
+                        道：是什么
+                    </span>
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400">理解 Vibe Coding 的本质与价值</p>
+            </div>
+            
+            <!-- Vibe Coding 定义 -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8 card-hover">
+                <h3 class="text-2xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>
+                    一、Vibe Coding 的定义
+                </h3>
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 mb-6">
+                    <p class="text-lg leading-relaxed mb-4">
+                        <strong>Vibe Coding</strong>（氛围编程）是一种使用AI辅助的全新编程范式。在这种模式下：
+                    </p>
+                    <ul class="space-y-3 text-gray-700 dark:text-gray-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span>程序员用<strong>自然语言描述</strong>要处理的问题</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span>将需求提供给<strong>大型语言模型（LLM）</strong></span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span>AI <strong>自动生成</strong>应用程序源代码</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span>程序员的工作从"撰写代码"转变为"<strong>指导AI、测试和优化代码</strong>"</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-4 rounded">
+                    <p class="text-sm">
+                        <i class="fas fa-info-circle text-yellow-500 mr-2"></i>
+                        <strong>历史背景：</strong>这一概念由<strong>安德烈·卡帕斯</strong>（Andrej Karpathy）在2025年2月提出，并在3月被收录进韦氏英语惯用法词典的"slang & trending"词条。
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 核心价值 -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+                    <div class="text-3xl mb-4">🚀</div>
+                    <h4 class="text-xl font-bold mb-3">降低编程门槛</h4>
+                    <ul class="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+                        <li>• 新手也能产出软件</li>
+                        <li>• 自然语言替代语法</li>
+                        <li>• 快速实现创意</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+                    <div class="text-3xl mb-4">👨‍🏫</div>
+                    <h4 class="text-xl font-bold mb-3">教师新角色</h4>
+                    <div class="space-y-2 text-sm">
+                        <p class="text-gray-500"><s>语法教学者</s> → <span class="text-green-600 font-semibold">需求分析引导者</span></p>
+                        <p class="text-gray-500"><s>代码调试者</s> → <span class="text-green-600 font-semibold">AI协作设计者</span></p>
+                        <p class="text-gray-500"><s>知识传授者</s> → <span class="text-green-600 font-semibold">问题解决导师</span></p>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+                    <div class="text-3xl mb-4">🛠️</div>
+                    <h4 class="text-xl font-bold mb-3">能做什么？</h4>
+                    <ul class="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
+                        <li>• SVG 图形绘制</li>
+                        <li>• HTML5 小游戏</li>
+                        <li>• 网页动画特效</li>
+                        <li>• 数据可视化图表</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 教学意义 -->
+            <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl shadow-lg p-8 card-hover">
+                <h3 class="text-2xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-star text-yellow-500 mr-3"></i>
+                    三、教学意义
+                </h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div>
+                        <h4 class="font-bold text-lg mb-3 text-purple-600 dark:text-purple-400">课程创新工具</h4>
+                        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                            <li>• 快速制作交互式教学课件</li>
+                            <li>• 生成趣味性课堂小工具</li>
+                            <li>• 创建个性化学习资源</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-3 text-purple-600 dark:text-purple-400">学生能力培养</h4>
+                        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                            <li>• 培养计算思维</li>
+                            <li>• 提升需求表达能力</li>
+                            <li>• 降低技术门槛</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-3 text-purple-600 dark:text-purple-400">教学效率提升</h4>
+                        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                            <li>• 减少重复性工作</li>
+                            <li>• 专注创意设计</li>
+                            <li>• 快速迭代优化</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 术：怎么做 -->
+        <section id="shu" class="mb-20">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">
+                    <span class="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                        术：怎么做
+                    </span>
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400">掌握 Vibe Coding 的实践方法</p>
+            </div>
+            
+            <!-- 工具选择 -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8">
+                <h3 class="text-2xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-tools text-orange-500 mr-3"></i>
+                    一、工具选择
+                </h3>
+                
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>工具</th>
+                                <th>特点</th>
+                                <th>适用场景</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-semibold">Cursor</td>
+                                <td>代码重构、大型项目管理</td>
+                                <td>复杂项目开发、多文件编辑</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">ChatGPT</td>
+                                <td>原型模拟、快速测试</td>
+                                <td>学习编程、快速验证想法</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">Claude</td>
+                                <td>长 prompt、跨文件修改</td>
+                                <td>架构性优化、文档处理</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">Chatwise</td>
+                                <td>国内可用、配置简单</td>
+                                <td>日常教学、快速开发</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">GLM-4.6</td>
+                                <td>AI PPT、全栈开发、虚拟机</td>
+                                <td>综合性教学工具开发</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6">
+                    <h4 class="font-bold mb-3">推荐配置</h4>
+                    <div class="grid md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg">
+                            <p class="font-semibold text-green-600 mb-2">初学者</p>
+                            <p>Chatwise + ChatGPT</p>
+                            <p class="text-gray-600 dark:text-gray-400 text-xs mt-1">门槛低、上手快</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg">
+                            <p class="font-semibold text-blue-600 mb-2">进阶用户</p>
+                            <p>Cursor + Claude</p>
+                            <p class="text-gray-600 dark:text-gray-400 text-xs mt-1">功能强大、适合复杂项目</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-700 p-4 rounded-lg">
+                            <p class="font-semibold text-purple-600 mb-2">教学场景</p>
+                            <p>GLM-4.6</p>
+                            <p class="text-gray-600 dark:text-gray-400 text-xs mt-1">集成度高、功能全面</p>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-center font-semibold text-orange-600">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        受网络影响，本次教学以 Deepseek 为例
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 实战案例 -->
+            <div class="space-y-8">
+                <!-- 案例1 -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="text-2xl font-bold mb-6 flex items-center">
+                        <span class="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">1</span>
+                        案例1: 黑客帝国风的随机点名器
+                    </h3>
+                    
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <i class="fas fa-bullseye text-green-500 text-2xl mb-2"></i>
+                            <p class="font-semibold mb-2">导入名单</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">从文本文件导入</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <i class="fas fa-palette text-blue-500 text-2xl mb-2"></i>
+                            <p class="font-semibold mb-2">随机分布</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">颜色和位置随机</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <i class="fas fa-film text-purple-500 text-2xl mb-2"></i>
+                            <p class="font-semibold mb-2">Matrix 风格</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">酷炫的滚动效果</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-bold mb-3">实操步骤</h4>
+                        <div class="space-y-4">
+                            <div class="bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 p-4 rounded-lg">
+                                <p class="font-semibold mb-2">第一步：初始需求描述</p>
+                                <pre class="text-sm">做一个网页随机抽人，人名放记事本中，打开时网页再导入。
+人名全部随机分布在网页中，颜色随机。抽取时，每个人名快速向上移动，
+到页面顶端再从页底循环。像黑客帝国数字1或0不停向上移动效果。
+抽取时，高亮放大显示被抽取到的姓名</pre>
+                            </div>
+                            
+                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-lg">
+                                <p class="font-semibold mb-2">第二步：迭代优化</p>
+                                <ul class="text-sm space-y-1">
+                                    <li>• 人名上下流动感觉，最多十列</li>
+                                    <li>• 屏幕要一直填满，选中人名居中高亮</li>
+                                    <li>• 支持下一轮随机抽取</li>
+                                    <li>• 添加关闭按钮，开启下一轮</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="video-container mb-4">
+                        <iframe src="https://player.bilibili.com/player.html?bvid=BV1X7s8zSEjP&page=1&high_quality=1&danmaku=0&autoplay=0" 
+                                scrolling="no" 
+                                border="0" 
+                                frameborder="no" 
+                                framespacing="0" 
+                                allowfullscreen="true"
+                                sandbox="allow-scripts allow-same-origin allow-presentation"
+                                loading="lazy">
+                        </iframe>
+                    </div>
+                    
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-4 rounded">
+                        <p class="font-semibold mb-2"><i class="fas fa-lightbulb mr-2"></i>教学要点</p>
+                        <ul class="text-sm space-y-1">
+                            <li>• 需求分解：从大需求拆分成小功能</li>
+                            <li>• 描述清晰：使用具体的视觉描述</li>
+                            <li>• 测试反馈：记录有效的 Prompt</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 案例2 -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="text-2xl font-bold mb-6 flex items-center">
+                        <span class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">2</span>
+                        案例2: Matrix 风格的 Code Rain 动画
+                    </h3>
+                    
+                    <div class="mb-6">
+                        <h4 class="font-bold mb-3">初始 Prompt</h4>
+                        <pre class="text-sm bg-gray-800 text-green-400 p-4 rounded-lg">用 React + HTML Canvas 创建 Matrix 风格的代码雨动画
+要求：
+- 使用 Create React App 搭建项目
+- 在黑色背景上显示绿色字符
+- 字符从上往下随机掉落
+- 创建连续的雨滴效果
+- 字符包括数字、字母和日文片假名</pre>
+                    </div>
+                    
+                    <div class="video-container mb-4">
+                        <iframe src="https://player.bilibili.com/player.html?bvid=BV1Yjs8znE9Z&page=1&high_quality=1&danmaku=0&autoplay=0" 
+                                scrolling="no" 
+                                border="0" 
+                                frameborder="no" 
+                                framespacing="0" 
+                                allowfullscreen="true"
+                                sandbox="allow-scripts allow-same-origin allow-presentation"
+                                loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+                
+                <!-- 案例3 -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 card-hover">
+                    <h3 class="text-2xl font-bold mb-6 flex items-center">
+                        <span class="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">3</span>
+                        案例3: 根据内容生成精美网页
+                    </h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h4 class="font-bold mb-3">功能特点</h4>
+                            <ul class="space-y-2 text-sm">
+                                <li><i class="fas fa-check text-green-500 mr-2"></i>响应式设计</li>
+                                <li><i class="fas fa-check text-green-500 mr-2"></i>深浅色主题切换</li>
+                                <li><i class="fas fa-check text-green-500 mr-2"></i>Linear App 风格</li>
+                                <li><i class="fas fa-check text-green-500 mr-2"></i>单文件 HTML</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-3">应用场景</h4>
+                            <ul class="space-y-2 text-sm">
+                                <li><i class="fas fa-star text-yellow-500 mr-2"></i>课程内容展示</li>
+                                <li><i class="fas fa-star text-yellow-500 mr-2"></i>学生作品集</li>
+                                <li><i class="fas fa-star text-yellow-500 mr-2"></i>教学资料整理</li>
+                                <li><i class="fas fa-star text-yellow-500 mr-2"></i>活动成果汇报</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="video-container">
+                        <iframe src="https://player.bilibili.com/player.html?bvid=BV19js8znE2j&page=1&high_quality=1&danmaku=0&autoplay=0" 
+                                scrolling="no" 
+                                border="0" 
+                                frameborder="no" 
+                                framespacing="0" 
+                                allowfullscreen="true"
+                                sandbox="allow-scripts allow-same-origin allow-presentation"
+                                loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 六大技巧 -->
+        <section id="tips" class="mb-20">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">
+                    <span class="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
+                        提升质量的六大技巧
+                    </span>
+                </h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- 技巧1 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+                    <div class="flex items-start mb-4">
+                        <span class="bg-pink-500 text-white w-10 h-10 rounded-full flex items-center justify-center mr-3 flex-shrink-0">1</span>
+                        <div>
+                            <h4 class="text-xl font-bold mb-2">行动 + 目的</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">明确指出要执行的动作与预期的结果</p>
+                        </div>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="bg-red-50 dark:bg-red-900/20 p-3 rounded">
+                            <p class="text-red-600 font-semibold mb-1">❌ 不好的 Prompt</p>
+                            <pre class="text-xs">做一个点名器</pre>
+                        </div>
+                        <div class="bg-green-50 dark:bg-green-900/20 p-3 rounded">
+                            <p class="text-green-600 font-semibold mb-1">✅ 好的 Prompt</p>
+                            <pre class="text-xs">用 HTML+CSS+JavaScript 创建一个随机点名器
+要求：可以从文本框输入学生名单、点击按钮随机选择
+添加酷炫的动画效果、使用黑客帝国风格的绿色主题</pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 技巧2 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+                    <div class="flex items-start mb-4">
+                        <span class="bg-blue-500 text-white w-10 h-10 rounded-full flex items-center justify-center mr-3 flex-shrink-0">2</span>
+                        <div>
+                            <h4 class="text-xl font-bold mb-2">互动式编码</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">持续对话微调，像与工程师协作</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p>• "请优化这段循环效能"</p>
+                        <p>• "改成符合 Bootstrap 的样式"</p>
+                        <p>• "添加响应式布局支持"</p>
+                    </div>
+                </div>
+                
+                <!-- 技巧3 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+                    <div class="flex items-start mb-4">
+                        <span class="bg-green-500 text-white w-10 h-10 rounded-full flex items-center justify-center mr-3 flex-shrink-0">3</span>
+                        <div>
+                            <h4 class="text-xl font-bold mb-2">添加条件限制</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">通过技术条件控制输出范围</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p>• "请使用 pandas 套件实作"</p>
+                        <p>• "限制在 50 行程式码内完成"</p>
+                        <p>• "使用纯 CSS 实现，不用 JavaScript"</p>
+                    </div>
+                </div>
+                
+                <!-- 技巧4 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+                    <div class="flex items-start mb-4">
+                        <span class="bg-yellow-500 text-white w-10 h-10 rounded-full flex items-center justify-center mr-3 flex-shrink-0">4</span>
+                        <div>
+                            <h4 class="text-xl font-bold mb-2">用注释补充</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">清晰的注释帮助 AI 理解逻辑意图</p>
+                        </div>
+                    </div>
+                    <pre class="text-xs">// 这段代码用来验证用户输入的表单数据
+// 需要检查：邮箱格式、密码强度、必填项
+function validateForm(formData) {
+    // 请帮我完善这个函数
+}</pre>
+                </div>
+                
+                <!-- 技巧5 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+                    <div class="flex items-start mb-4">
+                        <span class="bg-purple-500 text-white w-10 h-10 rounded-full flex items-center justify-center mr-3 flex-shrink-0">5</span>
+                        <div>
+                            <h4 class="text-xl font-bold mb-2">了解工具特性</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">选对工具事半功倍</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <p>• 快速原型 → ChatGPT</p>
+                        <p>• 复杂项目 → Cursor</p>
+                        <p>• 文档处理 → Claude</p>
+                    </div>
+                </div>
+                
+                <!-- 技巧6 -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 card-hover">
+                    <div class="flex items-start mb-4">
+                        <span class="bg-orange-500 text-white w-10 h-10 rounded-full flex items-center justify-center mr-3 flex-shrink-0">6</span>
+                        <div>
+                            <h4 class="text-xl font-bold mb-2">建立 Prompt Library</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">收藏常用 prompt，提高效率</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded">📊 数据可视化类</div>
+                        <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded">🌐 网页设计类</div>
+                        <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded">🎮 交互工具类</div>
+                        <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded">📝 文档处理类</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 总结 -->
+        <section id="summary" class="mb-20">
+            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-2xl p-8 md:p-12 text-white">
+                <h2 class="text-3xl md:text-4xl font-bold mb-8 text-center">总结与展望</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-yin-yang mr-3"></i>
+                            道（理念层）
+                        </h3>
+                        <ul class="space-y-2">
+                            <li>• Vibe Coding 是 AI 时代的新编程范式</li>
+                            <li>• 教师角色从"教语法"转向"教思维"</li>
+                            <li>• 降低门槛，让更多人参与创造</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 flex items-center">
+                            <i class="fas fa-wrench mr-3"></i>
+                            术（实践层）
+                        </h3>
+                        <ul class="space-y-2">
+                            <li>• 选对工具是成功的一半</li>
+                            <li>• 好的 prompt 决定输出质量</li>
+                            <li>• 迭代优化是关键流程</li>
+                            <li>• 建立个人 prompt 库提升效率</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="bg-white/10 rounded-xl p-6 backdrop-blur-sm">
+                    <h3 class="text-xl font-bold mb-4">行动建议</h3>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div>
+                            <h4 class="font-bold mb-2">本周实践</h4>
+                            <ul class="text-sm space-y-1">
+                                <li>1. 选择一个工具开始尝试</li>
+                                <li>2. 完成一个简单案例</li>
+                                <li>3. 记录第一个 prompt</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2">本月目标</h4>
+                            <ul class="text-sm space-y-1">
+                                <li>1. 建立 prompt 库（10+）</li>
+                                <li>2. 开发教学小工具</li>
+                                <li>3. 在课堂中尝试应用</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2">长期发展</h4>
+                            <ul class="text-sm space-y-1">
+                                <li>1. 关注 AI 工具更新</li>
+                                <li>2. 积累典型案例</li>
+                                <li>3. 形成教学方法论</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-8 text-2xl font-bold">
+                    让我们一起探索 AI 时代信息教师的无限可能！🚀
+                </div>
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-primary-500 hover:bg-primary-600 text-white w-12 h-12 rounded-full shadow-lg opacity-0 transition-all duration-300 flex items-center justify-center">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    
+    <!-- 页脚 -->
+    <footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <div class="mb-4">
+                    <h3 class="text-xl font-bold mb-2">作者信息</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        <i class="fas fa-user mr-2"></i>
+                        <strong>吴铭英</strong>
+                    </p>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        <i class="fas fa-school mr-2"></i>
+                        深圳市龙岗区仙田外国语学校
+                    </p>
+                </div>
+                <div class="border-t border-gray-300 dark:border-gray-600 pt-4">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        © 2025 吴铭英. 保留所有权利.
+                    </p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                        本页面使用 Vibe Coding 技术生成
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // 主题切换
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // 检测系统主题偏好
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            html.classList.add('dark');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+        
+        // 从本地存储恢复主题
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            html.classList.toggle('dark', savedTheme === 'dark');
+        }
+        
+        // 返回顶部按钮
+        const backToTop = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.style.opacity = '1';
+                backToTop.style.pointerEvents = 'auto';
+            } else {
+                backToTop.style.opacity = '0';
+                backToTop.style.pointerEvents = 'none';
+            }
+        });
+        
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // 平滑滚动到锚点
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // 添加淡入动画到可视区域的元素
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // 观察所有卡片元素
+        document.querySelectorAll('.card-hover').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.6s ease-out';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

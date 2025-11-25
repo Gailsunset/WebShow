@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>太阳系行星轨道模型</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .solar-system {
+            position: relative;
+            width: 800px;
+            height: 800px;
+        }
+
+        .sun {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #ffeb3b 0%, #ff9800 100%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 30px #ffeb3b, 0 0 60px #ff9800;
+            z-index: 100;
+        }
+
+        .orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            transform-origin: center;
+        }
+
+        .planet:hover {
+            transform: scale(1.2);
+        }
+
+        .planet-info {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            white-space: nowrap;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .speed-buttons {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #1565c0;
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .reset-btn {
+            background: #dc3545;
+            width: 100%;
+        }
+
+        .reset-btn:hover {
+            background: #c82333;
+        }
+
+        .info-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #1976d2;
+            z-index: 2000;
+            display: none;
+            min-width: 250px;
+            text-align: center;
+        }
+
+        .info-panel h3 {
+            color: #ffeb3b;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .info-panel p {
+            margin: 5px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 25px;
+            height: 25px;
+        }
+
+        .distance-unit {
+            font-size: 10px;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="solar-system" id="solarSystem">
+            <div class="sun"></div>
+            
+            <!-- 行星轨道和行星将通过JavaScript动态生成 -->
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label>公转控制</label>
+            <div class="speed-buttons">
+                <button onclick="setSpeed('slow')">慢速</button>
+                <button onclick="setSpeed('normal')" id="normalBtn" disabled>正常</button>
+                <button onclick="setSpeed('fast')">快速</button>
+            </div>
+            <button class="reset-btn" onclick="resetSystem()">重置</button>
+        </div>
+    </div>
+
+    <div class="info-panel" id="infoPanel">
+        <button class="close-btn" onclick="closeInfo()">&times;</button>
+        <h3 id="planetName"></h3>
+        <p><strong>与太阳距离:</strong> <span id="planetDistance"></span></p>
+        <p class="distance-unit">（距离比例值，非真实距离）</p>
+    </div>
+
+    <script>
+        // 行星数据（简化，按距离太阳远近排序）
+        const planetsData = [
+            { name: '水星', distance: 100, size: 4, speed: 4.74, color: '#8C7853', angle: 0 },
+            { name: '金星', distance: 130, size: 6, speed: 3.50, color: '#FFC649', angle: 0 },
+            { name: '地球', distance: 160, size: 6, speed: 2.98, color: '#6B93D6', angle: 0 },
+            { name: '火星', distance: 190, size: 5, speed: 2.41, color: '#CD5C5C', angle: 0 },
+            { name: '木星', distance: 250, size: 12, speed: 1.31, color: '#D8CA9D', angle: 0 },
+            { name: '土星', distance: 300, size: 10, speed: 0.97, color: '#FAD5A5', angle: 0 },
+            { name: '天王星', distance: 340, size: 8, speed: 0.68, color: '#4FD0E7', angle: 0 },
+            { name: '海王星', distance: 380, size: 8, speed: 0.54, color: '#4B70DD', angle: 0 }
+        ];
+
+        let currentSpeed = 'normal';
+        let isRunning = false;
+        let animationId;
+        let planets = [];
+
+        // 速度配置
+        const speedConfig = {
+            slow: 0.3,
+            normal: 1,
+            fast: 2
+        };
+
+        // 初始化系统
+        function initSystem() {
+            const solarSystem = document.getElementById('solarSystem');
+            
+            planetsData.forEach((planetData, index) => {
+                // 创建轨道
+                const orbit = document.createElement('div');
+                orbit.className = 'orbit';
+                const orbitSize = planetData.distance * 2;
+                orbit.style.width = orbitSize + 'px';
+                orbit.style.height = orbitSize + 'px';
+                solarSystem.appendChild(orbit);
+
+                // 创建行星
+                const planet = document.createElement('div');
+                planet.className = 'planet';
+                planet.style.width = planetData.size + 'px';
+                planet.style.height = planetData.size + 'px';
+                planet.style.backgroundColor = planetData.color;
+                planet.style.left = (planetData.distance - planetData.size/2) + 'px';
+                planet.style.top = '50%';
+                planet.style.transform = 'translateY(-50%)';
+                planet.setAttribute('data-planet-index', index);
+                
+                // 行星标签
+                const planetLabel = document.createElement('div');
+                planetLabel.className = 'planet-info';
+                planetLabel.textContent = planetData.name;
+                planet.appendChild(planetLabel);
+
+                // 点击事件
+                planet.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showPlanetInfo(index);
+                });
+
+                solarSystem.appendChild(planet);
+                planets.push(planetData);
+            });
+        }
+
+        // 显示行星信息
+        function showPlanetInfo(index) {
+            const planet = planetsData[index];
+            document.getElementById('planetName').textContent = planet.name;
+            document.getElementById('planetDistance').textContent = `约 ${planet.distance} 单位距离`;
+            document.getElementById('infoPanel').style.display = 'block';
+        }
+
+        // 关闭信息面板
+        function closeInfo() {
+            document.getElementById('infoPanel').style.display = 'none';
+        }
+
+        // 设置公转速度
+        function setSpeed(speed) {
+            currentSpeed = speed;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.speed-buttons button').forEach(btn => {
+                btn.disabled = true;
+            });
+            if (speed === 'slow') {
+                document.querySelector('.speed-buttons button').disabled = false;
+            } else if (speed === 'normal') {
+                document.getElementById('normalBtn').disabled = false;
+            } else if (speed === 'fast') {
+                document.querySelector('.speed-buttons button:nth-child(3)').disabled = false;
+            }
+            
+            if (!isRunning) {
+                startRotation();
+            }
+        }
+
+        // 开始公转
+        function startRotation() {
+            if (isRunning) return;
+            isRunning = true;
+            animate();
+        }
+
+        // 停止公转
+        function stopRotation() {
+            isRunning = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        }
+
+        // 动画循环
+        function animate() {
+            if (!isRunning) return;
+
+            const speedMultiplier = speedConfig[currentSpeed];
+            
+            planets.forEach((planetData, index) => {
+                const planetElement = document.querySelectorAll('.planet')[index];
+                const baseSpeed = planetData.speed;
+                const currentAngle = planetData.angle;
+                
+                // 更新角度
+                planetData.angle += baseSpeed * 0.001 * speedMultiplier;
+                
+                // 计算新位置
+                const centerX = 400; // 容器中心X
+                const centerY = 400; // 容器中心Y
+                const radius = planetData.distance;
+                const x = centerX + Math.cos(planetData.angle) * radius - planetData.size/2;
+                const y = centerY + Math.sin(planetData.angle) * radius - planetData.size/2;
+                
+                // 应用位置
+                planetElement.style.left = x + 'px';
+                planetElement.style.top = y + 'px';
+                planetElement.style.transform = 'translateY(-50%)';
+            });
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // 重置系统
+        function resetSystem() {
+            stopRotation();
+            
+            planets.forEach((planetData, index) => {
+                planetData.angle = 0;
+                const planetElement = document.querySelectorAll('.planet')[index];
+                const x = planetData.distance - planetData.size/2;
+                planetElement.style.left = x + 'px';
+                planetElement.style.top = '50%';
+                planetElement.style.transform = 'translateY(-50%)';
+            });
+            
+            isRunning = false;
+            currentSpeed = 'normal';
+            
+            // 重置按钮状态
+            document.querySelectorAll('.speed-buttons button').forEach(btn => {
+                btn.disabled = true;
+            });
+            document.getElementById('normalBtn').disabled = false;
+        }
+
+        // 点击背景关闭信息面板
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.planet') && !e.target.closest('.info-panel')) {
+                closeInfo();
+            }
+        });
+
+        // ESC键关闭信息面板
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeInfo();
+            }
+        });
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', () => {
+            initSystem();
+        });
+    </script>
+</body>
+</html>

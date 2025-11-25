@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人体消化系统漫游 - MVP设计方案</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36D399',
+                        accent: '#FF6B35',
+                        neutral: '#F5F7FA',
+                        dark: '#1D2939'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body class="font-inter bg-gray-50 text-dark">
+    <!-- 顶部导航栏 -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fa fa-medkit text-primary text-2xl mr-3"></i>
+                    <span class="font-bold text-xl text-primary">人体消化系统漫游</span>
+                </div>
+                <nav class="hidden md:block">
+                    <ul class="flex space-x-8">
+                        <li><a href="#user" class="text-gray-600 hover:text-primary transition-colors">用户画像</a></li>
+                        <li><a href="#story" class="text-gray-600 hover:text-primary transition-colors">场景故事</a></li>
+                        <li><a href="#features" class="text-gray-600 hover:text-primary transition-colors">核心功能</a></li>
+                        <li><a href="#flow" class="text-gray-600 hover:text-primary transition-colors">交互流程</a></li>
+                    </ul>
+                </nav>
+                <div class="md:hidden">
+                    <button type="button" class="text-gray-600 hover:text-primary">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="bg-gradient-to-br from-primary/90 to-primary py-20 text-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 text-shadow">探索人体消化系统的奇妙旅程</h1>
+            <p class="text-xl md:text-2xl max-w-3xl mx-auto opacity-90">一个专为初高中学生设计的交互式学习工具，让抽象的生物知识变得直观易懂。</p>
+            <div class="mt-10">
+                <a href="#user" class="inline-flex items-center bg-white text-primary px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all">
+                    了解更多
+                    <i class="fa fa-arrow-down ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <!-- 一、典型用户画像 -->
+        <section id="user" class="mb-20">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center mb-8">
+                    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-4">
+                        <i class="fa fa-user text-primary text-xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-dark">典型用户画像</h2>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-8 card-hover">
+                    <p class="text-lg text-gray-700 leading-relaxed">
+                        12-18 岁初高中生物学习者，对抽象消化过程理解困难，需可视化工具辅助课堂学习与课后复习。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 二、场景故事 -->
+        <section id="story" class="mb-20">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center mb-8">
+                    <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mr-4">
+                        <i class="fa fa-book text-secondary text-xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-dark">场景故事</h2>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-8 card-hover">
+                    <div class="flex items-start mb-6">
+                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center mr-4 mt-1">
+                            <i class="fa fa-lightbulb-o text-accent"></i>
+                        </div>
+                        <div>
+                            <p class="text-lg text-gray-700 leading-relaxed">
+                                初中生小明复习消化系统章节时，通过产品 3D 漫游直观看到食物从口腔到肛门的消化路径及关键器官作用，快速掌握考点。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 三、功能列表 -->
+        <section id="features" class="mb-20">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex items-center mb-8">
+                    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-4">
+                        <i class="fa fa-cubes text-primary text-xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-dark">MVP 核心功能列表</h2>
+                </div>
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <ul class="divide-y divide-gray-200">
+                        <li class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-4">
+                                    <i class="fa fa-eye text-primary"></i>
+                                </div>
+                                <p class="text-lg text-gray-700">提供3D 可视化消化系统模型（包含口腔、食道、胃、小肠、大肠、肝脏、胰腺关键器官）</p>
+                            </div>
+                        </li>
+                        <li class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-4">
+                                    <i class="fa fa-play text-primary"></i>
+                                </div>
+                                <p class="text-lg text-gray-700">支持按消化顺序自动漫游（食物消化路径动画演示）</p>
+                            </div>
+                        </li>
+                        <li class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-4">
+                                    <i class="fa fa-question-circle text-primary"></i>
+                                </div>
+                                <p class="text-lg text-gray-700">点击器官显示核心功能文字说明（不超过 30 字）</p>
+                            </div>
+                        </li>
+                        <li class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-4">
+                                    <i class="fa fa-control text-primary"></i>
+                                </div>
+                                <p class="text-lg text-gray-700">提供基础导航控制（暂停 / 继续、返回起点）</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 四、交互流程 -->
+        <section id="flow" class="mb-10">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center mb-8">
+                    <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mr-4">
+                        <i class="fa fa-sitemap text-secondary text-xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-dark">交互流程</h2>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-8 mb-10">
+                    <ul class="space-y-4 text-lg text-gray-700">
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center mr-3">1</span>
+                            <span>打开产品，自动加载 3D 消化系统模型及初始漫游界面</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center mr-3">2</span>
+                            <span>点击 "开始漫游" 按钮，触发食物消化路径动画</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center mr-3">3</span>
+                            <span>漫游过程中点击任意器官，弹出功能说明弹窗</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center mr-3">4</span>
+                            <span>点击 "暂停" 可中断漫游，点击 "继续" 恢复，点击 "返回起点" 重置至初始状态</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="flex-shrink-0 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center mr-3">5</span>
+                            <span>关闭弹窗或退出产品，结束使用</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Mermaid 流程图 -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">交互流程示意图</h3>
+                    <div class="mermaid">
+                        flowchart TB
+                            A[打开产品] --> B[自动加载3D消化系统模型+初始界面]
+                            B --> C[点击“开始漫游”]
+                            C --> D[触发食物消化路径动画]
+                            D --> E{交互操作}
+                            E -->|点击器官| F[弹出核心功能文字说明弹窗]
+                            E -->|点击“暂停”| G[中断漫游]
+                            G -->|点击“继续”| D
+                            E -->|点击“返回起点”| B
+                            F -->|关闭弹窗| E
+                            E -->|退出产品| H[结束使用]
+                            subgraph MVP核心功能
+                                I[3D可视化消化系统模型]
+                                J[按消化顺序自动漫游]
+                                K[器官点击文字说明]
+                                L[基础导航控制：暂停/继续/返回起点]
+                            end
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center">
+                        <i class="fa fa-medkit text-primary text-2xl mr-3"></i>
+                        <span class="font-bold text-xl">人体消化系统漫游</span>
+                    </div>
+                    <p class="mt-2 text-gray-400">让学习变得更直观、更有趣</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-facebook text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-github text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
+                <p>&copy; 2023 人体消化系统漫游. 保留所有权利。</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 初始化 Mermaid
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'default',
+                securityLevel: 'loose',
+                flowchart: {
+                    curve: 'monotoneX',
+                    useMaxWidth: false
+                }
+            });
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

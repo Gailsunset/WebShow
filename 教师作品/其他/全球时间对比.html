@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>全球主要城市时间对比</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f9f9fb;
+      color: #333;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      color: #2c3e50;
+    }
+
+    .reference-time {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 0;
+    }
+
+    .flag {
+      width: 40px;
+      height: 24px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      margin-bottom: 10px;
+    }
+
+    .time-display {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin: 10px 0;
+      color: #2c3e50;
+    }
+
+    .date-display {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      color: #555;
+    }
+
+    .clock {
+      width: 200px;
+      height: 200px;
+      border: 4px solid #2c3e50;
+      border-radius: 50%;
+      position: relative;
+      margin: 0 auto 20px;
+      background-color: #fff;
+    }
+
+    .clock .hour, .clock .minute, .clock .second {
+      position: absolute;
+      background: #2c3e50;
+      transform-origin: bottom center;
+      left: 50%;
+      bottom: 50%;
+    }
+
+    .clock .hour {
+      width: 6px;
+      height: 40px;
+      margin-left: -3px;
+    }
+
+    .clock .minute {
+      width: 4px;
+      height: 60px;
+      margin-left: -2px;
+    }
+
+    .clock .second {
+      width: 2px;
+      height: 70px;
+      background: #e74c3c;
+      margin-left: -1px;
+    }
+
+    .instructions {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1rem;
+      color: #7f8c8d;
+    }
+
+    .cities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .city-card {
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      background-color: #fff;
+    }
+
+    .city-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+
+    .city-card.day {
+      background-color: #fff9e6; /* 浅黄 */
+    }
+
+    .city-card.night {
+      background-color: #e6f2ff; /* 浅蓝 */
+    }
+
+    .city-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .city-flag {
+      width: 32px;
+      height: 20px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      margin-right: 10px;
+    }
+
+    .city-name {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .city-time {
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin: 8px 0;
+      color: #2c3e50;
+    }
+
+    .city-date {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .daynight-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    .daynight-tag.day {
+      background-color: #f1c40f;
+    }
+
+    .daynight-tag.night {
+      background-color: #3498db;
+    }
+
+    @media (max-width: 600px) {
+      .cities-grid {
+        grid-template-columns: 1fr;
+      }
+      .time-display {
+        font-size: 2rem;
+      }
+      .clock {
+        width: 160px;
+        height: 160px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>全球主要城市时间对比</h1>
+  </header>
+
+  <div class="reference-time">
+    <div class="flag" id="ref-flag"></div>
+    <div class="time-display" id="ref-time">--:--:--</div>
+    <div class="date-display" id="ref-date">----</div>
+    <div class="clock">
+      <div class="hour" id="hour-hand"></div>
+      <div class="minute" id="minute-hand"></div>
+      <div class="second" id="second-hand"></div>
+    </div>
+  </div>
+
+  <p class="instructions">点击城市卡片以选择参照城市，查看其他城市的时差</p>
+
+  <div class="cities-grid" id="cities-container">
+    <!-- 城市卡片将由 JS 动态生成 -->
+  </div>
+
+  <script>
+    // 城市数据：城市名、时区（IANA）、国旗 CSS 类
+    const cities = [
+      { name: "北京", tz: "Asia/Shanghai", flag: "cn" },
+      { name: "纽约", tz: "America/New_York", flag: "us" },
+      { name: "伦敦", tz: "Europe/London", flag: "gb" },
+      { name: "巴黎", tz: "Europe/Paris", flag: "fr" },
+      { name: "东京", tz: "Asia/Tokyo", flag: "jp" },
+      { name: "悉尼", tz: "Australia/Sydney", flag: "au" },
+      { name: "莫斯科", tz: "Europe/Moscow", flag: "ru" },
+      { name: "迪拜", tz: "Asia/Dubai", flag: "ae" }
+    ];
+
+    // 国旗背景映射（使用 emoji 作为简易替代）
+    const flagEmoji = {
+      cn: "🇨🇳",
+      us: "🇺🇸",
+      gb: "🇬🇧",
+      fr: "🇫🇷",
+      jp: "🇯🇵",
+      au: "🇦🇺",
+      ru: "🇷🇺",
+      ae: "🇦🇪"
+    };
+
+    let referenceCityIndex = 0; // 默认北京
+
+    // 格式化星期
+    function getWeekday(date) {
+      const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+      return weekdays[date.getDay()];
+    }
+
+    // 判断白天/夜晚（简化：6:00-18:00 为白天）
+    function isDay(time24) {
+      const hour = parseInt(time24.split(':')[0], 10);
+      return hour >= 6 && hour < 18;
+    }
+
+    // 更新所有显示
+    function updateAll() {
+      const now = new Date();
+      const refCity = cities[referenceCityIndex];
+      const refTime = new Intl.DateTimeFormat('zh-CN', {
+        timeZone: refCity.tz,
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      }).format(now);
+
+      const refDateObj = new Date(now.toLocaleString("en-US", { timeZone: refCity.tz }));
+      const refDateStr = `${refDateObj.getFullYear()}年${String(refDateObj.getMonth() + 1).padStart(2, '0')}月${String(refDateObj.getDate()).padStart(2, '0')}日`;
+      const refWeekday = getWeekday(refDateObj);
+
+      document.getElementById('ref-time').textContent = refTime;
+      document.getElementById('ref-date').textContent = `${refDateStr} ${refWeekday}`;
+      document.getElementById('ref-flag').textContent = flagEmoji[refCity.flag];
+
+      // 更新模拟时钟（基于参考城市时间）
+      const refHours = refDateObj.getHours();
+      const refMinutes = refDateObj.getMinutes();
+      const refSeconds = refDateObj.getSeconds();
+
+      const hourDeg = (refHours % 12) * 30 + refMinutes * 0.5;
+      const minuteDeg = refMinutes * 6;
+      const secondDeg = refSeconds * 6;
+
+      document.getElementById('hour-hand').style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+      document.getElementById('minute-hand').style.transform = `translateX(-50%) rotate(${minuteDeg}deg)`;
+      document.getElementById('second-hand').style.transform = `translateX(-50%) rotate(${secondDeg}deg)`;
+
+      // 渲染城市卡片
+      const container = document.getElementById('cities-container');
+      container.innerHTML = '';
+
+      cities.forEach((city, idx) => {
+        const cityTime = new Intl.DateTimeFormat('zh-CN', {
+          timeZone: city.tz,
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        }).format(now);
+
+        const cityDateObj = new Date(now.toLocaleString("en-US", { timeZone: city.tz }));
+        const cityDateStr = `${cityDateObj.getFullYear()}年${String(cityDateObj.getMonth() + 1).padStart(2, '0')}月${String(cityDateObj.getDate()).padStart(2, '0')}日`;
+        const cityWeekday = getWeekday(cityDateObj);
+        const dayNight = isDay(cityTime) ? 'day' : 'night';
+
+        const card = document.createElement('div');
+        card.className = `city-card ${dayNight}`;
+        card.dataset.index = idx;
+        card.innerHTML = `
+          <div class="city-header">
+            <span class="city-flag">${flagEmoji[city.flag]}</span>
+            <span class="city-name">${city.name}</span>
+          </div>
+          <div class="city-time">${cityTime}</div>
+          <div class="city-date">${cityDateStr} ${cityWeekday}</div>
+          <span class="daynight-tag ${dayNight}">${dayNight === 'day' ? '白天' : '夜晚'}</span>
+        `;
+        card.addEventListener('click', () => {
+          referenceCityIndex = idx;
+          updateAll();
+        });
+        container.appendChild(card);
+      });
+    }
+
+    // 初始化并每秒更新
+    updateAll();
+    setInterval(updateAll, 1000);
+  </script>
+</body>
+</html>

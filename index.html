@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025年 AIGC 学科融合作品展</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 1600px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        h1 { text-align: center; color: #1a237e; margin-bottom: 10px; font-size: 2.2em; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 40px; font-size: 1.1em; letter-spacing: 1px; }
+        
+        /* 🟢 整体两栏布局 */
+        .main-layout {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap; /* 小屏幕自动换行 */
+        }
+        
+        .column {
+            flex: 1;
+            min-width: 400px; /* 最小宽度，保证手机上不会太挤 */
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        
+        /* 🟢 教师栏样式 (左侧) */
+        .teacher-column { 
+            border-top: 5px solid #ffb74d; 
+            flex: 0.8; /* 教师栏稍微窄一点点，比例 4:6 左右 */
+        }
+        
+        /* 🟢 学生栏样式 (右侧) */
+        .student-column { 
+            border-top: 5px solid #42a5f5; 
+            flex: 1.2; 
+        }
+
+        /* 栏目标题 */
+        .column-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        .column-header h2 {
+            margin: 0;
+            font-size: 1.4em;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* 小节标题 */
+        .section-title { 
+            font-size: 1.1em; 
+            margin-top: 25px; 
+            margin-bottom: 15px; 
+            color: #546e7a; 
+            font-weight: bold; 
+            display: flex; 
+            align-items: center; 
+            background: #fcfcfc;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 4px solid #ddd;
+        }
+        .teacher-column .section-title { border-left-color: #ffb74d; }
+        .student-column .section-title { border-left-color: #42a5f5; }
+        
+        /* 🟢 核心：内部列表的双栏布局 */
+        .file-list { 
+            list-style: none; 
+            padding: 0; 
+            margin-bottom: 20px;
+            
+            /* 重点：使用 Grid 实现内部双栏/多栏 */
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* 每个卡片最小220px，自动填满 */
+            gap: 12px;
+        }
+
+        /* 卡片样式 */
+        .file-link { 
+            display: flex; 
+            align-items: center; 
+            text-decoration: none; 
+            color: #333; 
+            padding: 10px; 
+            background: #f8f9fa; 
+            border-radius: 8px; 
+            transition: all 0.2s; 
+            border: 1px solid #eef0f2;
+            height: 100%; /* 保证同一行高度对齐 */
+        }
+        .file-link:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        }
+        
+        /* 特定卡片悬停色 */
+        .teacher-card:hover { background: #fff8e1; border-color: #ffe0b2; }
+        .student-card:hover { background: #e3f2fd; border-color: #bbdefb; }
+
+        .icon { margin-right: 10px; font-size: 1.4em; min-width: 30px; text-align: center; }
+        .info { display: flex; flex-direction: column; overflow: hidden; }
+        .name { font-weight: 600; font-size: 0.95em; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .filename { font-size: 0.75em; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        footer { margin-top: 40px; text-align: center; font-size: 0.9em; color: #888; padding: 20px 0; clear: both; }
+
+        /* 手机适配 */
+        @media (max-width: 768px) {
+            .main-layout { flex-direction: column; }
+            .column { min-width: auto; }
+        }
+    </style>
+</head>
+<body>
+    <h1>✨ 2025年 AIGC 学科融合作品展 ✨</h1>
+    <div class="subtitle">用网页演绎学科奥秘 · 探索 AI 赋能教育</div>
+    
+    <div class="main-layout">
+        
+        <!-- Left Column: Teacher Works -->
+        <div class="column teacher-column">
+            <div class="column-header">
+                <h2><span>👩‍🏫</span> 教师教学工具与课件</h2>
+            </div>
+
+            
+            <div class="section-title"><span>📘</span> 演示课件</div>
+            <ul class="file-list">
+                <li><a href="教师作品/课件类/01专家指导课_AI魔法师——用网页演绎学科奥秘.html" class="file-link teacher-card"><span class="icon">🎓</span><div class="info"><span class="name">专家指导课：AI魔法师</span><span class="filename">用网页演绎学科奥秘</span></div></a></li>
+                <li><a href="教师作品/课件类/02区级公开课_探索AI时代信息教师的道与术.html" class="file-link teacher-card"><span class="icon">🏫</span><div class="info"><span class="name">区级公开课：道与术</span><span class="filename">探索AI时代信息教师</span></div></a></li>
+                <li><a href="教师作品/课件类/03新课标信息科技课程可视化.html" class="file-link teacher-card"><span class="icon">📑</span><div class="info"><span class="name">新课标课程可视化</span><span class="filename">信息科技课程标准</span></div></a></li>
+                <li><a href="教师作品/其他/全球时间对比.html" class="file-link teacher-card"><span class="icon">🌍</span><div class="info"><span class="name">全球时间对比</span><span class="filename">地理/实用工具</span></div></a></li>
+            </ul>
+            
+            <div class="section-title"><span>📦</span> 教学工具</div>
+            <ul class="file-list">
+                <li><a href="教师作品/教学类/词义射击小游戏.html" class="file-link teacher-card"><span class="icon">🎮</span><div class="info"><span class="name">词义射击小游戏</span><span class="filename">英语学科互动游戏</span></div></a></li>
+                <li><a href="教师作品/教学类/随机点名大转盘.html" class="file-link teacher-card"><span class="icon">🎡</span><div class="info"><span class="name">随机点名大转盘</span><span class="filename">课堂互动工具</span></div></a></li>
+                <li><a href="教师作品/教学类/黑客帝国风的随机点名器.html" class="file-link teacher-card"><span class="icon">💻</span><div class="info"><span class="name">黑客帝国风点名器</span><span class="filename">酷炫课堂工具</span></div></a></li>
+                <li><a href="教师作品/教学类/信息科技过程性评价.html" class="file-link teacher-card"><span class="icon">📊</span><div class="info"><span class="name">信息科技过程性评价</span><span class="filename">评价系统演示</span></div></a></li>
+                <li><a href="教师作品/教学类/黑洞的 3D动画.html" class="file-link teacher-card"><span class="icon">🌌</span><div class="info"><span class="name">黑洞 3D 动画</span><span class="filename">物理可视化演示</span></div></a></li>
+            </ul>
+
+
+        </div>
+
+        <!-- Right Column: Student Works -->
+        <div class="column student-column">
+            <div class="column-header">
+                <h2><span>🚀</span> 学生创意与实践作品</h2>
+            </div>
+
+            <div class="section-title"><span>🔭</span> 理科模拟与实验</div>
+            <ul class="file-list">
+                <li><a href="学生优秀作品/701_28_苏青_凸透镜成像规律模拟器.html" class="file-link student-card"><span class="icon">🔍</span><div class="info"><span class="name">苏青 - 凸透镜成像规律模拟器</span><span class="filename">701_28_苏青_凸透镜成像规律模拟器.html</span></div></a></li>
+                <li><a href="学生优秀作品/702_38_陈志杰_原子结构.html" class="file-link student-card"><span class="icon">⚛️</span><div class="info"><span class="name">陈志杰 - 原子结构可视化</span><span class="filename">702_38_陈志杰_原子结构.html</span></div></a></li>
+                <li><a href="学生优秀作品/704_08_黎旭航_病毒结构组装游戏.html" class="file-link student-card"><span class="icon">🧬</span><div class="info"><span class="name">黎旭航 - 病毒结构组装游戏</span><span class="filename">704_08_黎旭航_病毒结构组装游戏.html</span></div></a></li>
+                <li><a href="学生优秀作品/704_25_谢涵茗_生态系统食物链可视化工具.html" class="file-link student-card"><span class="icon">🌿</span><div class="info"><span class="name">谢涵茗 - 生态系统食物链工具</span><span class="filename">704_25_谢涵茗_生态系统食物链可视化工具.html</span></div></a></li>
+                <li><a href="学生优秀作品/704_26_李卓昊_焰色反应实验学习平台.html" class="file-link student-card"><span class="icon">🔥</span><div class="info"><span class="name">李卓昊 - 焰色反应实验学习平台</span><span class="filename">704_26_李卓昊_焰色反应实验学习平台.html</span></div></a></li>
+                <li><a href="学生优秀作品/704_40_龚城_火箭发射参数优化系统.html" class="file-link student-card"><span class="icon">🚀</span><div class="info"><span class="name">龚城 - 火箭发射参数优化系统</span><span class="filename">704_40_龚城_火箭发射参数优化系统.html</span></div></a></li>
+                <li><a href="学生优秀作品/704_41_刘圣智_动量守恒碰撞演示.html" class="file-link student-card"><span class="icon">🎱</span><div class="info"><span class="name">刘圣智 - 动量守恒碰撞演示</span><span class="filename">704_41_刘圣智_动量守恒碰撞演示.html</span></div></a></li>
+                <li><a href="学生优秀作品/707_14_贺珮_人体消化系统漫游.html" class="file-link student-card"><span class="icon">🍔</span><div class="info"><span class="name">贺珮 - 人体消化系统漫游</span><span class="filename">707_14_贺珮_人体消化系统漫游.html</span></div></a></li>
+                <li><a href="学生优秀作品/707_20_温宇轩_能量转换过山车.html" class="file-link student-card"><span class="icon">🎢</span><div class="info"><span class="name">温宇轩 - 能量转换过山车</span><span class="filename">707_20_温宇轩_能量转换过山车.html</span></div></a></li>
+                <li><a href="学生优秀作品/707_27_钟一齐_地震波传播演示.html" class="file-link student-card"><span class="icon">〰️</span><div class="info"><span class="name">钟一齐 - 地震波传播演示</span><span class="filename">707_27_钟一齐_地震波传播演示.html</span></div></a></li>
+                <li><a href="学生优秀作品/707_44_刘梓晨707 _公转控制2.html" class="file-link student-card"><span class="icon">🪐</span><div class="info"><span class="name">刘梓晨 - 公转控制演示</span><span class="filename">707_44_刘梓晨707 _公转控制2.html</span></div></a></li>
+            </ul>
+
+            <div class="section-title"><span>📜</span> 历史与人文</div>
+            <ul class="file-list">
+                <li><a href="学生优秀作品/703_46_王泽林_帝王在位时间对比.html" class="file-link student-card"><span class="icon">👑</span><div class="info"><span class="name">王泽林 - 帝王在位时间对比</span><span class="filename">703_46_王泽林_帝王在位时间对比.html</span></div></a></li>
+                <li><a href="学生优秀作品/704_31_王博涵_历史人物关系图.html" class="file-link student-card"><span class="icon">🕸️</span><div class="info"><span class="name">王博涵 - 历史人物关系图</span><span class="filename">704_31_王博涵_历史人物关系图.html</span></div></a></li>
+                <li><a href="学生优秀作品/704_37_陈文轩_古埃及金字塔建造模拟器.html" class="file-link student-card"><span class="icon">🏜️</span><div class="info"><span class="name">陈文轩 - 古埃及金字塔建造模拟器</span><span class="filename">704_37_陈文轩_古埃及金字塔建造模拟器.html</span></div></a></li>
+                <li><a href="学生优秀作品/704_46_钱相鑫_历史人物关系图谱.html" class="file-link student-card"><span class="icon">📜</span><div class="info"><span class="name">钱相鑫 - 历史人物关系图谱</span><span class="filename">704_46_钱相鑫_历史人物关系图谱.html</span></div></a></li>
+                <li><a href="学生优秀作品/704_47_世界大战参战国统计.html" class="file-link student-card"><span class="icon">⚔️</span><div class="info"><span class="name">世界大战参战国统计</span><span class="filename">704_47_世界大战参战国统计.html</span></div></a></li>
+                <li><a href="学生优秀作品/707_09_南艺雅 707_古诗填空.html" class="file-link student-card"><span class="icon">✒️</span><div class="info"><span class="name">南艺雅 - 古诗填空</span><span class="filename">707_09_南艺雅 707_古诗填空.html</span></div></a></li>
+            </ul>
+
+            <div class="section-title"><span>🔢</span> 数学与计算</div>
+            <ul class="file-list">
+                <li><a href="学生优秀作品/702_05_黄晨亿 猜数字.html" class="file-link student-card"><span class="icon">🎲</span><div class="info"><span class="name">黄晨亿 - 猜数字游戏</span><span class="filename">702_05_黄晨亿 猜数字.html</span></div></a></li>
+                <li><a href="学生优秀作品/703_37_袁廖智_坐标寻宝大冒险 .html" class="file-link student-card"><span class="icon">🗺️</span><div class="info"><span class="name">袁廖智 - 坐标寻宝大冒险</span><span class="filename">703_37_袁廖智_坐标寻宝大冒险 .html</span></div></a></li>
+                <li><a href="学生优秀作品/704_01_李佳璐_心算大师.html" class="file-link student-card"><span class="icon">🧠</span><div class="info"><span class="name">李佳璐 - 心算大师</span><span class="filename">704_01_李佳璐_心算大师.html</span></div></a></li>
+                <li><a href="学生优秀作品/707_11_黄丞骏_掷骰子概率分布.html" class="file-link student-card"><span class="icon">📊</span><div class="info"><span class="name">黄丞骏 - 掷骰子概率分布</span><span class="filename">707_11_黄丞骏_掷骰子概率分布.html</span></div></a></li>
+                <li><a href="学生优秀作品/707_31_刘家骏_汇率计算器.html" class="file-link student-card"><span class="icon">💱</span><div class="info"><span class="name">刘家骏 - 汇率计算器</span><span class="filename">707_31_刘家骏_汇率计算器.html</span></div></a></li>
+                <li><a href="学生优秀作品/708_47_程梦洁_小学数学练习题（100以内加减法）.html" class="file-link student-card"><span class="icon">📝</span><div class="info"><span class="name">程梦洁 - 小学数学练习题</span><span class="filename">708_47_程梦洁_小学数学练习题.html</span></div></a></li>
+            </ul>
+            
+            <div class="section-title"><span>🎵</span> 艺术与交互</div>
+            <ul class="file-list">
+                 <li><a href="学生优秀作品/704_45_704 吴紫晨_虚拟钢琴波形解剖.html" class="file-link student-card"><span class="icon">🎹</span><div class="info"><span class="name">吴紫晨 - 虚拟钢琴波形解剖</span><span class="filename">704_45_704 吴紫晨_虚拟钢琴波形解剖.html</span></div></a></li>
+            </ul>
+
+            <div class="section-title"><span>🎬</span> 精彩演示 (GIF)</div>
+            <ul class="file-list">
+                <li><a href="学生优秀作品/701_28_苏青_凸透镜成像规律模拟器.gif" class="file-link student-card"><span class="icon">🎞️</span><div class="info"><span class="name">苏青 - 凸透镜成像规律演示</span><span class="filename">701_28_苏青_凸透镜成像规律模拟器.gif</span></div></a></li>
+                <li><a href="学生优秀作品/702_38_陈志杰_原子结构.gif" class="file-link student-card"><span class="icon">🎞️</span><div class="info"><span class="name">陈志杰 - 原子结构演示</span><span class="filename">702_38_陈志杰_原子结构.gif</span></div></a></li>
+                <li><a href="学生优秀作品/703_46_王泽林_帝王在位时间对比.gif" class="file-link student-card"><span class="icon">🎞️</span><div class="info"><span class="name">王泽林 - 帝王在位时间对比演示</span><span class="filename">703_46_王泽林_帝王在位时间对比.gif</span></div></a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Created with ❤️ for Science Education by WuMingYing</p>
+    </footer>
+</body>
+</html>
+```

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3D分子模型构建器</title>
+    <style>
+        body { margin: 0; font-family: Arial; background: #f0f0f0; }
+        #container { display: flex; height: 100vh; }
+        #canvas-container { flex: 1; position: relative; }
+        #atom-panel { 
+            width: 200px; background: white; 
+            padding: 20px; box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+        }
+        .atom-item { 
+            width: 50px; height: 50px; margin: 10px auto; 
+            border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; color: white; font-weight: bold; 
+            cursor: grab; border: 2px solid #333;
+        }
+        #controls { margin-top: 20px; }
+        button { padding: 8px 16px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="canvas-container">
+            <div id="info">拖拽原子构建分子 | 滚轮缩放 | 右键平移</div>
+        </div>
+        <div id="atom-panel">
+            <h3>原子库</h3>
+            <div class="atom-item" style="background: #333;" data-atom="C">C</div>
+            <div class="atom-item" style="background: #fff; color: #000; border-color: #000;" data-atom="H">H</div>
+            <div class="atom-item" style="background: #ff0000;" data-atom="O">O</div>
+            <div class="atom-item" style="background: #0000ff;" data-atom="N">N</div>
+            <div id="controls">
+                <button onclick="saveStructure()">保存结构</button>
+                <button onclick="clearModel()">清除模型</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- 引入轨道控制器 -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <script>
+        // 全局变量
+        let scene, camera, renderer, controls;
+        let atoms = [], bonds = [];
+        let atomData = { C:6, H:1, O:8, N:7 }; // 原子序数映射
+        
+        // 初始化3D场景
+        function init() {
+            const container = document.getElementById('canvas-container');
+            
+            // 创建场景
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f0f0);
+            
+            // 创建相机
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 10);
+            
+            // 创建渲染器
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+            
+            // 轨道控制器
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            
+            // 添加光源
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 10, 5);
+            scene.add(directionalLight);
+            
+            // 创建原子模板
+            createAtomTemplates();
+            
+            // 绑定原子拖拽事件
+            bindAtomDragEvents();
+            
+            // 开始渲染循环
+            animate();
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', onWindowResize);
+        }
+        
+        // 创建原子模板
+        function createAtomTemplates() {
+            window.atomTemplates = {
+                C: () => createAtomSphere(0x333333, 1.7), // 碳原子
+                H: () => createAtomSphere(0xffffff, 1.2), // 氢原子
+                O: () => createAtomSphere(0xff0000, 1.52), // 氧原子
+                N: () => createAtomSphere(0x0000ff, 1.55)  // 氮原子
+            };
+        }
+        
+        // 创建原子球体
+        function createAtomSphere(color, radius) {
+            const geometry = new THREE.SphereGeometry(radius, 32, 32);
+            const material = new THREE.MeshPhongMaterial({ color });
+            const sphere = new THREE.Mesh(geometry, material);
+            sphere.castShadow = true;
+            sphere.receiveShadow = true;
+            return sphere;
+        }
+        
+        // 绑定原子拖拽事件
+        function bindAtomDragEvents() {
+            const atomItems = document.querySelectorAll('.atom-item');
+            atomItems.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', e.target.dataset.atom);
+                });
+                item.draggable = true;
+            });
+            
+            const canvasContainer = document.getElementById('canvas-container');
+            canvasContainer.addEventListener('dragover', (e) => e.preventDefault());
+            canvasContainer.addEventListener('drop', handleAtomDrop);
+        }
+        
+        // 处理原子放置
+        function handleAtomDrop(event) {
+            event.preventDefault();
+            const atomType = event.dataTransfer.getData('text/plain');
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = ((event.clientX - rect.left) / rect.width) * 20 - 10;
+            const y = -((event.clientY - rect.top) / rect.height) * 20 + 10;
+            const z = 0;
+            
+            createAtom(atomType, x, y, z);
+            checkBondFormation();
+        }
+        
+        // 创建原子
+        function createAtom(type, x, y, z) {
+            const atomTemplate = window.atomTemplates[type];
+            if (!atomTemplate) return;
+            
+            const atomMesh = atomTemplate();
+            atomMesh.position.set(x, y, z);
+            atomMesh.userData = { type, originalPos: { x, y, z } };
+            
+            scene.add(atomMesh);
+            atoms.push(atomMesh);
+        }
+        
+        // 检查化学键形成
+        function checkBondFormation() {
+            for (let i = 0; i < atoms.length; i++) {
+                for (let j = i + 1; j < atoms.length; j++) {
+                    const atom1 = atoms[i];
+                    const atom2 = atoms[j];
+                    const distance = atom1.position.distanceTo(atom2.position);
+                    
+                    // 简单成键规则：距离小于2.5且无现有键
+                    if (distance < 2.5 && !isBonded(atom1, atom2)) {
+                        createBond(atom1, atom2);
+                    }
+                }
+            }
+        }
+        
+        // 判断是否已存在键
+        function isBonded(atom1, atom2) {
+            return bonds.some(bond => 
+                (bond.atom1 === atom1 && bond.atom2 === atom2) || 
+                (bond.atom1 === atom2 && bond.atom2 === atom1)
+            );
+        }
+        
+        // 创建化学键
+        function createBond(atom1, atom2) {
+            const bondGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1, 8);
+            const bondMaterial = new THREE.MeshPhongMaterial({ color: 0x666666 });
+            const bondMesh = new THREE.Mesh(bondGeometry, bondMaterial);
+            
+            // 计算键的位置和方向
+            const direction = new THREE.Vector3()
+                .subVectors(atom2.position, atom1.position)
+                .normalize();
+            const distance = atom1.position.distanceTo(atom2.position);
+            const midpoint = new THREE.Vector3()
+                .addVectors(atom1.position, atom2.position)
+                .multiplyScalar(0.5);
+            
+            bondMesh.position.copy(midpoint);
+            bondMesh.lookAt(atom2.position);
+            bondMesh.rotateX(Math.PI / 2);
+            bondMesh.scale.y = distance / 2;
+            
+            scene.add(bondMesh);
+            bonds.push({ atom1, atom2, mesh: bondMesh });
+        }
+        
+        // 保存分子结构
+        function saveStructure() {
+            const structure = {
+                atoms: atoms.map(atom => ({
+                    type: atom.userData.type,
+                    position: { ...atom.position }
+                })),
+                bonds: bonds.map(bond => ({
+                    atom1Index: atoms.indexOf(bond.atom1),
+                    atom2Index: atoms.indexOf(bond.atom2)
+                }))
+            };
+            console.log('分子结构数据:', JSON.stringify(structure, null, 2));
+            alert('结构已保存到控制台，请按F12查看');
+        }
+        
+        // 清除模型
+        function clearModel() {
+            // 移除所有原子
+            atoms.forEach(atom => scene.remove(atom));
+            // 移除所有化学键
+            bonds.forEach(bond => scene.remove(bond.mesh));
+            atoms = [];
+            bonds = [];
+        }
+        
+        // 动画循环
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        // 窗口大小调整
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

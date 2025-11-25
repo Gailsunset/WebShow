@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2015级704班 - 太阳系行星轨道模型</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .title {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .class-tag {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        #solar-system {
+            position: relative;
+            width: 800px;
+            height: 800px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            background-color: #000;
+            overflow: hidden;
+        }
+        .sun {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #ffd000;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 30px #ffd000;
+        }
+        .orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 1px dashed #333;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        .planet-name {
+            position: absolute;
+            color: #fff;
+            font-size: 12px;
+            transform: translateY(-50%);
+        }
+        .controls {
+            margin-top: 30px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .planet-info {
+            display: none;
+            position: absolute;
+            width: 150px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">太阳系行星轨道模型</h1>
+    <div class="class-tag">2015级704班专用教学工具</div>
+    <div id="solar-system">
+        <div class="sun"></div>
+        <!-- 水星轨道 -->
+        <div class="orbit" style="width: 160px; height: 160px;">
+            <div class="planet" id="mercury" style="width: 8px; height: 8px; background-color: #a6a6a6; top: 20px; left: 80px;"></div>
+            <div class="planet-name" style="top: 10px; left: 80px;">水星</div>
+        </div>
+        <!-- 金星轨道 -->
+        <div class="orbit" style="width: 240px; height: 240px;">
+            <div class="planet" id="venus" style="width: 12px; height: 12px; background-color: #e6b89c; top: 20px; left: 120px;"></div>
+            <div class="planet-name" style="top: 10px; left: 120px;">金星</div>
+        </div>
+        <!-- 地球轨道 -->
+        <div class="orbit" style="width: 320px; height: 320px;">
+            <div class="planet" id="earth" style="width: 14px; height: 14px; background-color: #4287f5; top: 20px; left: 160px;"></div>
+            <div class="planet-name" style="top: 10px; left: 160px;">地球</div>
+        </div>
+        <!-- 火星轨道 -->
+        <div class="orbit" style="width: 400px; height: 400px;">
+            <div class="planet" id="mars" style="width: 10px; height: 10px; background-color: #e65c3c; top: 20px; left: 200px;"></div>
+            <div class="planet-name" style="top: 10px; left: 200px;">火星</div>
+        </div>
+        <!-- 木星轨道 -->
+        <div class="orbit" style="width: 480px; height: 480px;">
+            <div class="planet" id="jupiter" style="width: 40px; height: 40px; background-color: #d9a466; top: 20px; left: 240px;"></div>
+            <div class="planet-name" style="top: 10px; left: 240px;">木星</div>
+        </div>
+        <!-- 土星轨道 -->
+        <div class="orbit" style="width: 560px; height: 560px;">
+            <div class="planet" id="saturn" style="width: 36px; height: 36px; background-color: #f0c881; top: 20px; left: 280px;">
+                <div style="position: absolute; width: 50px; height: 10px; background-color: #c2a26f; top: 13px; left: -7px; border-radius: 50%;"></div>
+            </div>
+            <div class="planet-name" style="top: 10px; left: 280px;">土星</div>
+        </div>
+        <!-- 天王星轨道 -->
+        <div class="orbit" style="width: 640px; height: 640px;">
+            <div class="planet" id="uranus" style="width: 24px; height: 24px; background-color: #a8d8ea; top: 20px; left: 320px;"></div>
+            <div class="planet-name" style="top: 10px; left: 320px;">天王星</div>
+        </div>
+        <!-- 海王星轨道 -->
+        <div class="orbit" style="width: 720px; height: 720px;">
+            <div class="planet" id="neptune" style="width: 22px; height: 22px; background-color: #4a7ba7; top: 20px; left: 360px;"></div>
+            <div class="planet-name" style="top: 10px; left: 360px;">海王星</div>
+        </div>
+        <div class="planet-info" id="info-panel"></div>
+    </div>
+    <div class="controls">
+        <button id="start">启动公转</button>
+        <button id="pause">暂停</button>
+        <button id="speed-up">增速</button>
+        <button id="speed-down">减速</button>
+        <button id="reset">重置</button>
+    </div>
+
+    <script>
+        // 行星数据
+        const planets = [
+            { id: 'mercury', name: '水星', distance: '约5800万千米', speed: 0.04 },
+            { id: 'venus', name: '金星', distance: '约1.08亿千米', speed: 0.03 },
+            { id: 'earth', name: '地球', distance: '约1.5亿千米', speed: 0.025 },
+            { id: 'mars', name: '火星', distance: '约2.28亿千米', speed: 0.02 },
+            { id: 'jupiter', name: '木星', distance: '约7.78亿千米', speed: 0.012 },
+            { id: 'saturn', name: '土星', distance: '约14.3亿千米', speed: 0.009 },
+            { id: 'uranus', name: '天王星', distance: '约28.7亿千米', speed: 0.007 },
+            { id: 'neptune', name: '海王星', distance: '约45亿千米', speed: 0.005 }
+        ];
+
+        let isRunning = false;
+        let speedMultiplier = 1;
+        let animationFrameId;
+
+        // 初始化行星位置
+        function initPlanets() {
+            planets.forEach(planet => {
+                const elem = document.getElementById(planet.id);
+                const orbit = elem.parentElement;
+                const orbitRadius = orbit.offsetWidth / 2;
+                elem.style.left = `${orbitRadius}px`;
+                elem.style.top = '20px';
+                elem.dataset.angle = '0';
+            });
+        }
+
+        // 公转动画
+        function animate() {
+            if (!isRunning) return;
+            planets.forEach(planet => {
+                const elem = document.getElementById(planet.id);
+                const orbit = elem.parentElement;
+                const orbitRadius = orbit.offsetWidth / 2;
+                let angle = parseFloat(elem.dataset.angle) + (planet.speed * speedMultiplier);
+                if (angle >= 360) angle = 0;
+                elem.dataset.angle = angle;
+                const radians = angle * Math.PI / 180;
+                elem.style.left = `${orbitRadius + orbitRadius * Math.cos(radians)}px`;
+                elem.style.top = `${orbitRadius + orbitRadius * Math.sin(radians)}px`;
+                // 调整行星名称位置
+                const nameElem = elem.nextElementSibling;
+                nameElem.style.left = `${orbitRadius + orbitRadius * Math.cos(radians)}px`;
+                nameElem.style.top = `${orbitRadius + orbitRadius * Math.sin(radians) - 10}px`;
+            });
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        // 显示行星信息
+        function showPlanetInfo(planet, x, y) {
+            const infoPanel = document.getElementById('info-panel');
+            infoPanel.innerHTML = `<strong>${planet.name}</strong><br>与太阳距离：${planet.distance}`;
+            infoPanel.style.display = 'block';
+            infoPanel.style.left = `${x}px`;
+            infoPanel.style.top = `${y}px`;
+        }
+
+        // 绑定事件
+        document.getElementById('start').addEventListener('click', () => {
+            if (!isRunning) {
+                isRunning = true;
+                animate();
+            }
+        });
+
+        document.getElementById('pause').addEventListener('click', () => {
+            isRunning = false;
+            cancelAnimationFrame(animationFrameId);
+        });
+
+        document.getElementById('speed-up').addEventListener('click', () => {
+            speedMultiplier = Math.min(speedMultiplier + 0.5, 3);
+        });
+
+        document.getElementById('speed-down').addEventListener('click', () => {
+            speedMultiplier = Math.max(speedMultiplier - 0.5, 0.5);
+        });
+
+        document.getElementById('reset').addEventListener('click', () => {
+            isRunning = false;
+            cancelAnimationFrame(animationFrameId);
+            speedMultiplier = 1;
+            initPlanets();
+            document.getElementById('info-panel').style.display = 'none';
+        });
+
+        // 行星点击事件
+        planets.forEach(planet => {
+            document.getElementById(planet.id).addEventListener('click', (e) => {
+                showPlanetInfo(planet, e.clientX + 10, e.clientY + 10);
+            });
+        });
+
+        // 点击空白处隐藏信息面板
+        document.getElementById('solar-system').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('solar-system')) {
+                document.getElementById('info-panel').style.display = 'none';
+            }
+        });
+
+        // 初始化
+        window.onload = initPlanets;
+    </script>
+</body>
+</html>

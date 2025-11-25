@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史人物关系图 - MVP版本</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* 查询页面样式 */
+        .query-page {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .query-section {
+            margin-bottom: 25px;
+        }
+
+        .query-section h2 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .period-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .period-btn {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .period-btn:hover {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        .period-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .query-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            width: 100%;
+        }
+
+        .query-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 图谱页面样式 */
+        .graph-page {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .graph-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .back-btn, .filter-btn, .reset-btn {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s ease;
+        }
+
+        .back-btn:hover, .filter-btn:hover, .reset-btn:hover {
+            background: #3182ce;
+        }
+
+        .graph-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .graph-container {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .node {
+            cursor: pointer;
+            stroke: #fff;
+            stroke-width: 2px;
+        }
+
+        .node:hover {
+            stroke-width: 3px;
+        }
+
+        .link {
+            stroke: #999;
+            stroke-opacity: 0.6;
+            stroke-width: 2px;
+        }
+
+        .relationship-label {
+            font-size: 10px;
+            fill: #666;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 200px;
+        }
+
+        .filter-panel {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .filter-checkbox {
+            margin: 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .stats {
+            background: #edf2f7;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>历史人物关系图</h1>
+            <p>基于MVP设计 · 快速查询 · 直观查看 · 简单筛选</p>
+        </div>
+
+        <!-- 查询页面 -->
+        <div class="query-page" id="queryPage">
+            <div class="query-section">
+                <h2>🔍 开始探索历史人物关系</h2>
+                <p style="color: #666; margin-bottom: 20px;">输入历史时期和核心人物，快速获取可视化关系图谱</p>
+            </div>
+
+            <div class="query-section">
+                <label><strong>🏛️ 选择历史时期：</strong></label>
+                <div class="form-group">
+                    <div class="period-buttons">
+                        <div class="period-btn active" data-period="唐朝">唐朝</div>
+                        <div class="period-btn" data-period="宋朝">宋朝</div>
+                        <div class="period-btn" data-period="明朝">明朝</div>
+                        <div class="period-btn" data-period="清朝">清朝</div>
+                        <div class="period-btn" data-period="秦汉">秦汉</div>
+                        <div class="period-btn" data-period="三国">三国</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="query-section">
+                <label for="characterInput"><strong>👤 输入核心人物：</strong></label>
+                <div class="form-group">
+                    <input type="text" id="characterInput" class="input-field" 
+                           placeholder="例如：李世民、李白、康熙帝..." />
+                </div>
+            </div>
+
+            <div class="query-section">
+                <button class="query-btn" onclick="searchRelationships()">
+                    🚀 查询人物关系图
+                </button>
+            </div>
+        </div>
+
+        <!-- 图谱页面 -->
+        <div class="graph-page" id="graphPage">
+            <div class="graph-controls">
+                <div>
+                    <button class="back-btn" onclick="goBack()">← 返回查询</button>
+                    <span class="graph-title" id="graphTitle">唐朝 - 李世民 关系图谱</span>
+                </div>
+                <div>
+                    <button class="reset-btn" onclick="resetFilters()">重置筛选</button>
+                </div>
+            </div>
+
+            <div class="filter-panel">
+                <label><strong>🔗 关系筛选：</strong></label>
+                <div class="filter-options">
+                    <div class="filter-option">
+                        <input type="checkbox" class="filter-checkbox" id="familyFilter" checked onchange="applyFilters()">
+                        <label for="familyFilter">亲属关系</label>
+                    </div>
+                    <div class="filter-option">
+                        <input type="checkbox" class="filter-checkbox" id="politicalFilter" checked onchange="applyFilters()">
+                        <label for="politicalFilter">政治关系</label>
+                    </div>
+                    <div class="filter-option">
+                        <input type="checkbox" class="filter-checkbox" id="otherFilter" checked onchange="applyFilters()">
+                        <label for="otherFilter">其他关联</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats" id="graphStats">
+                共加载 0 个节点，0 条关系线
+            </div>
+
+            <div class="graph-container" id="graphContainer">
+                <div class="loading" id="loadingText">
+                    点击"查询人物关系图"开始探索
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip" style="display: none;"></div>
+
+    <script>
+        // 模拟历史人物数据
+        const historicalData = {
+            "唐朝": {
+                "李世民": {
+                    "name": "李世民",
+                    "dynasty": "唐朝",
+                    "identity": "唐太宗，唐朝第二位皇帝",
+                    "relationships": [
+                        {"name": "李渊", "type": "父子", "category": "亲属", "description": "父亲，唐朝开国皇帝"},
+                        {"name": "长孙皇后", "type": "夫妻", "category": "亲属", "description": "皇后，长孙无忌之妹"},
+                        {"name": "魏征", "type": "君臣", "category": "政治", "description": "著名谏臣，贞观之治重要功臣"},
+                        {"name": "房玄龄", "type": "君臣", "category": "政治", "description": "宰相，贞观名臣"},
+                        {"name": "杜如晦", "type": "君臣", "category": "政治", "description": "宰相，贞观名臣"},
+                        {"name": "李靖", "type": "君臣", "category": "政治", "description": "大将，平定突厥"},
+                        {"name": "李建成", "type": "兄弟", "category": "亲属", "description": "太子，玄武门之变对立"},
+                        {"name": "李元吉", "type": "兄弟", "category": "亲属", "description": "齐王，玄武门之变对立"}
+                    ]
+                },
+                "李白": {
+                    "name": "李白",
+                    "dynasty": "唐朝",
+                    "identity": "诗仙，唐代著名诗人",
+                    "relationships": [
+                        {"name": "唐玄宗", "type": "君臣", "category": "政治", "description": "曾供奉翰林，为皇帝作诗"},
+                        {"name": "贺知章", "type": "朋友", "category": "其他", "description": "诗友，称李白为'谪仙人'"},
+                        {"name": "杜甫", "type": "朋友", "category": "其他", "description": "大诗人，后世并称'李杜'"},
+                        {"name": "高适", "type": "朋友", "category": "其他", "description": "边塞诗人，好友"},
+                        {"name": "孟浩然", "type": "朋友", "category": "其他", "description": "山水诗人，好友"}
+                    ]
+                }
+            },
+            "宋朝": {
+                "苏轼": {
+                    "name": "苏轼",
+                    "dynasty": "宋朝",
+                    "identity": "文学家，唐宋八大家之一",
+                    "relationships": [
+                        {"name": "宋神宗", "type": "君臣", "category": "政治", "description": "在位期间苏轼经历多次贬谪"},
+                        {"name": "王安石", "type": "政敌", "category": "政治", "description": "变法派领袖，政治观点对立"},
+                        {"name": "司马光", "type": "政友", "category": "政治", "description": "反对变法，后来成为朋友"},
+                        {"name": "苏辙", "type": "兄弟", "category": "亲属", "description": "弟弟，同样为著名文学家"},
+                        {"name": "黄庭坚", "type": "朋友", "category": "其他", "description": "江西诗派代表，好友"}
+                    ]
+                }
+            },
+            "明朝": {
+                "朱元璋": {
+                    "name": "朱元璋",
+                    "dynasty": "明朝",
+                    "identity": "明太祖，明朝开国皇帝",
+                    "relationships": [
+                        {"name": "马皇后", "type": "夫妻", "category": "亲属", "description": "皇后，朱元璋的重要支持者"},
+                        {"name": "朱标", "type": "父子", "category": "亲属", "description": "太子，朱元璋属意的继承人"},
+                        {"name": "刘伯温", "type": "君臣", "category": "政治", "description": "军师，明朝开国功臣"},
+                        {"name": "徐达", "type": "君臣", "category": "政治", "description": "大将，北伐元朝的主帅"},
+                        {"name": "胡惟庸", "type": "君臣", "category": "政治", "description": "丞相，后因谋反被诛杀"}
+                    ]
+                }
+            },
+            "清朝": {
+                "康熙帝": {
+                    "name": "康熙帝",
+                    "dynasty": "清朝",
+                    "identity": "清圣祖，清朝第四位皇帝",
+                    "relationships": [
+                        {"name": "孝庄太后", "type": "祖孙", "category": "亲属", "description": "祖母，重要的政治指导者"},
+                        {"name": "鳌拜", "type": "君臣", "category": "政治", "description": "权臣，后被康熙智擒"},
+                        {"name": "明珠", "type": "君臣", "category": "政治", "description": "重臣，索额图的政治对手"},
+                        {"name": "索额图", "type": "君臣", "category": "政治", "description": "重臣，康熙初期重要大臣"},
+                        {"name": "胤礽", "type": "父子", "category": "亲属", "description": "太子，两次被立废"}
+                    ]
+                }
+            },
+            "秦汉": {
+                "刘邦": {
+                    "name": "刘邦",
+                    "dynasty": "秦汉",
+                    "identity": "汉高祖，汉朝开国皇帝",
+                    "relationships": [
+                        {"name": "吕雉", "type": "夫妻", "category": "亲属", "description": "皇后，后来的吕后"},
+                        {"name": "项羽", "type": "敌对", "category": "政治", "description": "西楚霸王，主要竞争对手"},
+                        {"name": "萧何", "type": "君臣", "category": "政治", "description": "丞相，汉初三杰之一"},
+                        {"name": "张良", "type": "君臣", "category": "政治", "description": "谋士，汉初三杰之一"},
+                        {"name": "韩信", "type": "君臣", "category": "政治", "description": "大将，汉初三杰之一"}
+                    ]
+                }
+            },
+            "三国": {
+                "刘备": {
+                    "name": "刘备",
+                    "dynasty": "三国",
+                    "identity": "蜀汉开国皇帝",
+                    "relationships": [
+                        {"name": "关羽", "type": "兄弟", "category": "亲属", "description": "结义兄弟，蜀汉大将"},
+                        {"name": "张飞", "type": "兄弟", "category": "亲属", "description": "结义兄弟，蜀汉大将"},
+                        {"name": "诸葛亮", "type": "君臣", "category": "政治", "description": "丞相，蜀汉重要谋士"},
+                        {"name": "曹操", "type": "敌对", "category": "政治", "description": "主要竞争对手，魏国奠基人"},
+                        {"name": "孙权", "type": "盟友/敌对", "category": "政治", "description": "东吴君主，既有联盟也有冲突"}
+                    ]
+                }
+            }
+        };
+
+        let currentPeriod = "唐朝";
+        let currentCharacter = "";
+        let graphData = { nodes: [], links: [] };
+        let svg, simulation;
+
+        // 时期按钮事件
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentPeriod = this.dataset.period;
+            });
+        });
+
+        // 查询人物关系
+        function searchRelationships() {
+            const characterInput = document.getElementById('characterInput').value.trim();
+            if (!characterInput) {
+                alert('请输入核心人物姓名');
+                return;
+            }
+
+            currentCharacter = characterInput;
+            showGraphPage();
+            loadGraphData();
+        }
+
+        // 显示图谱页面
+        function showGraphPage() {
+            document.getElementById('queryPage').style.display = 'none';
+            document.getElementById('graphPage').style.display = 'block';
+            
+            const title = `${currentPeriod} - ${currentCharacter} 关系图谱`;
+            document.getElementById('graphTitle').textContent = title;
+        }
+
+        // 返回查询页面
+        function goBack() {
+            document.getElementById('graphPage').style.display = 'none';
+            document.getElementById('queryPage').style.display = 'block';
+            document.getElementById('characterInput').value = '';
+        }
+
+        // 加载图谱数据
+        function loadGraphData() {
+            const loadingText = document.getElementById('loadingText');
+            loadingText.style.display = 'block';
+            loadingText.textContent = '正在加载关系数据...';
+
+            // 模拟加载延迟
+            setTimeout(() => {
+                const characterData = historicalData[currentPeriod]?.[currentCharacter];
+                if (!characterData) {
+                    // 如果没有找到精确匹配，尝试显示该时期的其他人物
+                    const periodData = historicalData[currentPeriod];
+                    if (periodData && Object.keys(periodData).length > 0) {
+                        const firstKey = Object.keys(periodData)[0];
+                        currentCharacter = firstKey;
+                        document.getElementById('graphTitle').textContent = `${currentPeriod} - ${firstKey} 关系图谱`;
+                        characterData = periodData[firstKey];
+                    } else {
+                        loadingText.textContent = '暂无该人物的关系数据，显示示例数据';
+                        characterData = createSampleData();
+                    }
+                }
+
+                graphData = createGraphFromCharacterData(characterData);
+                renderGraph();
+                loadingText.style.display = 'none';
+                
+                const stats = document.getElementById('graphStats');
+                stats.textContent = `共加载 ${graphData.nodes.length} 个节点，${graphData.links.length} 条关系线`;
+            }, 1000);
+        }
+
+        // 创建示例数据（当找不到指定人物时）
+        function createSampleData() {
+            return {
+                name: "示例人物",
+                dynasty: currentPeriod,
+                identity: "示例历史人物",
+                relationships: [
+                    {"name": "君主", "type": "君臣", "category": "政治", "description": "上级领导"},
+                    {"name": "家人", "type": "亲属", "category": "亲属", "description": "家庭成员"},
+                    {"name": "朋友", "type": "朋友", "category": "其他", "description": "好友关系"},
+                    {"name": "同僚", "type": "同事", "category": "政治", "description": "同事关系"}
+                ]
+            };
+        }
+
+        // 从人物数据创建图谱数据
+        function createGraphFromCharacterData(characterData) {
+            const nodes = [];
+            const links = [];
+
+            // 添加中心人物节点
+            const mainNode = {
+                id: characterData.name,
+                name: characterData.name,
+                dynasty: characterData.dynasty,
+                identity: characterData.identity,
+                type: 'main',
+                category: 'center'
+            };
+            nodes.push(mainNode);
+
+            // 添加关系节点和连线
+            characterData.relationships.forEach(rel => {
+                // 关系对象节点
+                const relatedNode = {
+                    id: rel.name,
+                    name: rel.name,
+                    dynasty: '相关人物',
+                    identity: rel.description,
+                    type: 'related',
+                    category: rel.category
+                };
+                nodes.push(relatedNode);
+
+                // 关系连线
+                const link = {
+                    source: characterData.name,
+                    target: rel.name,
+                    relationship: rel.type,
+                    category: rel.category,
+                    description: rel.description
+                };
+                links.push(link);
+            });
+
+            return { nodes, links };
+        }
+
+        // 渲染图谱
+        function renderGraph() {
+            const container = document.getElementById('graphContainer');
+            container.innerHTML = '';
+
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            svg = d3.select('#graphContainer')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            // 创建缩放行为
+            const zoom = d3.zoom()
+                .scaleExtent([0.1, 4])
+                .on('zoom', (event) => {
+                    svg.select('g').attr('transform', event.transform);
+                });
+
+            svg.call(zoom);
+
+            const g = svg.append('g');
+
+            // 创建力导向模拟
+            simulation = d3.forceSimulation(graphData.nodes)
+                .force('link', d3.forceLink(graphData.links).id(d => d.id).distance(100))
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('center', d3.forceCenter(width / 2, height / 2));
+
+            // 创建连线
+            const link = g.append('g')
+                .selectAll('line')
+                .data(graphData.links.filter(link => isLinkVisible(link)))
+                .enter().append('line')
+                .attr('class', 'link');
+
+            // 创建连线标签
+            const linkLabel = g.append('g')
+                .selectAll('text')
+                .data(graphData.links.filter(link => isLinkVisible(link)))
+                .enter().append('text')
+                .attr('class', 'relationship-label')
+                .text(d => d.relationship);
+
+            // 创建节点
+            const node = g.append('g')
+                .selectAll('circle')
+                .data(graphData.nodes.filter(node => isNodeVisible(node)))
+                .enter().append('circle')
+                .attr('class', 'node')
+                .attr('r', d => d.type === 'main' ? 20 : 12)
+                .attr('fill', d => d.type === 'main' ? '#ff6b6b' : getNodeColor(d.category))
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended));
+
+            // 创建节点标签
+            const nodeLabels = g.append('g')
+                .selectAll('text')
+                .data(graphData.nodes.filter(node => isNodeVisible(node)))
+                .enter().append('text')
+                .attr('dx', d => d.type === 'main' ? 25 : 15)
+                .attr('dy', 4)
+                .text(d => d.name)
+                .style('font-size', d => d.type === 'main' ? '12px' : '10px')
+                .style('font-weight', d => d.type === 'main' ? 'bold' : 'normal')
+                .style('fill', '#333');
+
+            // 工具提示
+            const tooltip = d3.select('#tooltip');
+
+            // 节点点击事件
+            node.on('click', function(event, d) {
+                if (d.type === 'related') {
+                    showPersonTooltip(event, d);
+                }
+            })
+            .on('mouseover', function(event, d) {
+                if (d.type === 'related') {
+                    tooltip.style('display', 'block')
+                        .html(`<strong>${d.name}</strong><br/>${d.identity}`)
+                        .style('left', (event.pageX + 10) + 'px')
+                        .style('top', (event.pageY - 10) + 'px');
+                }
+            })
+            .on('mouseout', function() {
+                tooltip.style('display', 'none');
+            });
+
+            // 更新模拟
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                linkLabel
+                    .attr('x', d => (d.source.x + d.target.x) / 2)
+                    .attr('y', d => (d.source.y + d.target.y) / 2);
+
+                node
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y);
+
+                nodeLabels
+                    .attr('x', d => d.x)
+                    .attr('y', d => d.y);
+            });
+        }
+
+        // 获取节点颜色
+        function getNodeColor(category) {
+            const colors = {
+                '亲属': '#4ecdc4',
+                '政治': '#45b7d1',
+                '其他': '#96ceb4'
+            };
+            return colors[category] || '#feca57';
+        }
+
+        // 判断节点是否可见
+        function isNodeVisible(node) {
+            if (node.type === 'main') return true;
+            
+            const visibleCategories = getVisibleCategories();
+            return visibleCategories.includes(node.category);
+        }
+
+        // 判断连线是否可见
+        function isLinkVisible(link) {
+            const visibleCategories = getVisibleCategories();
+            return visibleCategories.includes(link.category);
+        }
+
+        // 获取可见的分类
+        function getVisibleCategories() {
+            const categories = [];
+            if (document.getElementById('familyFilter').checked) categories.push('亲属');
+            if (document.getElementById('politicalFilter').checked) categories.push('政治');
+            if (document.getElementById('otherFilter').checked) categories.push('其他');
+            return categories;
+        }
+
+        // 应用筛选
+        function applyFilters() {
+            if (svg) {
+                // 重新渲染以应用筛选
+                const link = svg.select('g').selectAll('.link');
+                const linkLabel = svg.select('g').selectAll('.relationship-label');
+                const node = svg.select('g').selectAll('.node');
+                const nodeLabels = svg.select('g').selectAll('text:nth-of-type(2)');
+
+                // 这里简化处理，重新渲染整个图谱
+                setTimeout(() => {
+                    renderGraph();
+                }, 100);
+            }
+        }
+
+        // 重置筛选
+        function resetFilters() {
+            document.getElementById('familyFilter').checked = true;
+            document.getElementById('politicalFilter').checked = true;
+            document.getElementById('otherFilter').checked = true;
+            applyFilters();
+        }
+
+        // 显示人物工具提示
+        function showPersonTooltip(event, d) {
+            const tooltip = d3.select('#tooltip');
+            tooltip.style('display', 'block')
+                .html(`<strong>${d.name}</strong><br/>${d.identity}`)
+                .style('left', (event.pageX + 10) + 'px')
+                .style('top', (event.pageY - 10) + 'px');
+        }
+
+        // 拖拽功能
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
+        // 响应式调整
+        window.addEventListener('resize', function() {
+            if (svg) {
+                renderGraph();
+            }
+        });
+    </script>
+</body>
+</html>

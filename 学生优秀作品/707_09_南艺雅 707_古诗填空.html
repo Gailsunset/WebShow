@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>古诗填空 - MVP</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+
+    <!-- 主容器 -->
+    <div id="app" class="max-w-md mx-auto p-5">
+
+        <!-- 首页 -->
+        <div id="home-screen" class="block">
+            <div class="text-center mb-8 mt-12">
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">古诗填空</h1>
+                <p class="text-gray-500">轻松练习，应对考试</p>
+            </div>
+            
+            <div id="progress" class="bg-white rounded-lg shadow p-4 mb-6 text-center">
+                <p class="text-gray-600">已练 <span id="total-practiced" class="font-bold text-blue-600">0</span> 题</p>
+                <p class="text-gray-600">正确率 <span id="accuracy-rate" class="font-bold text-green-600">0</span>%</p>
+            </div>
+
+            <button id="btn-start" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg font-medium mb-4 transition-colors">开始练习</button>
+            <button id="btn-categories" class="w-full bg-gray-700 hover:bg-gray-800 text-white py-3 px-4 rounded-lg font-medium transition-colors">分类题库</button>
+            
+            <div class="text-right mt-8">
+                <button id="btn-settings" class="text-gray-500 hover:text-gray-700 p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15a3 3 0 110-6 3 3 0 010 6z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 分类选择页 -->
+        <div id="category-screen" class="hidden">
+            <div class="flex items-center mb-6">
+                <button id="btn-back" class="text-gray-500 hover:text-gray-700 mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                </button>
+                <h2 class="text-2xl font-bold text-gray-800">选择分类</h2>
+            </div>
+            <div id="category-list" class="space-y-3">
+                <!-- 分类按钮将通过JS动态生成 -->
+            </div>
+        </div>
+
+        <!-- 练习页 -->
+        <div id="practice-screen" class="hidden">
+            <div class="flex justify-between items-center mb-8">
+                <button id="btn-quit" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                </button>
+                <span id="current-category" class="text-lg font-semibold text-gray-700">全部</span>
+                <div class="w-6"></div> <!-- 占位符，保持居中 -->
+            </div>
+
+            <div id="question-container" class="bg-white rounded-xl shadow-lg p-6 mb-6 min-h-[150px] flex flex-col justify-center">
+                <p id="poem-line" class="text-2xl text-center text-gray-800">床前明月光，_________</p>
+            </div>
+
+            <div id="feedback-container" class="mb-4 hidden">
+                <div id="correct-feedback" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 hidden">
+                    <p class="font-bold">√ 回答正确！</p>
+                </div>
+                <div id="wrong-feedback" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 hidden">
+                    <p class="font-bold">× 再试试？</p>
+                    <p class="mt-2">正确答案：<span id="correct-answer" class="font-semibold"></span></p>
+                    <p>易错字：<span id="error-words" class="text-red-500 font-bold"></span></p>
+                </div>
+            </div>
+
+            <input type="text" id="user-input" class="w-full border border-gray-300 rounded-lg py-3 px-4 text-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入答案">
+            <button id="btn-submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-lg font-medium transition-colors">提交</button>
+            <button id="btn-next" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg font-medium mt-4 hidden transition-colors">下一题</button>
+        </div>
+
+        <!-- 设置页 -->
+        <div id="settings-screen" class="hidden">
+            <div class="flex items-center mb-8">
+                <button id="btn-settings-back" class="text-gray-500 hover:text-gray-700 mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                </button>
+                <h2 class="text-2xl font-bold text-gray-800">设置</h2>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">字体大小</label>
+                    <div class="flex space-x-2">
+                        <button data-size="sm" class="font-size-btn flex-1 py-2 px-4 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 transition-colors">小</button>
+                        <button data-size="md" class="font-size-btn flex-1 py-2 px-4 border border-gray-300 rounded-lg text-base hover:bg-gray-100 transition-colors">中</button>
+                        <button data-size="lg" class="font-size-btn flex-1 py-2 px-4 border border-gray-300 rounded-lg text-lg hover:bg-gray-100 transition-colors">大</button>
+                    </div>
+                </div>
+                <button id="btn-reset-progress" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-medium transition-colors">重置练习进度</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. 数据模型
+        const poemData = [
+            { author: "李白", title: "静夜思", line: "床前明月光，_________", answer: "疑是地上霜", errorWords: "疑,霜" },
+            { author: "李白", title: "望庐山瀑布", line: "飞流直下三千尺，_________", answer: "疑是银河落九天", errorWords: "疑,银河" },
+            { author: "杜甫", title: "望岳", line: "造化钟神秀，_________", answer: "阴阳割昏晓", errorWords: "割" },
+            { author: "杜甫", title: "春望", line: "国破山河在，_________", answer: "城春草木深", errorWords: "城,深" },
+            { author: "白居易", title: "赋得古原草送别", line: "野火烧不尽，_________", answer: "春风吹又生", errorWords: "吹,生" },
+            { author: "王维", title: "相思", line: "红豆生南国，_________", answer: "春来发几枝", errorWords: "枝" },
+            { author: "孟浩然", title: "春晓", line: "春眠不觉晓，_________", answer: "处处闻啼鸟", errorWords: "啼" },
+            { author: "王之涣", title: "登鹳雀楼", line: "欲穷千里目，_________", answer: "更上一层楼", errorWords: "层" },
+        ];
+
+        // 状态管理
+        const state = {
+            currentScreen: 'home',
+            currentQuestion: null,
+            currentCategory: '全部',
+            practiceCount: 0,
+            correctCount: 0,
+            fontSize: 'md'
+        };
+
+        // 2. 工具函数
+        function getCategories() {
+            const categories = new Set(poemData.map(poem => poem.author));
+            return ['全部', ...categories];
+        }
+
+        function getFilteredPoems(category) {
+            if (category === '全部') return poemData;
+            return poemData.filter(poem => poem.author === category);
+        }
+        
+        function getRandomQuestion(category) {
+            const poems = getFilteredPoems(category);
+            if (poems.length === 0) return null;
+            const randomIndex = Math.floor(Math.random() * poems.length);
+            return poems[randomIndex];
+        }
+
+        function calculateAccuracy() {
+            if (state.practiceCount === 0) return 0;
+            return Math.round((state.correctCount / state.practiceCount) * 100);
+        }
+
+        function saveProgress() {
+            localStorage.setItem('practiceProgress', JSON.stringify({
+                count: state.practiceCount,
+                correct: state.correctCount
+            }));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('practiceProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                state.practiceCount = data.count;
+                state.correctCount = data.correct;
+            }
+        }
+        
+        function saveSettings() {
+            localStorage.setItem('appSettings', JSON.stringify({
+                fontSize: state.fontSize
+            }));
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('appSettings');
+            if (saved) {
+                const data = JSON.parse(saved);
+                state.fontSize = data.fontSize;
+                document.getElementById('poem-line').classList.add(`text-${state.fontSize}`);
+                document.querySelector(`.font-size-btn[data-size="${state.fontSize}"]`).classList.add('bg-blue-500', 'text-white');
+            }
+        }
+
+        // 3. 渲染函数
+        function renderHomeScreen() {
+            document.getElementById('total-practiced').textContent = state.practiceCount;
+            document.getElementById('accuracy-rate').textContent = calculateAccuracy();
+        }
+
+        function renderCategoryScreen() {
+            const categoryList = document.getElementById('category-list');
+            categoryList.innerHTML = '';
+            getCategories().forEach(category => {
+                const button = document.createElement('button');
+                button.className = 'w-full text-left bg-white hover:bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 transition-colors';
+                button.textContent = category;
+                button.addEventListener('click', () => {
+                    selectCategory(category);
+                });
+                categoryList.appendChild(button);
+            });
+        }
+        
+        function renderPracticeScreen() {
+            state.currentQuestion = getRandomQuestion(state.currentCategory);
+            if (!state.currentQuestion) {
+                alert('该分类下没有题目！');
+                navigateTo('home');
+                return;
+            }
+
+            document.getElementById('poem-line').textContent = state.currentQuestion.line;
+            document.getElementById('current-category').textContent = state.currentCategory;
+            document.getElementById('user-input').value = '';
+            document.getElementById('feedback-container').classList.add('hidden');
+            document.getElementById('correct-feedback').classList.add('hidden');
+            document.getElementById('wrong-feedback').classList.add('hidden');
+            document.getElementById('btn-submit').classList.remove('hidden');
+            document.getElementById('btn-next').classList.add('hidden');
+            document.getElementById('user-input').focus();
+        }
+
+        function updateProgressDisplay() {
+            document.getElementById('total-practiced').textContent = state.practiceCount;
+            document.getElementById('accuracy-rate').textContent = calculateAccuracy();
+        }
+
+        // 4. 事件处理函数
+        function navigateTo(screenName) {
+            // 隐藏所有屏幕
+            document.querySelectorAll('[id$="-screen"]').forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            // 显示目标屏幕
+            document.getElementById(`${screenName}-screen`).classList.remove('hidden');
+            state.currentScreen = screenName;
+
+            // 根据屏幕名称执行特定渲染
+            if (screenName === 'category') {
+                renderCategoryScreen();
+            } else if (screenName === 'practice') {
+                renderPracticeScreen();
+            } else if (screenName === 'home') {
+                renderHomeScreen();
+            }
+        }
+        
+        function selectCategory(category) {
+            state.currentCategory = category;
+            navigateTo('practice');
+        }
+
+        function handleSubmit() {
+            const userInput = document.getElementById('user-input').value.trim();
+            if (!userInput) return;
+
+            state.practiceCount++;
+            const isCorrect = userInput === state.currentQuestion.answer;
+            if (isCorrect) {
+                state.correctCount++;
+            }
+            
+            // 保存进度
+            saveProgress();
+            updateProgressDisplay();
+
+            // 显示反馈
+            document.getElementById('feedback-container').classList.remove('hidden');
+            document.getElementById('btn-submit').classList.add('hidden');
+            document.getElementById('btn-next').classList.remove('hidden');
+
+            if (isCorrect) {
+                document.getElementById('correct-feedback').classList.remove('hidden');
+                // 1秒后自动跳转下一题
+                setTimeout(() => {
+                    renderPracticeScreen();
+                }, 1000);
+            } else {
+                document.getElementById('wrong-feedback').classList.remove('hidden');
+                document.getElementById('correct-answer').textContent = state.currentQuestion.answer;
+                
+                // 处理易错字显示
+                const errorWordsContainer = document.getElementById('error-words');
+                errorWordsContainer.innerHTML = ''; // 清空之前的内容
+                const errorWords = state.currentQuestion.errorWords.split(',');
+                errorWords.forEach(word => {
+                    const span = document.createElement('span');
+                    span.className = 'bg-red-200 px-1 mx-0.5 rounded';
+                    span.textContent = word;
+                    errorWordsContainer.appendChild(span);
+                });
+            }
+        }
+        
+        function handleFontSizeChange(size) {
+            state.fontSize = size;
+            document.getElementById('poem-line').className = `text-${size} text-center text-gray-800`;
+            
+            // 更新按钮样式
+            document.querySelectorAll('.font-size-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-500', 'text-white');
+            });
+            document.querySelector(`.font-size-btn[data-size="${size}"]`).classList.add('bg-blue-500', 'text-white');
+            
+            saveSettings();
+        }
+        
+        function handleResetProgress() {
+            if (confirm('确定要重置所有练习进度吗？此操作不可恢复。')) {
+                state.practiceCount = 0;
+                state.correctCount = 0;
+                saveProgress();
+                updateProgressDisplay();
+            }
+        }
+
+        // 5. 初始化
+        function init() {
+            // 加载数据
+            loadProgress();
+            loadSettings();
+
+            // 绑定事件监听
+            document.getElementById('btn-start').addEventListener('click', () => {
+                selectCategory('全部');
+            });
+            document.getElementById('btn-categories').addEventListener('click', () => {
+                navigateTo('category');
+            });
+            document.getElementById('btn-settings').addEventListener('click', () => {
+                navigateTo('settings');
+            });
+            
+            document.getElementById('btn-back').addEventListener('click', () => {
+                navigateTo('home');
+            });
+            document.getElementById('btn-settings-back').addEventListener('click', () => {
+                navigateTo('home');
+            });
+            document.getElementById('btn-quit').addEventListener('click', () => {
+                navigateTo('home');
+            });
+
+            document.getElementById('btn-submit').addEventListener('click', handleSubmit);
+            document.getElementById('user-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleSubmit();
+            });
+            document.getElementById('btn-next').addEventListener('click', renderPracticeScreen);
+            
+            document.querySelectorAll('.font-size-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    handleFontSizeChange(btn.dataset.size);
+                });
+            });
+            document.getElementById('btn-reset-progress').addEventListener('click', handleResetProgress);
+
+            // 初始导航到首页
+            navigateTo('home');
+        }
+
+        // 启动应用
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小学数学练习题生成器</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; }
+        .settings { margin-bottom: 20px; }
+        select { padding: 8px; font-size: 16px; }
+        .question { margin: 10px 0; display: flex; align-items: center; }
+        input[type="number"] { width: 80px; padding: 5px; margin-left: 10px; }
+        button { padding: 10px 20px; margin: 10px 5px; font-size: 16px; cursor: pointer; }
+        .result { margin-top: 20px; font-weight: bold; }
+        .correct { color: green; }
+        .incorrect { color: red; }
+    </style>
+</head>
+<body>
+    <h1>小学数学练习题（100以内加减法）</h1>
+    <div class="settings">
+        <label>运算类型：</label>
+        <select id="operationType">
+            <option value="mixed">加减混合</option>
+            <option value="add">仅加法</option>
+            <option value="subtract">仅减法</option>
+        </select>
+    </div>
+    <div id="questionsContainer"></div>
+    <button onclick="checkAnswers()">检查答案</button>
+    <button onclick="generateQuestions()">换一批题目</button>
+    <div id="result" class="result"></div>
+
+    <script>
+        let currentAnswers = [];
+        function generateQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            currentAnswers = [];
+            const operationType = document.getElementById('operationType').value;
+            const questionCount = 10;
+            
+            for (let i = 0; i < questionCount; i++) {
+                let num1 = Math.floor(Math.random() * 100) + 1;
+                let num2 = Math.floor(Math.random() * 100) + 1;
+                let operator, answer;
+                
+                if (operationType === 'add') {
+                    operator = '+';
+                    answer = num1 + num2;
+                } else if (operationType === 'subtract') {
+                    // 确保结果为正数
+                    if (num1 < num2) [num1, num2] = [num2, num1];
+                    operator = '-';
+                    answer = num1 - num2;
+                } else { // mixed
+                    operator = Math.random() > 0.5 ? '+' : '-';
+                    if (operator === '+') {
+                        answer = num1 + num2;
+                    } else {
+                        if (num1 < num2) [num1, num2] = [num2, num1];
+                        answer = num1 - num2;
+                    }
+                }
+                
+                currentAnswers.push(answer);
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `
+                    <span>${i + 1}. ${num1} ${operator} ${num2} = </span>
+                    <input type="number" id="answer${i}" min="0" max="200">
+                `;
+                container.appendChild(questionDiv);
+            }
+            document.getElementById('result').innerHTML = '';
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            const results = [];
+            for (let i = 0; i < currentAnswers.length; i++) {
+                const userAnswer = parseInt(document.getElementById(`answer${i}`).value) || 0;
+                const correctAnswer = currentAnswers[i];
+                if (userAnswer === correctAnswer) {
+                    correct++;
+                    results.push(`<div class="correct">第${i + 1}题：正确 (${correctAnswer})</div>`);
+                } else {
+                    results.push(`<div class="incorrect">第${i + 1}题：错误 (你的答案:${userAnswer}, 正确答案:${correctAnswer})</div>`);
+                }
+            }
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div>总分：${correct}/${currentAnswers.length} (${Math.round(correct / currentAnswers.length * 100)}%)</div>
+                ${results.join('')}
+            `;
+        }
+
+        // 页面加载时生成初始题目
+        window.onload = generateQuestions;
+    </script>
+</body>
+</html>

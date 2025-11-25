@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>词义射击游戏 - 英语单词学习</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            width: 100%;
+            max-width: 800px;
+            height: 600px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* 开始界面样式 */
+        #start-screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #43cea2, #185a9d);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        #start-screen h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        #start-screen p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            max-width: 500px;
+        }
+        
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            background-color: #ff5252;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 游戏界面样式 */
+        #game-screen {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #game-header {
+            padding: 15px 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        #current-word {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        #score-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+        
+        #game-area {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .balloon {
+            position: absolute;
+            width: 100px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            cursor: crosshair;
+            transition: transform 0.2s;
+            box-shadow: inset -10px -10px 10px rgba(0, 0, 0, 0.1);
+            animation: float 15s linear forwards;
+        }
+        
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            width: 2px;
+            height: 30px;
+            background-color: rgba(0, 0, 0, 0.2);
+            transform: translateX(-50%);
+        }
+        
+        .balloon:hover {
+            transform: scale(1.05);
+        }
+        
+        @keyframes float {
+            0% {
+                bottom: -150px;
+            }
+            100% {
+                bottom: 100%;
+            }
+        }
+        
+        /* 游戏结束界面样式 */
+        #end-screen {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            color: #333;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        #end-screen h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        #final-score {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        #message {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            max-width: 500px;
+        }
+        
+        /* 反馈效果 */
+        .feedback {
+            position: absolute;
+            font-size: 2rem;
+            font-weight: bold;
+            animation: feedback 1s forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes feedback {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+        }
+        
+        .correct {
+            color: #4CAF50;
+        }
+        
+        .incorrect {
+            color: #F44336;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <!-- 开始界面 -->
+        <div id="start-screen">
+            <h1>词义射击游戏</h1>
+            <p>通过射击正确释义的气球来学习英语单词！提高你的词汇量，让学习变得有趣！</p>
+            <button id="start-btn" class="btn">开始游戏</button>
+        </div>
+        
+        <!-- 游戏界面 -->
+        <div id="game-screen">
+            <div id="game-header">
+                <div id="current-word">Word</div>
+                <div id="score-display">得分: <span id="score">0</span></div>
+            </div>
+            <div id="game-area">
+                <!-- 气球将通过JS动态生成 -->
+            </div>
+        </div>
+        
+        <!-- 游戏结束界面 -->
+        <div id="end-screen">
+            <h2>游戏结束!</h2>
+            <div id="final-score">0</div>
+            <p id="message">继续努力，你可以做得更好！</p>
+            <button id="restart-btn" class="btn">再玩一次</button>
+        </div>
+    </div>
+
+    <script>
+        // 单词库
+        const wordList = [
+            { word: "apple", definition: "苹果", wrongDefinitions: ["香蕉", "猫", "汽车"] },
+            { word: "banana", definition: "香蕉", wrongDefinitions: ["苹果", "狗", "书"] },
+            { word: "cat", definition: "猫", wrongDefinitions: ["狗", "鸟", "鱼"] },
+            { word: "dog", definition: "狗", wrongDefinitions: ["猫", "马", "兔子"] },
+            { word: "book", definition: "书", wrongDefinitions: ["笔", "桌子", "椅子"] },
+            { word: "house", definition: "房子", wrongDefinitions: ["汽车", "树", "学校"] },
+            { word: "water", definition: "水", wrongDefinitions: ["火", "土", "空气"] },
+            { word: "friend", definition: "朋友", wrongDefinitions: ["敌人", "老师", "陌生人"] },
+            { word: "school", definition: "学校", wrongDefinitions: ["医院", "公园", "商场"] },
+            { word: "computer", definition: "电脑", wrongDefinitions: ["手机", "电视", "冰箱"] }
+        ];
+        
+        // 游戏状态
+        let gameState = {
+            currentWordIndex: 0,
+            score: 0,
+            totalWords: 10,
+            gameActive: false
+        };
+        
+        // DOM 元素
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const currentWordElement = document.getElementById('current-word');
+        const scoreElement = document.getElementById('score');
+        const finalScoreElement = document.getElementById('final-score');
+        const messageElement = document.getElementById('message');
+        const gameArea = document.getElementById('game-area');
+        
+        // 开始游戏
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+        
+        function startGame() {
+            // 重置游戏状态
+            gameState.currentWordIndex = 0;
+            gameState.score = 0;
+            gameState.gameActive = true;
+            
+            // 更新UI
+            scoreElement.textContent = gameState.score;
+            startScreen.style.display = 'none';
+            endScreen.style.display = 'none';
+            gameScreen.style.display = 'flex';
+            
+            // 开始第一轮
+            startRound();
+        }
+        
+        function startRound() {
+            // 清除上一轮的气球
+            gameArea.innerHTML = '';
+            
+            // 检查游戏是否结束
+            if (gameState.currentWordIndex >= gameState.totalWords) {
+                endGame();
+                return;
+            }
+            
+            // 获取当前单词
+            const currentWord = wordList[gameState.currentWordIndex];
+            currentWordElement.textContent = currentWord.word;
+            
+            // 创建气球
+            createBalloons(currentWord);
+            
+            // 增加当前单词索引
+            gameState.currentWordIndex++;
+        }
+        
+        function createBalloons(wordData) {
+            // 准备所有可能的释义
+            const definitions = [wordData.definition, ...wordData.wrongDefinitions.slice(0, 3)];
+            
+            // 随机排序释义
+            shuffleArray(definitions);
+            
+            // 创建气球
+            definitions.forEach((definition, index) => {
+                const balloon = document.createElement('div');
+                balloon.className = 'balloon';
+                balloon.textContent = definition;
+                
+                // 随机位置
+                const left = 10 + Math.random() * 80; // 10% 到 90%
+                balloon.style.left = `${left}%`;
+                
+                // 随机颜色
+                const colors = ['#FF5252', '#FF4081', '#E040FB', '#7C4DFF', '#536DFE', '#448AFF', '#40C4FF', '#18FFFF', '#64FFDA', '#69F0AE'];
+                balloon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                // 设置动画延迟，使气球不同时出现
+                balloon.style.animationDelay = `${index * 0.5}s`;
+                
+                // 添加点击事件
+                balloon.addEventListener('click', () => handleBalloonClick(balloon, definition === wordData.definition));
+                
+                // 添加到游戏区域
+                gameArea.appendChild(balloon);
+                
+                // 气球飞出屏幕后自动移除
+                setTimeout(() => {
+                    if (balloon.parentNode) {
+                        balloon.remove();
+                        // 如果所有气球都消失了且游戏还在进行中，进入下一轮
+                        if (gameArea.children.length === 0 && gameState.gameActive) {
+                            startRound();
+                        }
+                    }
+                }, 15000 - (index * 500)); // 15秒减去延迟时间
+            });
+        }
+        
+        function handleBalloonClick(balloon, isCorrect) {
+            if (!gameState.gameActive) return;
+            
+            // 创建反馈文本
+            const feedback = document.createElement('div');
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.textContent = isCorrect ? '+1 正确!' : '不对!';
+            feedback.style.left = `${balloon.offsetLeft}px`;
+            feedback.style.top = `${balloon.offsetTop}px`;
+            gameArea.appendChild(feedback);
+            
+            // 移除反馈文本
+            setTimeout(() => {
+                feedback.remove();
+            }, 1000);
+            
+            if (isCorrect) {
+                // 增加分数
+                gameState.score++;
+                scoreElement.textContent = gameState.score;
+                
+                // 移除所有气球
+                while (gameArea.firstChild) {
+                    gameArea.firstChild.remove();
+                }
+                
+                // 进入下一轮
+                setTimeout(startRound, 800);
+            } else {
+                // 只移除错误的气球
+                balloon.remove();
+            }
+        }
+        
+        function endGame() {
+            gameState.gameActive = false;
+            
+            // 更新结束界面
+            finalScoreElement.textContent = gameState.score;
+            
+            // 根据得分设置不同的消息
+            if (gameState.score >= 8) {
+                messageElement.textContent = "太棒了！你是个单词大师！";
+            } else if (gameState.score >= 5) {
+                messageElement.textContent = "做得不错！继续努力！";
+            } else {
+                messageElement.textContent = "继续练习，你会越来越好的！";
+            }
+            
+            // 显示结束界面
+            gameScreen.style.display = 'none';
+            endScreen.style.display = 'flex';
+        }
+        
+        // 辅助函数：随机排序数组
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
+</body>
+</html>

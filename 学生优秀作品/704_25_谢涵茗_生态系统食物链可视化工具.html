@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生态系统食物链可视化工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .step {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .step-title {
+            font-size: 1.4em;
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .step-number {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .typography-highlight {
+            font-weight: bold;
+            color: #667eea;
+            font-style: italic;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .feature-list li {
+            background: #f7fafc;
+            margin: 12px 0;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            position: relative;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            color: #48bb78;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.1em;
+        }
+        
+        .flowchart {
+            background: #f8f9fa;
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.8;
+            color: #4a5568;
+        }
+        
+        .flowchart-step {
+            margin: 8px 0;
+            padding: 5px 0;
+        }
+        
+        .flowchart-arrow {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .ecosystem-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .ecosystem-card {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .ecosystem-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            border-color: #667eea;
+        }
+        
+        .ecosystem-card.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #4c51bf;
+        }
+        
+        .canvas-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            min-height: 300px;
+            background: #fafafa;
+            position: relative;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+        }
+        
+        .biological-node {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            padding: 8px 15px;
+            cursor: grab;
+            user-select: none;
+            font-size: 0.9em;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            position: absolute;
+        }
+        
+        .biological-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .biological-node:active {
+            cursor: grabbing;
+        }
+        
+        .node-producer {
+            border-color: #48bb78;
+            background: #f0fff4;
+            color: #2f855a;
+        }
+        
+        .node-primary {
+            border-color: #4299e1;
+            background: #ebf8ff;
+            color: #2b6cb0;
+        }
+        
+        .node-secondary {
+            border-color: #ed8936;
+            background: #fffbf0;
+            color: #c05621;
+        }
+        
+        .node-tertiary {
+            border-color: #9f7aea;
+            background: #faf5ff;
+            color: #6b46c1;
+        }
+        
+        .dragging {
+            opacity: 0.8;
+            z-index: 1000;
+            transform: rotate(5deg);
+        }
+        
+        .action-buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .nutrition-label {
+            font-size: 0.7em;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌱 生态系统食物链可视化工具</h1>
+            <p>直观学习生态食物链构成与关系的智能辅助工具</p>
+        </div>
+
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">1</span>
+                典型用户画像
+            </div>
+            <p><span class="typography-highlight">一句话描述：</span>需要直观学习、展示生态系统食物链构成与关系的<span class="typography-highlight">学生（中小学 / 大学）及科普爱好者</span>，<span class="typography-highlight">核心痛点是抽象知识难理解、缺乏便捷可视化工具</span>。</p>
+        </div>
+
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">2</span>
+                场景故事
+            </div>
+            <p><span class="typography-highlight">一句话描述：</span>初中生小李为完成生物课食物链作业，通过产品快速选择生态类型（如森林 / 海洋）、添加生物节点、自动生成可视化食物链图谱，<span class="typography-highlight">轻松完成作业并理解生物间依存关系</span>。</p>
+        </div>
+
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">3</span>
+                功能特性
+            </div>
+            <ul class="feature-list">
+                <li>支持 <span class="typography-highlight">3 种基础生态类型选择</span>（森林、海洋、草原）</li>
+                <li>提供对应生态的 <span class="typography-highlight">10 种核心生物标签</span>（生产者 / 初级消费者 / 次级消费者各 3-4 种）</li>
+                <li>支持 <span class="typography-highlight">拖拽生物标签生成食物链链路</span>（最多 5 个节点）</li>
+                <li><span class="typography-highlight">自动标注生物营养级</span>（生产者 / 初级消费者 / 次级消费者 / 三级消费者）</li>
+                <li>生成<span class="typography-highlight">简约可视化食物链图谱</span>（可截图保存）</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">4</span>
+                交互流程
+            </div>
+            <div class="flowchart">
+                <div class="flowchart-step">A[<span class="typography-highlight">用户打开产品</span>] <span class="flowchart-arrow">→</span></div>
+                <div class="flowchart-step">B[<span class="typography-highlight">选择生态类型<br>（森林/海洋/草原）</span>] <span class="flowchart-arrow">→</span></div>
+                <div class="flowchart-step">C[<span class="typography-highlight">进入编辑页<br>查看生物标签库</span>] <span class="flowchart-arrow">→</span></div>
+                <div class="flowchart-step">D[<span class="typography-highlight">拖拽生物标签至画布<br>（最多5个节点，系统提示排序）</span>] <span class="flowchart-arrow">→</span></div>
+                <div class="flowchart-step">E[<span class="typography-highlight">点击"生成图谱"按钮</span>] <span class="flowchart-arrow">→</span></div>
+                <div class="flowchart-step">F[<span class="typography-highlight">自动标注营养级<br>（生产者/初级/次级/三级消费者）</span>] <span class="flowchart-arrow">→</span></div>
+                <div class="flowchart-step">G[<span class="typography-highlight">生成可视化图谱</span>] <span class="flowchart-arrow">→</span></div>
+                <div class="flowchart-step">H[<span class="typography-highlight">用户截图保存图谱</span>]</div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">5</span>
+                交互演示区域
+            </div>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <label style="font-weight: bold; margin-right: 15px;">选择生态类型：</label>
+                <div class="ecosystem-cards">
+                    <div class="ecosystem-card selected" onclick="selectEcosystem('forest')" data-eco="forest">
+                        🌲 森林生态
+                    </div>
+                    <div class="ecosystem-card" onclick="selectEcosystem('ocean')" data-eco="ocean">
+                        🌊 海洋生态
+                    </div>
+                    <div class="ecosystem-card" onclick="selectEcosystem('grassland')" data-eco="grassland">
+                        🌾 草原生态
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn" onclick="resetCanvas()">🔄 重置画布</button>
+                <button class="btn" id="generateBtn" onclick="generateFoodChain()" disabled>🎯 生成图谱</button>
+            </div>
+
+            <div class="canvas-area" id="canvasArea" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <div style="color: #a0aec0; text-align: center; font-size: 1.1em;">
+                    🖱️ 从下方拖拽生物到此区域开始构建食物链<br>
+                    <small>（最多选择5个生物节点）</small>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <div id="selectedCount" style="color: #667eea; font-weight: bold;">已选择 0 个生物节点</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEcosystem = 'forest';
+        let selectedNodes = [];
+        let nodeCounter = 0;
+        const maxNodes = 5;
+
+        // 不同生态系统的生物数据
+        const ecosystemData = {
+            forest: {
+                name: '森林生态',
+                producers: [
+                    {name: '树木', type: 'producer'},
+                    {name: '灌木', type: 'producer'}, 
+                    {name: '草本植物', type: 'producer'},
+                    {name: '苔藓', type: 'producer'}
+                ],
+                primary: [
+                    {name: '兔子', type: 'primary'},
+                    {name: '鹿', type: 'primary'},
+                    {name: '松鼠', type: 'primary'},
+                    {name: '昆虫', type: 'primary'}
+                ],
+                secondary: [
+                    {name: '狐狸', type: 'secondary'},
+                    {name: '猫头鹰', type: 'secondary'},
+                    {name: '蛇', type: 'secondary'},
+                    {name: '鸟类', type: 'secondary'}
+                ]
+            },
+            ocean: {
+                name: '海洋生态',
+                producers: [
+                    {name: '浮游植物', type: 'producer'},
+                    {name: '海藻', type: 'producer'},
+                    {name: '海草', type: 'producer'},
+                    {name: '珊瑚', type: 'producer'}
+                ],
+                primary: [
+                    {name: '小鱼', type: 'primary'},
+                    {name: '虾', type: 'primary'},
+                    {name: '浮游动物', type: 'primary'},
+                    {name: '贝类', type: 'primary'}
+                ],
+                secondary: [
+                    {name: '鲨鱼', type: 'secondary'},
+                    {name: '海豚', type: 'secondary'},
+                    {name: '金枪鱼', type: 'secondary'},
+                    {name: '章鱼', type: 'secondary'}
+                ]
+            },
+            grassland: {
+                name: '草原生态',
+                producers: [
+                    {name: '草原草', type: 'producer'},
+                    {name: '野花', type: 'producer'},
+                    {name: '灌木丛', type: 'producer'},
+                    {name: '仙人掌', type: 'producer'}
+                ],
+                primary: [
+                    {name: '羚羊', type: 'primary'},
+                    {name: '野兔', type: 'primary'},
+                    {name: '土拨鼠', type: 'primary'},
+                    {name: '蝗虫', type: 'primary'}
+                ],
+                secondary: [
+                    {name: '狮子', type: 'secondary'},
+                    {name: '狼', type: 'secondary'},
+                    {name: '鹰', type: 'secondary'},
+                    {name: '狐狸', type: 'secondary'}
+                ]
+            }
+        };
+
+        function selectEcosystem(ecoType) {
+            currentEcosystem = ecoType;
+            
+            // 更新选中状态
+            document.querySelectorAll('.ecosystem-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`[data-eco="${ecoType}"]`).classList.add('selected');
+            
+            resetCanvas();
+        }
+
+        function getAllBiologicalNodes() {
+            const data = ecosystemData[currentEcosystem];
+            return [...data.producers, ...data.primary, ...data.secondary];
+        }
+
+        function createBiologicalNodes() {
+            const canvas = document.getElementById('canvasArea');
+            const existingNodes = canvas.querySelectorAll('.biological-node');
+            existingNodes.forEach(node => node.remove());
+
+            const nodes = getAllBiologicalNodes();
+            const nodeContainer = document.createElement('div');
+            nodeContainer.style.position = 'relative';
+            nodeContainer.style.minHeight = '200px';
+            nodeContainer.style.display = 'flex';
+            nodeContainer.style.flexWrap = 'wrap';
+            nodeContainer.style.gap = '10px';
+            nodeContainer.style.justifyContent = 'center';
+            nodeContainer.style.alignItems = 'center';
+            nodeContainer.style.padding = '20px';
+
+            nodes.forEach((bio, index) => {
+                const node = document.createElement('div');
+                node.className = `biological-node node-${bio.type}`;
+                node.draggable = true;
+                node.id = `source-${index}`;
+                node.textContent = bio.name;
+                node.style.margin = '5px';
+                
+                // 添加营养级标识
+                const nutritionLabels = {
+                    'producer': '<span class="nutrition-label">生产者</span>',
+                    'primary': '<span class="nutrition-label">初级消费者</span>',
+                    'secondary': '<span class="nutrition-label">次级消费者</span>'
+                };
+                node.innerHTML = bio.name + nutritionLabels[bio.type];
+
+                node.addEventListener('dragstart', handleDragStart);
+                node.addEventListener('dragend', handleDragEnd);
+                nodeContainer.appendChild(node);
+            });
+
+            // 清除原有内容，保留提示文字
+            canvas.innerHTML = '';
+            const提示文字 = document.createElement('div');
+            提示文字.style.color = '#a0aec0';
+            提示文字.style.textAlign = 'center';
+            提示文字.style.fontStyle = 'italic';
+            提示文字.style.marginTop = '50px';
+            提示文字.innerHTML = '🖱️ 从上方拖拽生物到下方区域开始构建食物链<br><small>（最多选择5个生物节点）</small>';
+            canvas.appendChild(提示文字);
+            
+            canvas.appendChild(nodeContainer);
+        }
+
+        function resetCanvas() {
+            selectedNodes = [];
+            nodeCounter = 0;
+            createBiologicalNodes();
+            updateSelectedCount();
+            document.getElementById('generateBtn').disabled = true;
+        }
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.id);
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function allowDrop(e) {
+            e.preventDefault();
+        }
+
+        function drop(e) {
+            e.preventDefault();
+            const data = e.dataTransfer.getData('text/plain');
+            const draggedNode = document.getElementById(data);
+            
+            if (draggedNode && selectedNodes.length < maxNodes) {
+                const nodeInfo = getNodeInfo(data);
+                if (nodeInfo) {
+                    createCanvasNode(nodeInfo, data);
+                }
+            }
+        }
+
+        function getNodeInfo(nodeId) {
+            const nodes = getAllBiologicalNodes();
+            const sourceNodes = document.querySelectorAll('#canvasArea [id^="source-"]');
+            
+            for (let i = 0; i < sourceNodes.length; i++) {
+                if (sourceNodes[i].id === nodeId) {
+                    return nodes[i];
+                }
+            }
+            return null;
+        }
+
+        function createCanvasNode(nodeInfo, originalId) {
+            const canvas = document.getElementById('canvasArea');
+            const existingPrompt = canvas.querySelector('div[style*="margin-top: 50px"]');
+            if (existingPrompt) {
+                existingPrompt.remove();
+            }
+
+            const node = document.createElement('div');
+            node.className = `biological-node node-${nodeInfo.type}`;
+            node.id = `canvas-node-${nodeCounter}`;
+            node.textContent = nodeInfo.name;
+            node.style.position = 'relative';
+            node.style.cursor = 'move';
+            
+            // 添加营养级标识
+            const nutritionLabels = {
+                'producer': '<span class="nutrition-label">生产者</span>',
+                'primary': '<span class="nutrition-label">初级消费者</span>',
+                'secondary': '<span class="nutrition-label">次级消费者</span>'
+            };
+            node.innerHTML = nodeInfo.name + nutritionLabels[nodeInfo.type];
+
+            // 添加删除功能
+            node.style.cursor = 'pointer';
+            node.title = '点击删除此节点';
+            node.onclick = function(e) {
+                if (e.detail === 2) { // 双击删除
+                    node.remove();
+                    selectedNodes = selectedNodes.filter(n => n.id !== node.id);
+                    updateSelectedCount();
+                    updateGenerateButton();
+                }
+            };
+
+            // 拖拽排序功能（简化版）
+            node.draggable = true;
+            node.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', node.id);
+            });
+
+            selectedNodes.push({
+                id: node.id,
+                name: nodeInfo.name,
+                type: nodeInfo.type,
+                element: node
+            });
+
+            canvas.appendChild(node);
+            nodeCounter++;
+            updateSelectedCount();
+            updateGenerateButton();
+        }
+
+        function updateSelectedCount() {
+            document.getElementById('selectedCount').textContent = `已选择 ${selectedNodes.length} 个生物节点`;
+        }
+
+        function updateGenerateButton() {
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = selectedNodes.length < 2 || selectedNodes.length > maxNodes;
+        }
+
+        function generateFoodChain() {
+            if (selectedNodes.length < 2) {
+                alert('请至少选择2个生物节点来构建食物链！');
+                return;
+            }
+
+            if (selectedNodes.length > maxNodes) {
+                alert(`最多只能选择${maxNodes}个生物节点！`);
+                return;
+            }
+
+            // 分析营养级并排序
+            const sortedChain = analyzeAndSortFoodChain(selectedNodes);
+            
+            if (sortedChain.length < 2) {
+                alert('无法构建有效的食物链关系，请检查选择的生物类型！');
+                return;
+            }
+
+            displayFoodChainVisualization(sortedChain);
+        }
+
+        function analyzeAndSortFoodChain(nodes) {
+            // 简化的食物链逻辑：生产者 -> 初级消费者 -> 次级消费者
+            const producers = nodes.filter(n => n.type === 'producer');
+            const primaryConsumers = nodes.filter(n => n.type === 'primary');
+            const secondaryConsumers = nodes.filter(n => n.type === 'secondary');
+
+            let chain = [];
+
+            // 先添加生产者
+            if (producers.length > 0) {
+                chain = chain.concat(producers);
+            }
+
+            // 添加初级消费者
+            if (primaryConsumers.length > 0) {
+                chain = chain.concat(primaryConsumers);
+            }
+
+            // 添加次级消费者
+            if (secondaryConsumers.length > 0) {
+                chain = chain.concat(secondaryConsumers);
+            }
+
+            // 如果没有明确的分类，按原始顺序但确保有生产者
+            if (chain.length === 0 && nodes.length > 0) {
+                chain = nodes;
+            }
+
+            return chain.slice(0, maxNodes); // 最多5个节点
+        }
+
+        function displayFoodChainVisualization(chain) {
+            const canvas = document.getElementById('canvasArea');
+            
+            // 清除现有内容（保留提示区域）
+            const existingNodes = canvas.querySelectorAll('.biological-node');
+            existingNodes.forEach(node => node.remove());
+
+            // 创建食物链可视化
+            const chainContainer = document.createElement('div');
+            chainContainer.style.display = 'flex';
+            chainContainer.style.flexDirection = 'column';
+            chainContainer.style.alignItems: 'center';
+            chainContainer.style.gap = '20px';
+            chainContainer.style.padding = '20px';
+            chainContainer.style.minHeight = '300px';
+
+            // 标题
+            const title = document.createElement('div');
+            title.style.textAlign = 'center';
+            title.style.fontWeight = 'bold';
+            title.style.fontSize = '1.2em';
+            title.style.marginBottom = '20px';
+            title.style.color = '#4a5568';
+            title.textContent = '🔬 食物链可视化图谱';
+            chainContainer.appendChild(title);
+
+            // 食物链节点
+            chain.forEach((node, index) => {
+                const nodeElement = document.createElement('div');
+                nodeElement.style.display = 'flex';
+                nodeElement.style.alignItems = 'center';
+                nodeElement.style.justifyContent = 'center';
+                nodeElement.style.gap = '10px';
+                nodeElement.style.margin = '10px 0';
+
+                // 营养级标签
+                const nutritionLevel = getNutritionLevel(index, chain.length);
+                const levelLabel = document.createElement('span');
+                levelLabel.style.background = getNutritionColor(nutritionLevel);
+                levelLabel.style.color = 'white';
+                levelLabel.style.padding = '4px 12px';
+                levelLabel.style.borderRadius = '15px';
+                levelLabel.style.fontSize = '0.8em';
+                levelLabel.style.fontWeight = 'bold';
+                levelLabel.textContent = nutritionLevel;
+
+                // 生物节点
+                const bioNode = document.createElement('div');
+                bioNode.style.background = 'white';
+                bioNode.style.padding = '10px 20px';
+                bioNode.style.borderRadius = '20px';
+                bioNode.style.border = '2px solid #667eea';
+                bioNode.style.fontSize = '1.1em';
+                bioNode.style.fontWeight = 'bold';
+                bioNode.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                bioNode.style.color = '#333';
+                bioNode.textContent = node.name;
+
+                nodeElement.appendChild(levelLabel);
+                nodeElement.appendChild(bioNode);
+                chainContainer.appendChild(nodeElement);
+            });
+
+            // 说明文字
+            const description = document.createElement('div');
+            description.style.textAlign = 'center';
+            description.style.marginTop = '20px';
+            description.style.color = '#666';
+            description.style.fontStyle = 'italic';
+            description.innerHTML = `💡 此食物链共包含 ${chain.length} 个生物节点，展示了从生产者到消费者的能量传递关系`;
+
+            chainContainer.appendChild(description);
+            canvas.appendChild(chainContainer);
+
+            // 滚动到结果区域
+            chainContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function getNutritionLevel(index, total) {
+            if (index === 0) return '🌱 生产者';
+            if (index === 1) return '🐰 初级消费者';
+            if (index === 2) return '🦊 次级消费者';
+            if (index === 3) return '🦅 三级消费者';
+            return '🔄 消费者';
+        }
+
+        function getNutritionColor(level) {
+            const colors = {
+                '🌱 生产者': '#48bb78',
+                '🐰 初级消费者': '#4299e1',
+                '🦊 次级消费者': '#ed8936',
+                '🦅 三级消费者': '#9f7aea',
+                '🔄 消费者': '#667eea'
+            };
+            for (let key in colors) {
+                if (level.includes(key.split(' ')[0])) {
+                    return colors[key];
+                }
+            }
+            return '#667eea';
+        }
+
+        // 页面加载时初始化
+        window.onload = function() {
+            createBiologicalNodes();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>虚拟钢琴波形解剖 - 声音与波形可视化</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .piano-section {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .piano-title {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #4a5568;
+            font-weight: bold;
+        }
+
+        .piano {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            height: 200px;
+            margin-bottom: 30px;
+        }
+
+        .key {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            padding-bottom: 10px;
+        }
+
+        .white-key {
+            width: 50px;
+            height: 180px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+            border: 2px solid #e9ecef;
+            border-radius: 0 0 8px 8px;
+            margin: 0 1px;
+            color: #495057;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .white-key:hover {
+            background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+            transform: translateY(2px);
+        }
+
+        .white-key:active, .white-key.active {
+            background: linear-gradient(to bottom, #e3f2fd 0%, #bbdefb 100%);
+            transform: translateY(4px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .black-key {
+            width: 30px;
+            height: 120px;
+            background: linear-gradient(to bottom, #2c3e50 0%, #34495e 100%);
+            border: 2px solid #1a252f;
+            border-radius: 0 0 6px 6px;
+            position: absolute;
+            z-index: 2;
+            color: white;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .black-key:hover {
+            background: linear-gradient(to bottom, #34495e 0%, #2c3e50 100%);
+            transform: translateY(2px);
+        }
+
+        .black-key:active, .black-key.active {
+            background: linear-gradient(to bottom, #3498db 0%, #2980b9 100%);
+            transform: translateY(4px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+
+        /* 黑键位置 */
+        .black-key:nth-of-type(1) { left: 36px; }  /* C# */
+        .black-key:nth-of-type(2) { left: 87px; }  /* D# */
+        .black-key:nth-of-type(3) { left: 189px; } /* F# */
+        .black-key:nth-of-type(4) { left: 240px; } /* G# */
+        .black-key:nth-of-type(5) { left: 291px; } /* A# */
+        
+        .waveform-section {
+            flex: 1;
+            min-width: 400px;
+        }
+
+        .waveform-title {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #4a5568;
+            font-weight: bold;
+        }
+
+        .canvas-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        #waveformCanvas {
+            width: 100%;
+            height: 300px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .info-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .info-item {
+            margin: 10px 0;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .info-label {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .info-value {
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .instructions h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .instructions p {
+            color: #424242;
+            line-height: 1.6;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .piano {
+                transform: scale(0.8);
+                transform-origin: center;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎹 虚拟钢琴波形解剖</h1>
+        <p>探索声音与波形的奥秘 - 直观理解音高与波形的关系</p>
+    </div>
+
+    <div class="container">
+        <div class="instructions">
+            <h3>🎯 使用说明</h3>
+            <p>点击钢琴琴键聆听音符，观察下方实时生成的声波波形。注意高音调音符波形更密集，低音调音符波形更稀疏，这就是声音频率的直观表现！</p>
+        </div>
+
+        <div class="main-content">
+            <div class="piano-section">
+                <div class="piano-title">🎼 虚拟钢琴键盘</div>
+                <div class="piano" id="piano">
+                    <!-- 白键 -->
+                    <div class="key white-key" data-note="C" data-freq="261.63">C<br>(Do)</div>
+                    <div class="key white-key" data-note="D" data-freq="293.66">D<br>(Re)</div>
+                    <div class="key white-key" data-note="E" data-freq="329.63">E<br>(Mi)</div>
+                    <div class="key white-key" data-freq="349.23">F<br>(Fa)</div>
+                    <div class="key white-key" data-note="G" data-freq="392.00">G<br>(Sol)</div>
+                    <div class="key white-key" data-note="A" data-freq="440.00">A<br>(La)</div>
+                    <div class="key white-key" data-note="B" data-freq="493.88">B<br>(Si)</div>
+                    
+                    <!-- 黑键 -->
+                    <div class="key black-key" data-note="C#" data-freq="277.18" style="left: 36px;">C#</div>
+                    <div class="key black-key" data-note="D#" data-freq="311.13" style="left: 87px;">D#</div>
+                    <div class="key black-key" data-note="F#" data-freq="369.99" style="left: 189px;">F#</div>
+                    <div class="key black-key" data-note="G#" data-freq="415.30" style="left: 240px;">G#</div>
+                    <div class="key black-key" data-note="A#" data-freq="466.16" style="left: 291px;">A#</div>
+                </div>
+            </div>
+
+            <div class="waveform-section">
+                <div class="waveform-title">🌊 实时声波波形</div>
+                <div class="canvas-container">
+                    <canvas id="waveformCanvas" width="600" height="300"></canvas>
+                </div>
+                
+                <div class="info-panel">
+                    <div class="info-item">
+                        <span class="info-label">当前音符:</span><br>
+                        <span class="info-value" id="currentNote">未选择</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">频率 (Hz):</span><br>
+                        <span class="info-value" id="currentFreq">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">振幅:</span><br>
+                        <span class="info-value" id="currentAmp">动态</span>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ff6b6b;"></div>
+                        <span>波形振幅</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4ecdc4;"></div>
+                        <span>零振幅线</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #45b7d1;"></div>
+                        <span>音符标识</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class PianoWaveformVisualizer {
+            constructor() {
+                this.canvas = document.getElementById('waveformCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.audioContext = null;
+                this.currentOscillator = null;
+                this.currentGain = null;
+                this.activeWaves = [];
+                this.animationId = null;
+                
+                // 画布设置
+                this.canvas.width = 600;
+                this.canvas.height = 300;
+                this.waveHistory = [];
+                this.maxWaveDuration = 3000; // 3秒
+                
+                this.init();
+            }
+
+            init() {
+                this.initAudio();
+                this.bindEvents();
+                this.startAnimation();
+            }
+
+            initAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (error) {
+                    console.warn('Web Audio API not supported:', error);
+                }
+            }
+
+            bindEvents() {
+                const keys = document.querySelectorAll('.key');
+                keys.forEach(key => {
+                    key.addEventListener('click', (e) => {
+                        this.playNote(e.target);
+                    });
+                });
+            }
+
+            async playNote(keyElement) {
+                // 恢复音频上下文（用户交互后）
+                if (this.audioContext && this.audioContext.state === 'suspended') {
+                    await this.audioContext.resume();
+                }
+
+                const note = keyElement.dataset.note;
+                const frequency = parseFloat(keyElement.dataset.freq);
+                
+                // 更新UI
+                this.updateInfo(note, frequency);
+                this.highlightKey(keyElement);
+                
+                // 播放音频
+                this.playTone(frequency);
+                
+                // 生成并显示波形
+                this.generateAndDisplayWave(frequency, note);
+                
+                // 清理之前的高亮
+                setTimeout(() => {
+                    this.unhighlightKey(keyElement);
+                }, 200);
+            }
+
+            highlightKey(keyElement) {
+                keyElement.classList.add('active');
+            }
+
+            unhighlightKey(keyElement) {
+                keyElement.classList.remove('active');
+            }
+
+            updateInfo(note, frequency) {
+                document.getElementById('currentNote').textContent = note;
+                document.getElementById('currentFreq').textContent = frequency.toFixed(2) + ' Hz';
+            }
+
+            async playTone(frequency) {
+                if (!this.audioContext) return;
+
+                // 停止当前音符
+                this.stopTone();
+
+                try {
+                    // 创建振荡器
+                    this.currentOscillator = this.audioContext.createOscillator();
+                    this.currentGain = this.audioContext.createGain();
+
+                    // 设置音频参数
+                    this.currentOscillator.type = 'sine';
+                    this.currentOscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+
+                    // 设置音量包络
+                    this.currentGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+                    this.currentGain.gain.linearRampToValueAtTime(0.3, this.audioContext.currentTime + 0.01);
+                    this.currentGain.gain.exponentialRampToValueAtTime(0.1, this.audioContext.currentTime + 0.1);
+
+                    // 连接音频节点
+                    this.currentOscillator.connect(this.currentGain);
+                    this.currentGain.connect(this.audioContext.destination);
+
+                    // 播放音符
+                    this.currentOscillator.start();
+                    
+                    // 3秒后自动停止
+                    setTimeout(() => {
+                        this.stopTone();
+                    }, 3000);
+                    
+                } catch (error) {
+                    console.warn('Error playing tone:', error);
+                }
+            }
+
+            stopTone() {
+                if (this.currentOscillator) {
+                    try {
+                        this.currentOscillator.stop();
+                    } catch (e) {
+                        // 振荡器可能已经停止
+                    }
+                    this.currentOscillator = null;
+                }
+                if (this.currentGain) {
+                    this.currentGain = null;
+                }
+            }
+
+            generateAndDisplayWave(frequency, note) {
+                const waveData = this.generateSineWave(frequency);
+                const waveInfo = {
+                    data: waveData,
+                    frequency: frequency,
+                    note: note,
+                    timestamp: Date.now(),
+                    amplitude: Math.max(...waveData) * 0.8
+                };
+                
+                this.waveHistory.push(waveInfo);
+                this.cleanupOldWaves();
+            }
+
+            generateSineWave(frequency) {
+                const sampleRate = 800; // 降低采样率以提高性能
+                const duration = 2; // 2秒的波形显示
+                const samples = Math.floor(sampleRate * duration);
+                const waveData = [];
+                
+                for (let i = 0; i < samples; i++) {
+                    const time = i / sampleRate;
+                    const amplitude = 0.8;
+                    const value = Math.sin(2 * Math.PI * frequency * time) * amplitude;
+                    waveData.push(value);
+                }
+                
+                return waveData;
+            }
+
+            cleanupOldWaves() {
+                const now = Date.now();
+                this.waveHistory = this.waveHistory.filter(wave => {
+                    return (now - wave.timestamp) < this.maxWaveDuration;
+                });
+            }
+
+            startAnimation() {
+                const animate = () => {
+                    this.draw();
+                    this.animationId = requestAnimationFrame(animate);
+                };
+                animate();
+            }
+
+            draw() {
+                // 清空画布
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // 绘制网格
+                this.drawGrid();
+                
+                // 绘制所有活跃的波形
+                this.waveHistory.forEach((wave, index) => {
+                    this.drawWave(wave, index);
+                });
+
+                // 绘制标签和信息
+                this.drawLabels();
+            }
+
+            drawGrid() {
+                this.ctx.strokeStyle = '#f0f0f0';
+                this.ctx.lineWidth = 1;
+
+                // 垂直网格线
+                for (let x = 0; x <= this.canvas.width; x += 50) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, 0);
+                    this.ctx.lineTo(x, this.canvas.height);
+                    this.ctx.stroke();
+                }
+
+                // 水平网格线
+                for (let y = 0; y <= this.canvas.height; y += 30) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y);
+                    this.ctx.lineTo(this.canvas.width, y);
+                    this.ctx.stroke();
+                }
+
+                // 中心线（零振幅线）
+                this.ctx.strokeStyle = '#4ecdc4';
+                this.ctx.lineWidth = 2;
+                this.ctx.setLineDash([]);
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, this.canvas.height / 2);
+                this.ctx.lineTo(this.canvas.width, this.canvas.height / 2);
+                this.ctx.stroke();
+            }
+
+            drawWave(wave, index) {
+                if (!wave.data || wave.data.length === 0) return;
+
+                const startX = 50;
+                const endX = this.canvas.width - 50;
+                const totalWidth = endX - startX;
+                const samples = wave.data.length;
+                const sampleStep = totalWidth / Math.max(samples - 1, 1);
+
+                // 根据频率设置颜色强度
+                const intensity = Math.min(wave.frequency / 100, 1);
+                const red = Math.floor(255 * (1 - intensity * 0.3));
+                const green = Math.floor(107 * (1 - intensity * 0.2));
+                const blue = Math.floor(107 * (1 - intensity * 0.2));
+                const alpha = Math.max(0.3, 1 - (Date.now() - wave.timestamp) / this.maxWaveDuration * 0.7);
+
+                this.ctx.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+                this.ctx.lineWidth = 2 + intensity;
+                this.ctx.beginPath();
+
+                let isFirstPoint = true;
+                for (let i = 0; i < Math.min(wave.data.length, samples); i++) {
+                    const x = startX + (i * sampleStep);
+                    const normalizedValue = (wave.data[i] + 1) / 2; // 归一化到 0-1
+                    const y = this.canvas.height / 2 - (normalizedValue * (this.canvas.height / 2 - 20));
+
+                    if (isFirstPoint) {
+                        this.ctx.moveTo(x, y);
+                        isFirstPoint = false;
+                    } else {
+                        this.ctx.lineTo(x, y);
+                    }
+                }
+
+                this.ctx.stroke();
+
+                // 绘制音符标识
+                if (isFirstPoint) return;
+                
+                const labelX = startX + 10;
+                const labelY = 30 + (index * 25);
+                
+                this.ctx.fillStyle = `rgba(69, 183, 209, ${alpha * 0.8})`;
+                this.ctx.font = 'bold 14px Arial';
+                this.ctx.fillText(`${wave.note} (${wave.frequency.toFixed(0)}Hz)`, labelX, labelY);
+            }
+
+            drawLabels() {
+                this.ctx.fillStyle = '#666';
+                this.ctx.font = '12px Arial';
+                
+                // X轴标签
+                this.ctx.fillText('时间 →', this.canvas.width - 60, this.canvas.height - 10);
+                
+                // Y轴标签
+                this.ctx.save();
+                this.ctx.translate(15, this.canvas.height / 2);
+                this.ctx.rotate(-Math.PI / 2);
+                this.ctx.fillText('振幅 →', 0, 0);
+                this.ctx.restore();
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            new PianoWaveformVisualizer();
+        });
+
+        // 添加键盘快捷键支持
+        document.addEventListener('keydown', (e) => {
+            const keyMap = {
+                'KeyA': 'C', 'KeyS': 'D', 'KeyD': 'E', 'KeyF': 'F',
+                'KeyG': 'G', 'KeyH': 'A', 'KeyJ': 'B',
+                'KeyW': 'C#', 'KeyE': 'D#', 'KeyT': 'F#', 'KeyY': 'G#', 'KeyU': 'A#'
+            };
+            
+            const note = keyMap[e.code];
+            if (note) {
+                const keyElement = document.querySelector(`[data-note="${note}"]`);
+                if (keyElement) {
+                    keyElement.click();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动量守恒碰撞演示 - MVP设计方案</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        accent: '#8b5cf6',
+                        neutral: '#64748b',
+                        light: '#f1f5f9',
+                        dark: '#1e293b'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md fixed w-full z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-flask text-primary text-2xl"></i>
+                <span class="text-xl font-bold text-primary">物理模拟实验室</span>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#overview" class="text-gray-600 hover:text-primary transition-colors">概览</a>
+                <a href="#user-profile" class="text-gray-600 hover:text-primary transition-colors">用户画像</a>
+                <a href="#scenario" class="text-gray-600 hover:text-primary transition-colors">场景故事</a>
+                <a href="#features" class="text-gray-600 hover:text-primary transition-colors">功能说明</a>
+                <a href="#flow" class="text-gray-600 hover:text-primary transition-colors">交互流程</a>
+                <a href="#demo" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-md transition-colors">在线演示</a>
+            </div>
+            <button class="md:hidden text-gray-600 focus:outline-none" id="mobile-menu-button">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- 移动端菜单 -->
+        <div class="md:hidden hidden bg-white shadow-lg absolute w-full" id="mobile-menu">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+                <a href="#overview" class="text-gray-600 hover:text-primary py-2 transition-colors">概览</a>
+                <a href="#user-profile" class="text-gray-600 hover:text-primary py-2 transition-colors">用户画像</a>
+                <a href="#scenario" class="text-gray-600 hover:text-primary py-2 transition-colors">场景故事</a>
+                <a href="#features" class="text-gray-600 hover:text-primary py-2 transition-colors">功能说明</a>
+                <a href="#flow" class="text-gray-600 hover:text-primary py-2 transition-colors">交互流程</a>
+                <a href="#demo" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-md text-center transition-colors">在线演示</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <header class="pt-24 pb-16 bg-gradient-to-r from-blue-50 to-purple-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-primary mb-6 leading-tight text-shadow">
+                    动量守恒碰撞演示
+                </h1>
+                <p class="text-[clamp(1rem,2vw,1.25rem)] text-gray-600 mb-8">
+                    一款帮助学生直观理解动量守恒定律的交互式物理模拟工具
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="#demo" class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-md transition-colors font-medium">
+                        <i class="fa fa-play-circle mr-2"></i>查看演示
+                    </a>
+                    <a href="#features" class="bg-white hover:bg-gray-50 text-primary border border-primary px-6 py-3 rounded-md transition-colors font-medium">
+                        <i class="fa fa-list-ul mr-2"></i>了解功能
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="py-12">
+        <!-- 概览部分 -->
+        <section id="overview" class="py-12 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-center mb-8 text-dark">MVP设计方案概述</h2>
+                    <div class="bg-light rounded-xl p-6 shadow-sm">
+                        <p class="text-gray-700 mb-4">
+                            本项目旨在开发一款动量守恒碰撞演示工具，帮助中学物理学习者通过交互式模拟更好地理解动量守恒定律。
+                            采用MVP（最小可行产品）原则，我们专注于实现核心功能，确保产品能够解决用户的关键痛点。
+                        </p>
+                        <div class="flex items-center justify-center mt-8">
+                            <div class="flex space-x-4">
+                                <div class="text-center">
+                                    <div class="bg-primary/10 text-primary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-2">
+                                        <i class="fa fa-user-circle text-2xl"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-600">用户中心</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="bg-secondary/10 text-secondary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-2">
+                                        <i class="fa fa-flask text-2xl"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-600">物理模拟</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="bg-accent/10 text-accent rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-2">
+                                        <i class="fa fa-line-chart text-2xl"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-600">数据分析</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="bg-neutral/10 text-neutral rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-2">
+                                        <i class="fa fa-refresh text-2xl"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-600">交互体验</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 用户画像 -->
+        <section id="user-profile" class="py-12 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-center mb-8 text-dark">典型用户画像</h2>
+                    <div class="bg-white rounded-xl p-8 shadow-sm card-hover">
+                        <div class="flex items-start mb-6">
+                            <div class="bg-primary/10 text-primary rounded-full w-12 h-12 flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fa fa-user text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-2 text-dark">中学物理学习者</h3>
+                                <p class="text-gray-600">初中高年级/高中生，对动量守恒碰撞原理理解抽象，缺乏直观感知，需要简易工具辅助验证规律、加深概念认知。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                            <div class="bg-light rounded-lg p-4">
+                                <div class="text-primary mb-2">
+                                    <i class="fa fa-search text-xl"></i>
+                                </div>
+                                <h4 class="font-medium mb-2">学习需求</h4>
+                                <p class="text-sm text-gray-600">理解动量守恒定律，掌握碰撞过程中的物理规律</p>
+                            </div>
+                            <div class="bg-light rounded-lg p-4">
+                                <div class="text-secondary mb-2">
+                                    <i class="fa fa-exclamation-triangle text-xl"></i>
+                                </div>
+                                <h4 class="font-medium mb-2">痛点问题</h4>
+                                <p class="text-sm text-gray-600">抽象概念难以理解，缺乏直观感知，传统实验条件有限</p>
+                            </div>
+                            <div class="bg-light rounded-lg p-4">
+                                <div class="text-accent mb-2">
+                                    <i class="fa fa-lightbulb-o text-xl"></i>
+                                </div>
+                                <h4 class="font-medium mb-2">期望解决方案</h4>
+                                <p class="text-sm text-gray-600">交互式模拟工具，可视化展示碰撞过程，实时数据反馈</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 场景故事 -->
+        <section id="scenario" class="py-12 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-center mb-8 text-dark">场景故事</h2>
+                    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-8 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16"></div>
+                        <div class="absolute bottom-0 left-0 w-24 h-24 bg-accent/10 rounded-full -ml-12 -mb-12"></div>
+                        
+                        <div class="relative">
+                            <div class="flex items-center mb-6">
+                                <div class="bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-md mr-4">
+                                    <i class="fa fa-book text-primary text-xl"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold text-dark">学习场景</h3>
+                            </div>
+                            
+                            <p class="text-gray-700 mb-6 leading-relaxed">
+                                学生在家完成物理作业时，遇到动量守恒碰撞相关题目，通过该演示工具设置小球质量和初始速度，
+                                模拟碰撞过程并查看数据，快速理解"碰撞前后总动量不变"的原理，顺利完成作业。
+                            </p>
+                            
+                            <div class="bg-white rounded-lg p-4 shadow-sm">
+                                <div class="flex items-center mb-3">
+                                    <div class="bg-green-100 text-green-600 rounded-full w-8 h-8 flex items-center justify-center mr-3">
+                                        <i class="fa fa-check"></i>
+                                    </div>
+                                    <p class="font-medium text-gray-800">问题解决</p>
+                                </div>
+                                <p class="text-sm text-gray-600 pl-11">
+                                    通过直观的动画演示和实时数据反馈，学生能够快速掌握动量守恒定律，提高学习效率。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能说明 -->
+        <section id="features" class="py-12 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-8 text-dark">MVP核心功能</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <div class="bg-white rounded-xl p-6 shadow-sm card-hover">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-primary/10 text-primary rounded-full w-10 h-10 flex items-center justify-center mr-3">
+                                <i class="fa fa-sliders text-lg"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-dark">参数设置功能</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm">
+                            提供两个小球的基础参数设置：可手动输入小球A质量、小球B质量，可输入小球A初始速度（小球B初始速度默认0）
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 shadow-sm card-hover">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-secondary/10 text-secondary rounded-full w-10 h-10 flex items-center justify-center mr-3">
+                                <i class="fa fa-play-circle text-lg"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-dark">正碰模拟动画</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm">
+                            点击"开始模拟"后，动态展示小球A撞击静止小球B的完整过程，帮助用户直观理解碰撞过程
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 shadow-sm card-hover">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-accent/10 text-accent rounded-full w-10 h-10 flex items-center justify-center mr-3">
+                                <i class="fa fa-bar-chart text-lg"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-dark">数据计算显示</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm">
+                            自动计算并显示关键数据：碰撞前总动量、碰撞后总动量，以及两小球碰撞前后的速度数值
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 shadow-sm card-hover">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-neutral/10 text-neutral rounded-full w-10 h-10 flex items-center justify-center mr-3">
+                                <i class="fa fa-refresh text-lg"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-dark">重置功能</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm">
+                            点击"重置"可恢复默认参数，便于更换条件重复模拟不同情况下的碰撞过程
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="mt-12 max-w-3xl mx-auto bg-white rounded-xl p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold text-dark mb-4">功能边界说明</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="flex items-center text-primary mb-2">
+                                <i class="fa fa-check-circle mr-2"></i>我们支持
+                            </h4>
+                            <ul class="text-gray-600 text-sm space-y-2 pl-6 list-disc">
+                                <li>两小球正碰模拟</li>
+                                <li>自定义小球质量</li>
+                                <li>自定义初始速度</li>
+                                <li>动量数据实时计算</li>
+                                <li>速度变化可视化</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="flex items-center text-red-500 mb-2">
+                                <i class="fa fa-times-circle mr-2"></i>当前不支持
+                            </h4>
+                            <ul class="text-gray-600 text-sm space-y-2 pl-6 list-disc">
+                                <li>多小球碰撞模拟</li>
+                                <li>斜碰或非弹性碰撞</li>
+                                <li>三维空间模拟</li>
+                                <li>复杂物理环境设置</li>
+                                <li>历史数据保存与对比</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 交互流程 -->
+        <section id="flow" class="py-12 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-center mb-8 text-dark">交互流程设计</h2>
+                    
+                    <div class="bg-light rounded-xl p-8 shadow-sm">
+                        <div class="flex flex-col space-y-6">
+                            <div class="flex">
+                                <div class="flex flex-col items-center mr-4">
+                                    <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-medium">1</div>
+                                    <div class="h-full w-0.5 bg-gray-200 mt-2"></div>
+                                </div>
+                                <div class="bg-white rounded-lg p-4 shadow-sm flex-1">
+                                    <h3 class="font-medium text-dark mb-1">打开演示工具</h3>
+                                    <p class="text-sm text-gray-600">用户打开【动量守恒碰撞演示】工具，进入主界面（显示参数输入区、模拟按钮、数据展示区）</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex">
+                                <div class="flex flex-col items-center mr-4">
+                                    <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-medium">2</div>
+                                    <div class="h-full w-0.5 bg-gray-200 mt-2"></div>
+                                </div>
+                                <div class="bg-white rounded-lg p-4 shadow-sm flex-1">
+                                    <h3 class="font-medium text-dark mb-1">设置参数</h3>
+                                    <p class="text-sm text-gray-600">在参数输入区，输入小球A的质量（如"1kg"）和初始速度（如"2m/s"），小球B质量可默认（如"1kg"）或修改</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex">
+                                <div class="flex flex-col items-center mr-4">
+                                    <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-medium">3</div>
+                                    <div class="h-full w-0.5 bg-gray-200 mt-2"></div>
+                                </div>
+                                <div class="bg-white rounded-lg p-4 shadow-sm flex-1">
+                                    <h3 class="font-medium text-dark mb-1">开始模拟</h3>
+                                    <p class="text-sm text-gray-600">点击"开始模拟"按钮，界面播放两小球正碰动画（小球A运动至碰撞小球B，随后两者分别运动）</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex">
+                                <div class="flex flex-col items-center mr-4">
+                                    <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-medium">4</div>
+                                    <div class="h-full w-0.5 bg-gray-200 mt-2"></div>
+                                </div>
+                                <div class="bg-white rounded-lg p-4 shadow-sm flex-1">
+                                    <h3 class="font-medium text-dark mb-1">查看数据</h3>
+                                    <p class="text-sm text-gray-600">动画结束后，数据展示区自动显示碰撞前后的总动量及两小球速度数据</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex">
+                                <div class="flex flex-col items-center mr-4">
+                                    <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-medium">5</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-4 shadow-sm flex-1">
+                                    <h3 class="font-medium text-dark mb-1">重新模拟</h3>
+                                    <p class="text-sm text-gray-600">若需重新模拟，点击"重置"按钮，参数恢复初始状态，重复步骤2-4</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 流程图 -->
+                    <div class="mt-12 bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="text-lg font-semibold text-center mb-6 text-dark">交互流程图</h3>
+                        <div class="flex justify-center">
+                            <div class="w-full max-w-2xl">
+                                <svg class="w-full" viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+                                    <!-- 流程节点 -->
+                                    <rect x="10" y="100" width="180" height="60" rx="10" fill="white" stroke="#3b82f6" stroke-width="2"/>
+                                    <text x="100" y="135" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="#1e293b">打开演示工具</text>
+                                    
+                                    <rect x="220" y="100" width="180" height="60" rx="10" fill="white" stroke="#3b82f6" stroke-width="2"/>
+                                    <text x="310" y="135" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="#1e293b">设置小球参数</text>
+                                    
+                                    <rect x="430" y="100" width="180" height="60" rx="10" fill="white" stroke="#3b82f6" stroke-width="2"/>
+                                    <text x="520" y="135" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="#1e293b">开始模拟碰撞</text>
+                                    
+                                    <rect x="640" y="100" width="180" height="60" rx="10" fill="white" stroke="#3b82f6" stroke-width="2"/>
+                                    <text x="730" y="135" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="#1e293b">显示结果数据</text>
+                                    
+                                    <!-- 判断节点 -->
+                                    <polygon points="430,220 520,180 610,220 520,260" fill="white" stroke="#f59e0b" stroke-width="2"/>
+                                    <text x="520" y="225" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="#1e293b">重新模拟?</text>
+                                    
+                                    <!-- 结束节点 -->
+                                    <circle cx="730" cy="220" r="30" fill="white" stroke="#ef4444" stroke-width="2"/>
+                                    <text x="730" y="225" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="#1e293b">结束</text>
+                                    
+                                    <!-- 箭头 -->
+                                    <defs>
+                                        <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                                            <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+                                        </marker>
+                                    </defs>
+                                    
+                                    <line x1="190" y1="130" x2="220" y2="130" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+                                    <line x1="390" y1="130" x2="430" y2="130" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+                                    <line x1="590" y1="130" x2="640" y2="130" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+                                    
+                                    <line x1="730" y1="160" x2="730" y2="190" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+                                    
+                                    <line x1="520" y1="160" x2="520" y2="180" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+                                    <line x1="520" y1="260" x2="310" y2="220" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+                                    <line x1="310" y1="220" x2="310" y2="160" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+                                    
+                                    <line x1="610" y1="220" x2="700" y2="220" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 在线演示 -->
+        <section id="demo" class="py-12 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-center mb-8 text-dark">在线演示</h2>
+                    
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="bg-primary text-white p-4">
+                            <h3 class="text-lg font-medium">动量守恒碰撞模拟器</h3>
+                        </div>
+                        
+                        <div class="p-6">
+                            <!-- 模拟区域 -->
+                            <div class="relative w-full h-64 border border-gray-200 rounded-lg mb-6 overflow-hidden bg-gray-50" id="simulation-area">
+                                <div class="absolute top-2 left-2 bg-white/80 px-2 py-1 rounded text-sm font-medium shadow-sm z-10">
+                                    碰撞模拟区
+                                </div>
+                                
+                                <!-- 小球 -->
+                                <div class="absolute w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold transition-all duration-1000 ease-linear" id="ball1" style="left: 50px; top: 100px;">A</div>
+                                <div class="absolute w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-white font-bold transition-all duration-1000 ease-linear" id="ball2" style="left: 300px; top: 100px;">B</div>
+                                
+                                <!-- 参考线 -->
+                                <div class="absolute h-0.5 w-full bg-gray-200 top-1/2 -translate-y-1/2"></div>
+                            </div>
+                            
+                            <!-- 控制面板 -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <h4 class="font-medium text-dark mb-3">参数设置</h4>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="mass1" class="block text-sm font-medium text-gray-700 mb-1">小球A质量 (kg)</label>
+                                            <input type="number" id="mass1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" value="1" min="0.1" step="0.1">
+                                        </div>
+                                        
+                                        <div>
+                                            <label for="velocity1" class="block text-sm font-medium text-gray-700 mb-1">小球A初始速度 (m/s)</label>
+                                            <input type="number" id="velocity1" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" value="2" min="0" step="0.1">
+                                        </div>
+                                        
+                                        <div>
+                                            <label for="mass2" class="block text-sm font-medium text-gray-700 mb-1">小球B质量 (kg)</label>
+                                            <input type="number" id="mass2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" value="1" min="0.1" step="0.1">
+                                        </div>
+                                        
+                                        <div>
+                                            <label for="velocity2" class="block text-sm font-medium text-gray-700 mb-1">小球B初始速度 (m/s)</label>
+                                            <input type="number" id="velocity2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" value="0" step="0.1">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-medium text-dark mb-3">模拟结果</h4>
+                                    <div class="space-y-3">
+                                        <div class="bg-light rounded-md p-3">
+                                            <div class="flex justify-between mb-1">
+                                                <span class="text-sm text-gray-600">碰撞前总动量:</span>
+                                                <span class="text-sm font-medium text-primary" id="momentum-before">0 kg·m/s</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-sm text-gray-600">碰撞后总动量:</span>
+                                                <span class="text-sm font-medium text-primary" id="momentum-after">0 kg·m/s</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div class="bg-light rounded-md p-3">
+                                                <div class="text-xs text-gray-500 mb-1">小球A</div>
+                                                <div class="flex justify-between mb-1">
+                                                    <span class="text-sm text-gray-600">碰撞前速度:</span>
+                                                    <span class="text-sm font-medium" id="velocity1-before">0 m/s</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-gray-600">碰撞后速度:</span>
+                                                    <span class="text-sm font-medium" id="velocity1-after">0 m/s</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="bg-light rounded-md p-3">
+                                                <div class="text-xs text-gray-500 mb-1">小球B</div>
+                                                <div class="flex justify-between mb-1">
+                                                    <span class="text-sm text-gray-600">碰撞前速度:</span>
+                                                    <span class="text-sm font-medium" id="velocity2-before">0 m/s</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-sm text-gray-600">碰撞后速度:</span>
+                                                    <span class="text-sm font-medium" id="velocity2-after">0 m/s</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 控制按钮 -->
+                            <div class="flex justify-center space-x-4">
+                                <button id="start-btn" class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-md transition-colors font-medium">
+                                    <i class="fa fa-play mr-2"></i>开始模拟
+                                </button>
+                                <button id="reset-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md transition-colors font-medium">
+                                    <i class="fa fa-refresh mr-2"></i>重置
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <div class="flex items-center justify-center mb-6">
+                    <i class="fa fa-flask text-primary text-3xl mr-3"></i>
+                    <span class="text-2xl font-bold">物理模拟实验室</span>
+                </div>
+                <p class="text-gray-400 mb-8">
+                    致力于开发高质量的物理模拟工具，帮助学生更好地理解物理概念
+                </p>
+                <div class="flex justify-center space-x-6 mb-8">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-facebook text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-github text-xl"></i>
+                    </a>
+                </div>
+                <div class="text-sm text-gray-500">
+                    © 2025 物理模拟实验室. 保留所有权利.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 移动端菜单切换
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // 关闭移动端菜单
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                }
+            });
+        });
+        
+        // 动量守恒碰撞模拟
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const ball1 = document.getElementById('ball1');
+            const ball2 = document.getElementById('ball2');
+            const startBtn = document.getElementById('start-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const simulationArea = document.getElementById('simulation-area');
+            
+            // 获取输入元素
+            const mass1Input = document.getElementById('mass1');
+            const velocity1Input = document.getElementById('velocity1');
+            const mass2Input = document.getElementById('mass2');
+            const velocity2Input = document.getElementById('velocity2');
+            
+            // 获取结果显示元素
+            const momentumBeforeElement = document.getElementById('momentum-before');
+            const momentumAfterElement = document.getElementById('momentum-after');
+            const velocity1BeforeElement = document.getElementById('velocity1-before');
+            const velocity1AfterElement = document.getElementById('velocity1-after');
+            const velocity2BeforeElement = document.getElementById('velocity2-before');
+            const velocity2AfterElement = document.getElementById('velocity2-after');
+            
+            // 初始状态
+            let isSimulating = false;
+            
+            // 重置模拟
+            function resetSimulation() {
+                // 停止任何正在进行的动画
+                ball1.style.transition = 'none';
+                ball2.style.transition = 'none';
+                
+                // 重置小球位置
+                ball1.style.left = '50px';
+                ball2.style.left = '300px';
+                
+                // 清空结果
+                momentumBeforeElement.textContent = '0 kg·m/s';
+                momentumAfterElement.textContent = '0 kg·m/s';
+                velocity1BeforeElement.textContent = '0 m/s';
+                velocity1AfterElement.textContent = '0 m/s';
+                velocity2BeforeElement.textContent = '0 m/s';
+                velocity2AfterElement.textContent = '0 m/s';
+                
+                // 重置输入框
+                mass1Input.value = '1';
+                velocity1Input.value = '2';
+                mass2Input.value = '1';
+                velocity2Input.value = '0';
+                
+                // 启用输入和按钮
+                mass1Input.disabled = false;
+                velocity1Input.disabled = false;
+                mass2Input.disabled = false;
+                velocity2Input.disabled = false;
+                startBtn.disabled = false;
+                
+                // 更新按钮文本
+                startBtn.innerHTML = '<i class="fa fa-play mr-2"></i>开始模拟';
+                
+                // 重置模拟状态
+                isSimulating = false;
+            }
+            
+            // 开始模拟
+            function startSimulation() {
+                if (isSimulating) return;
+                
+                // 获取输入值
+                const mass1 = parseFloat(mass1Input.value);
+                const velocity1 = parseFloat(velocity1Input.value);
+                const mass2 = parseFloat(mass2Input.value);
+                const velocity2 = parseFloat(velocity2Input.value);
+                
+                // 验证输入
+                if (isNaN(mass1) || isNaN(velocity1) || isNaN(mass2) || isNaN(velocity2) ||
+                    mass1 <= 0 || mass2 <= 0) {
+                    alert('请输入有效的参数值');
+                    return;
+                }
+                
+                // 禁用输入和按钮
+                mass1Input.disabled = true;
+                velocity1Input.disabled = true;
+                mass2Input.disabled = true;
+                velocity2Input.disabled = true;
+                startBtn.disabled = true;
+                startBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>模拟中...';
+                
+                // 设置模拟状态
+                isSimulating = true;
+                
+                // 计算碰撞前的动量
+                const momentumBefore = mass1 * velocity1 + mass2 * velocity2;
+                
+                // 计算碰撞后的速度（弹性碰撞）
+                const velocity1After = ((mass1 - mass2) * velocity1 + 2 * mass2 * velocity2) / (mass1 + mass2);
+                const velocity2After = ((mass2 - mass1) * velocity2 + 2 * mass1 * velocity1) / (mass1 + mass2);
+                
+                // 计算碰撞后的动量
+                const momentumAfter = mass1 * velocity1After + mass2 * velocity2After;
+                
+                // 更新结果显示
+                momentumBeforeElement.textContent = momentumBefore.toFixed(2) + ' kg·m/s';
+                momentumAfterElement.textContent = momentumAfter.toFixed(2) + ' kg·m/s';
+                velocity1BeforeElement.textContent = velocity1.toFixed(2) + ' m/s';
+                velocity1AfterElement.textContent = velocity1After.toFixed(2) + ' m/s';
+                velocity2BeforeElement.textContent = velocity2.toFixed(2) + ' m/s';
+                velocity2AfterElement.textContent = velocity2After.toFixed(2) + ' m/s';
+                
+                // 重置小球位置
+                ball1.style.transition = 'none';
+                ball2.style.transition = 'none';
+                ball1.style.left = '50px';
+                ball2.style.left = '300px';
+                
+                // 等待重排完成
+                setTimeout(() => {
+                    // 计算小球的移动距离和时间
+                    const simulationWidth = simulationArea.offsetWidth;
+                    const ballWidth = ball1.offsetWidth;
+                    const collisionPoint = 300 - ballWidth / 2;
+                    const distanceToCollision = collisionPoint - 50 - ballWidth;
+                    
+                    // 计算时间（假设1m/s对应100px/s）
+                    const timeToCollision = distanceToCollision / (velocity1 * 100);
+                    
+                    // 设置小球1移动到碰撞点
+                    ball1.style.transition = `left ${timeToCollision}s linear`;
+                    ball1.style.left = (collisionPoint - ballWidth) + 'px';
+                    
+                    // 等待碰撞
+                    setTimeout(() => {
+                        // 计算碰撞后的移动距离
+                        const remainingWidth = simulationWidth - collisionPoint - ballWidth * 2;
+                        
+                        // 计算时间比例
+                        let timeAfterCollision = 1;
+                        if (Math.abs(velocity1After) > 0 || Math.abs(velocity2After) > 0) {
+                            const maxVelocity = Math.max(Math.abs(velocity1After), Math.abs(velocity2After));
+                            timeAfterCollision = remainingWidth / (maxVelocity * 100);
+                        }
+                        
+                        // 设置小球移动
+                        ball1.style.transition = `left ${timeAfterCollision}s linear`;
+                        ball2.style.transition = `left ${timeAfterCollision}s linear`;
+                        
+                        // 根据速度方向设置最终位置
+                        if (velocity1After >= 0) {
+                            ball1.style.left = (collisionPoint + ballWidth + velocity1After * 100 * timeAfterCollision) + 'px';
+                        } else {
+                            ball1.style.left = (collisionPoint - ballWidth + velocity1After * 100 * timeAfterCollision) + 'px';
+                        }
+                        
+                        if (velocity2After >= 0) {
+                            ball2.style.left = (collisionPoint + ballWidth + velocity2After * 100 * timeAfterCollision) + 'px';
+                        } else {
+                            ball2.style.left = (collisionPoint - ballWidth + velocity2After * 100 * timeAfterCollision) + 'px';
+                        }
+                        
+                        // 等待动画完成
+                        setTimeout(() => {
+                            // 更新按钮文本
+                            startBtn.innerHTML = '<i class="fa fa-check mr-2"></i>模拟完成';
+                            
+                            // 重置模拟状态
+                            setTimeout(() => {
+                                isSimulating = false;
+                                startBtn.disabled = false;
+                                startBtn.innerHTML = '<i class="fa fa-play mr-2"></i>再次模拟';
+                            }, 1000);
+                        }, timeAfterCollision * 1000);
+                    }, timeToCollision * 1000);
+                }, 100);
+            }
+            
+            // 绑定事件
+            startBtn.addEventListener('click', startSimulation);
+            resetBtn.addEventListener('click', resetSimulation);
+            
+            // 初始化
+            resetSimulation();
+        });
+    </script>
+</body>
+</html>

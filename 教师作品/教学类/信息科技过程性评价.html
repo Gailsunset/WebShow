@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能班级过程性评价系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 顶部标题区 */
+        .header {
+            background: linear-gradient(135deg, #ffffff 0%, #f1f8f4 100%);
+            border-radius: 20px;
+            padding: 35px 25px 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.15);
+            border: 1px solid rgba(76, 175, 80, 0.1);
+        }
+
+        .title-edit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .title-edit::before {
+            content: '🎓';
+            font-size: 32px;
+            position: absolute;
+            left: 0;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .title-edit::after {
+            content: '📚';
+            font-size: 32px;
+            position: absolute;
+            right: 0;
+            animation: float 3s ease-in-out infinite;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .title-input {
+            font-size: 28px;
+            font-weight: 700;
+            color: transparent;
+            background: linear-gradient(135deg, #2e7d32, #4caf50, #66bb6a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border: 2px dashed transparent;
+            padding: 12px 20px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            background-color: transparent;
+            text-align: center;
+            flex: 1;
+            max-width: 600px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .title-input:hover {
+            border-color: #4caf50;
+            background-color: #f1f8f4;
+            background: linear-gradient(135deg, #2e7d32, #4caf50, #66bb6a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transform: scale(1.02);
+        }
+
+        .title-input:focus {
+            outline: none;
+            border-color: #4caf50;
+            border-style: solid;
+            background-color: white;
+            background: linear-gradient(135deg, #1b5e20, #2e7d32, #4caf50);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+        }
+
+        /* 功能按钮区 */
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #66bb6a, #4caf50);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .toolbar button,
+        .toolbar input[type="file"] {
+            padding: 10px 20px;
+            border: 2px solid #4caf50;
+            background: white;
+            color: #4caf50;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .toolbar button:hover {
+            background: #4caf50;
+            color: white;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-label {
+            padding: 10px 20px;
+            border: 2px solid #4caf50;
+            background: white;
+            color: #4caf50;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .file-label:hover {
+            background: #4caf50;
+            color: white;
+        }
+
+        /* 主内容区 */
+        .content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 500px;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        /* 座位视图 */
+        .seats-grid {
+            display: grid;
+            grid-template-columns: 60px repeat(6, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .seat-card {
+            background: linear-gradient(135deg, #f1f8f4, #e8f5e9);
+            border: 2px solid #c8e6c9;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .seat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
+        }
+
+        .seat-card.selected {
+            background: linear-gradient(135deg, #a5d6a7, #81c784);
+            border-color: #4caf50;
+            border-width: 3px;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+        }
+
+        .seat-number {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .student-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2e7d32;
+        }
+
+        .attendance-status {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .seat-card.present .attendance-status {
+            background: #4caf50;
+        }
+
+        .seat-card.absent .attendance-status {
+            background: #f44336;
+        }
+
+        .seat-card.leave .attendance-status {
+            background: #ff9800;
+        }
+
+        /* 积分榜视图 */
+        .ranking-list {
+            margin-top: 20px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px 20px;
+            background: #f8fdf9;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .ranking-item:hover {
+            background: #e8f5e9;
+            transform: translateX(5px);
+        }
+
+        .rank-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4caf50;
+            min-width: 40px;
+        }
+
+        .rank-number.top1 {
+            color: #ffd700;
+        }
+
+        .rank-number.top2 {
+            color: #c0c0c0;
+        }
+
+        .rank-number.top3 {
+            color: #cd7f32;
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-info .name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+
+        .student-info .details {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .score-display {
+            font-size: 28px;
+            font-weight: 700;
+            color: #4caf50;
+        }
+
+        /* 评价弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: #e0e0e0;
+            transform: rotate(90deg);
+        }
+
+        .score-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .score-btn {
+            padding: 15px;
+            border: 2px solid #4caf50;
+            background: white;
+            color: #4caf50;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .score-btn:hover {
+            background: #4caf50;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .score-btn.negative {
+            border-color: #f44336;
+            color: #f44336;
+        }
+
+        .score-btn.negative:hover {
+            background: #f44336;
+            color: white;
+        }
+
+        .eval-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .eval-type {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .eval-type.active {
+            border-color: #4caf50;
+            background: #4caf50;
+            color: white;
+        }
+
+        .confirm-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #66bb6a, #4caf50);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        /* 批量操作 */
+        .batch-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .batch-btn {
+            padding: 10px 20px;
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .batch-btn:hover {
+            background: #1976d2;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 18px;
+            color: #666;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .seats-grid {
+                grid-template-columns: 50px repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .seats-grid {
+                grid-template-columns: 40px repeat(2, 1fr);
+            }
+
+            .group-label {
+                font-size: 16px;
+                padding: 10px 5px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                min-width: 100%;
+            }
+
+            .title-input {
+                font-size: 20px;
+                padding: 10px 15px;
+                max-width: 90%;
+            }
+
+            .title-edit::before,
+            .title-edit::after {
+                font-size: 24px;
+            }
+
+            .header {
+                padding: 25px 15px 20px;
+            }
+        }
+
+        /* 小组标签 */
+        .group-label {
+            background: linear-gradient(135deg, #66bb6a, #4caf50);
+            color: white;
+            padding: 15px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 班级筛选 */
+        .class-filter {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f0f8f5;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .class-filter label {
+            font-size: 14px;
+            color: #2e7d32;
+            font-weight: 500;
+        }
+
+        .class-filter select {
+            padding: 6px 12px;
+            border: 2px solid #4caf50;
+            border-radius: 6px;
+            background: white;
+            color: #2e7d32;
+            font-size: 14px;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .class-filter select:focus {
+            outline: none;
+            border-color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部标题 -->
+        <div class="header">
+            <div class="title-edit">
+                <input type="text" class="title-input" id="classTitle" value="仙田外国语七(5)班过程性评价系统">
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn active" data-view="attendance">📋 考勤</button>
+                <button class="nav-btn" data-view="callname">🎯 点名</button>
+                <button class="nav-btn" data-view="evaluate">⭐ 评价</button>
+                <button class="nav-btn" data-view="ranking">🏆 积分榜</button>
+            </div>
+        </div>
+
+        <!-- 工具栏 -->
+        <div class="toolbar">
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" accept=".xlsx,.xls,.txt" onchange="handleFileUpload(event)">
+                <label class="file-label" for="fileInput">📂 导入学生名单</label>
+            </div>
+            <button onclick="exportData()">📊 导出数据</button>
+            <button onclick="exportReport()">📄 导出报告</button>
+            <button onclick="batchEvaluate()">✨ 批量评价</button>
+            <button onclick="clearData()">🗑️ 清空数据</button>
+            <span style="margin-left: auto; color: #666; font-size: 14px;" id="studentCount">学生人数: 0</span>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="content">
+            <!-- 考勤视图 -->
+            <div id="attendanceView" class="view active">
+                <h3 style="margin-bottom: 10px; color: #2e7d32;">📋 考勤管理</h3>
+                <div class="class-filter">
+                    <label>班级筛选：</label>
+                    <select id="classFilterAttendance" onchange="filterByClass()">
+                        <option value="all">全部班级</option>
+                    </select>
+                    <span id="attendanceStudentCount" style="color: #666; font-size: 14px; margin-left: 10px;"></span>
+                </div>
+                <div class="batch-actions">
+                    <button class="batch-btn" onclick="markAllAttendance('present')">✓ 全部出勤</button>
+                    <button class="batch-btn" onclick="markAllAttendance('absent')">✗ 全部缺勤</button>
+                    <button class="batch-btn" onclick="markAllAttendance('leave')">⊙ 全部请假</button>
+                    <button class="batch-btn" onclick="markAllAttendance('')">○ 清除标记</button>
+                </div>
+                <div class="seats-grid" id="seatsGrid"></div>
+            </div>
+
+            <!-- 点名视图 -->
+            <div id="callnameView" class="view">
+                <h3 style="margin-bottom: 20px; color: #2e7d32;">🎯 随机点名</h3>
+                <div style="text-align: center; padding: 40px;">
+                    <button class="confirm-btn" style="max-width: 300px; margin: 0 auto;" onclick="randomCall()">🎲 开始点名</button>
+                    <div id="calledName" style="font-size: 48px; font-weight: 700; color: #4caf50; margin-top: 40px; min-height: 60px;"></div>
+                </div>
+            </div>
+
+            <!-- 评价视图 -->
+            <div id="evaluateView" class="view">
+                <h3 style="margin-bottom: 10px; color: #2e7d32;">⭐ 学生评价</h3>
+                <div class="class-filter">
+                    <label>班级筛选：</label>
+                    <select id="classFilterEvaluate" onchange="filterByClass()">
+                        <option value="all">全部班级</option>
+                    </select>
+                    <span id="evaluateStudentCount" style="color: #666; font-size: 14px; margin-left: 10px;"></span>
+                </div>
+                <div class="batch-actions">
+                    <button class="batch-btn" onclick="toggleMultiSelect()">
+                        <span id="multiSelectBtnText">✓ 开启多选</span>
+                    </button>
+                    <button class="batch-btn" onclick="batchEvaluateSelected()" id="batchEvalBtn" style="display: none;">
+                        ⭐ 批量评价选中的学生
+                    </button>
+                    <span id="selectedCount" style="color: #666; font-size: 14px; margin-left: 10px;"></span>
+                </div>
+                <div class="seats-grid" id="evaluateGrid"></div>
+            </div>
+
+            <!-- 积分榜视图 -->
+            <div id="rankingView" class="view">
+                <h3 style="margin-bottom: 20px; color: #2e7d32;">🏆 积分排行榜</h3>
+                <div class="ranking-list" id="rankingList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 评价弹窗 -->
+    <div class="modal" id="evaluateModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeEvaluateModal()">×</button>
+            <div class="modal-header" id="modalTitle">评价学生</div>
+            
+            <div style="margin-bottom: 20px;">
+                <div style="color: #666; font-size: 14px; margin-bottom: 10px;">选择分数：</div>
+                <div class="score-buttons">
+                    <button class="score-btn" onclick="selectScore(1)">+1</button>
+                    <button class="score-btn" onclick="selectScore(2)">+2</button>
+                    <button class="score-btn" onclick="selectScore(5)">+5</button>
+                    <button class="score-btn negative" onclick="selectScore(-1)">-1</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <div style="color: #666; font-size: 14px; margin-bottom: 10px;">评价类型：</div>
+                <div class="eval-types">
+                    <div class="eval-type" onclick="selectType(this, '发言')">发言</div>
+                    <div class="eval-type" onclick="selectType(this, '作业')">作业</div>
+                    <div class="eval-type" onclick="selectType(this, '纪律')">纪律</div>
+                    <div class="eval-type" onclick="selectType(this, '互助')">互助</div>
+                    <div class="eval-type" onclick="selectType(this, '创新')">创新</div>
+                    <div class="eval-type" onclick="selectType(this, '其他')">其他</div>
+                </div>
+            </div>
+
+            <button class="confirm-btn" onclick="confirmEvaluate()">确认评价</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // 全局数据
+        let allStudents = []; // 所有学生数据
+        let students = []; // 当前显示的学生（筛选后）
+        let currentStudent = null;
+        let selectedScore = 0;
+        let selectedType = '';
+        let currentClass = 'all'; // 当前选择的班级
+        let multiSelectMode = false; // 多选模式
+        let selectedStudents = []; // 选中的学生ID列表
+
+        // 初始化
+        window.onload = function() {
+            loadFromLocalStorage();
+            updateClassFilter();
+            updateClassTitle();
+            renderSeats();
+            renderRanking();
+            updateStudentCount();
+            
+            // 初始化学生数计数显示
+            if (students.length > 0) {
+                document.getElementById('attendanceStudentCount').textContent = `当前显示: ${students.length} 人`;
+                document.getElementById('evaluateStudentCount').textContent = `当前显示: ${students.length} 人`;
+            }
+        };
+
+        // 导航切换
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                const viewId = this.dataset.view + 'View';
+                document.getElementById(viewId).classList.add('active');
+                
+                if (this.dataset.view === 'evaluate') {
+                    renderEvaluateGrid();
+                } else if (this.dataset.view === 'ranking') {
+                    renderRanking();
+                }
+            });
+        });
+
+        // 文件导入
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            
+            if (file.name.endsWith('.txt')) {
+                reader.onload = function(event) {
+                    const content = event.target.result;
+                    const lines = content.split('\n').map(line => line.trim()).filter(line => line);
+                    
+                    allStudents = lines.map((name, index) => ({
+                        id: index + 1,
+                        name: name,
+                        score: 0,
+                        attendance: '',
+                        evaluations: [],
+                        evaluationCount: 0,
+                        class: '' // txt文件没有班级信息
+                    }));
+                    
+                    students = [...allStudents];
+                    currentClass = 'all';
+                    
+                    saveToLocalStorage();
+                    updateClassFilter();
+                    renderSeats();
+                    renderRanking();
+                    updateStudentCount();
+                    alert(`成功导入 ${allStudents.length} 名学生`);
+                };
+                reader.readAsText(file, 'UTF-8');
+            } else {
+                reader.onload = function(event) {
+                    try {
+                        const data = new Uint8Array(event.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        
+                        allStudents = jsonData.map((row, index) => ({
+                            id: index + 1,
+                            name: row['新生姓名'] || row['姓名'] || row['name'] || `学生${index + 1}`,
+                            gender: row['性别'] || '',
+                            class: row['班级'] || '',
+                            score: 0,
+                            attendance: '',
+                            evaluations: [],
+                            evaluationCount: 0
+                        }));
+                        
+                        students = [...allStudents];
+                        currentClass = 'all';
+                        
+                        saveToLocalStorage();
+                        updateClassFilter();
+                        renderSeats();
+                        renderRanking();
+                        updateStudentCount();
+                        alert(`成功导入 ${allStudents.length} 名学生`);
+                    } catch (error) {
+                        alert('文件解析失败，请确保格式正确: ' + error.message);
+                        console.error(error);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        // 更新班级筛选下拉框
+        function updateClassFilter() {
+            // 获取所有班级
+            const classes = [...new Set(allStudents.map(s => s.class).filter(c => c))];
+            classes.sort();
+            
+            // 更新两个下拉框
+            const filters = ['classFilterAttendance', 'classFilterEvaluate'];
+            filters.forEach(filterId => {
+                const select = document.getElementById(filterId);
+                select.innerHTML = '<option value="all">全部班级</option>';
+                classes.forEach(cls => {
+                    const option = document.createElement('option');
+                    option.value = cls;
+                    option.textContent = cls;
+                    select.appendChild(option);
+                });
+                select.value = currentClass;
+            });
+        }
+
+        // 班级筛选
+        function filterByClass() {
+            // 获取当前激活的视图对应的筛选器
+            const activeView = document.querySelector('.view.active');
+            let selectedClass = 'all';
+            
+            if (activeView.id === 'attendanceView') {
+                selectedClass = document.getElementById('classFilterAttendance').value;
+            } else if (activeView.id === 'evaluateView') {
+                selectedClass = document.getElementById('classFilterEvaluate').value;
+            }
+            
+            currentClass = selectedClass;
+            
+            // 同步两个筛选器的值
+            document.getElementById('classFilterAttendance').value = selectedClass;
+            document.getElementById('classFilterEvaluate').value = selectedClass;
+            
+            // 筛选学生
+            if (selectedClass === 'all') {
+                students = [...allStudents];
+            } else {
+                students = allStudents.filter(s => s.class && s.class === selectedClass);
+            }
+            
+            console.log('Filtering by class:', selectedClass);
+            console.log('Filtered students:', students.length);
+            
+            // 更新标题
+            updateClassTitle();
+            
+            // 清除多选
+            selectedStudents = [];
+            multiSelectMode = false;
+            updateMultiSelectUI();
+            
+            // 重新渲染
+            if (activeView.id === 'attendanceView') {
+                renderSeats();
+                document.getElementById('attendanceStudentCount').textContent = `当前显示: ${students.length} 人`;
+            } else if (activeView.id === 'evaluateView') {
+                renderEvaluateGrid();
+                document.getElementById('evaluateStudentCount').textContent = `当前显示: ${students.length} 人`;
+            }
+            
+            renderRanking();
+            saveToLocalStorage();
+        }
+
+        // 更新班级标题
+        function updateClassTitle() {
+            const titleInput = document.getElementById('classTitle');
+            const baseTitle = '仙田外国语';
+            
+            if (currentClass === 'all' || !currentClass) {
+                titleInput.value = baseTitle + '过程性评价系统';
+            } else {
+                titleInput.value = baseTitle + currentClass + '过程性评价系统';
+            }
+        }
+
+        // 渲染座位
+        function renderSeats() {
+            const grid = document.getElementById('seatsGrid');
+            if (students.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">请先导入学生名单</div></div>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            const studentsPerGroup = 6;
+            const totalGroups = 9; // 固定9个小组
+            const maxStudents = studentsPerGroup * totalGroups; // 最多54人
+            
+            for (let groupIndex = 0; groupIndex < totalGroups; groupIndex++) {
+                // 添加左侧小组标签
+                const groupLabel = document.createElement('div');
+                groupLabel.className = 'group-label';
+                groupLabel.textContent = groupIndex + 1;
+                grid.appendChild(groupLabel);
+                
+                // 计算该组的学生范围（严格限制为6人）
+                const startIdx = groupIndex * studentsPerGroup;
+                const endIdx = Math.min(startIdx + studentsPerGroup, students.length);
+                
+                // 添加学生卡片（最多6个）
+                let addedCount = 0;
+                for (let i = startIdx; i < endIdx && addedCount < studentsPerGroup; i++) {
+                    const student = students[i];
+                const card = document.createElement('div');
+                card.className = `seat-card ${student.attendance}`;
+                card.innerHTML = `
+                    <div class="attendance-status"></div>
+                        <div class="seat-number">座位 ${i + 1}</div>
+                        <div class="student-name">${student.name}</div>
+                    `;
+                    card.onclick = () => toggleAttendance(student.id);
+                    grid.appendChild(card);
+                    addedCount++;
+                }
+                
+                // 补充空位到6个
+                for (let i = addedCount; i < studentsPerGroup; i++) {
+                    const emptyCard = document.createElement('div');
+                    emptyCard.className = 'seat-card';
+                    emptyCard.style.opacity = '0.3';
+                    emptyCard.style.cursor = 'default';
+                    emptyCard.innerHTML = `
+                        <div class="seat-number">空位</div>
+                        <div class="student-name">-</div>
+                    `;
+                    grid.appendChild(emptyCard);
+                }
+            }
+        }
+
+        // 渲染评价网格
+        function renderEvaluateGrid() {
+            const grid = document.getElementById('evaluateGrid');
+            if (students.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⭐</div><div class="empty-state-text">请先导入学生名单</div></div>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            const studentsPerGroup = 6;
+            const totalGroups = 9; // 固定9个小组
+            
+            for (let groupIndex = 0; groupIndex < totalGroups; groupIndex++) {
+                // 添加左侧小组标签
+                const groupLabel = document.createElement('div');
+                groupLabel.className = 'group-label';
+                groupLabel.textContent = groupIndex + 1;
+                grid.appendChild(groupLabel);
+                
+                // 计算该组的学生范围（严格限制为6人）
+                const startIdx = groupIndex * studentsPerGroup;
+                const endIdx = Math.min(startIdx + studentsPerGroup, students.length);
+                
+                // 添加学生卡片（最多6个）
+                let addedCount = 0;
+                for (let i = startIdx; i < endIdx && addedCount < studentsPerGroup; i++) {
+                    const student = students[i];
+                    const card = document.createElement('div');
+                    card.className = 'seat-card';
+                    
+                    // 如果在多选模式下且被选中，添加selected类
+                    if (multiSelectMode && selectedStudents.includes(student.id)) {
+                        card.classList.add('selected');
+                    }
+                    
+                    card.innerHTML = `
+                        <div class="seat-number">座位 ${i + 1}</div>
+                        <div class="student-name">${student.name}</div>
+                        <div style="font-size: 20px; color: #4caf50; margin-top: 8px;">${student.score}分</div>
+                    `;
+                    
+                    // 根据是否多选模式设置点击行为
+                    if (multiSelectMode) {
+                        card.onclick = () => toggleStudentSelect(student.id);
+                    } else {
+                        card.onclick = () => openEvaluateModal(student);
+                    }
+                    
+                    grid.appendChild(card);
+                    addedCount++;
+                }
+                
+                // 补充空位到6个
+                for (let i = addedCount; i < studentsPerGroup; i++) {
+                    const emptyCard = document.createElement('div');
+                    emptyCard.className = 'seat-card';
+                    emptyCard.style.opacity = '0.3';
+                    emptyCard.style.cursor = 'default';
+                    emptyCard.innerHTML = `
+                        <div class="seat-number">空位</div>
+                        <div class="student-name">-</div>
+                    `;
+                    grid.appendChild(emptyCard);
+                }
+            }
+        }
+
+        // 渲染积分榜
+        function renderRanking() {
+            const list = document.getElementById('rankingList');
+            if (students.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏆</div><div class="empty-state-text">请先导入学生名单</div></div>';
+                return;
+            }
+
+            const sorted = [...students].sort((a, b) => b.score - a.score);
+            
+            list.innerHTML = '';
+            sorted.forEach((student, index) => {
+                const item = document.createElement('div');
+                item.className = 'ranking-item';
+                
+                let rankClass = '';
+                if (index === 0) rankClass = 'top1';
+                else if (index === 1) rankClass = 'top2';
+                else if (index === 2) rankClass = 'top3';
+                
+                const lastEval = student.evaluations && student.evaluations.length > 0 
+                    ? student.evaluations[student.evaluations.length - 1] 
+                    : null;
+                
+                item.innerHTML = `
+                    <div class="rank-number ${rankClass}">${index + 1}</div>
+                    <div class="student-info">
+                        <div class="name">${student.name}</div>
+                        <div class="details">
+                            评价次数: ${student.evaluationCount || 0} 次
+                            ${lastEval ? ` | 最近: ${lastEval.type} ${lastEval.score > 0 ? '+' : ''}${lastEval.score}分` : ''}
+                        </div>
+                    </div>
+                    <div class="score-display">${student.score}</div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        // 切换考勤状态
+        function toggleAttendance(studentId) {
+            // 在 allStudents 中查找并更新
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return;
+
+            const states = ['', 'present', 'absent', 'leave'];
+            const currentIndex = states.indexOf(student.attendance);
+            student.attendance = states[(currentIndex + 1) % states.length];
+            
+            // 同步更新 students 数组中的相同学生
+            const filteredStudent = students.find(s => s.id === studentId);
+            if (filteredStudent) {
+                filteredStudent.attendance = student.attendance;
+            }
+            
+            saveToLocalStorage();
+            renderSeats();
+        }
+
+        // 批量考勤
+        function markAllAttendance(status) {
+            // 更新当前显示的学生
+            students.forEach(s => {
+                s.attendance = status;
+                // 同步更新 allStudents 中的相同学生
+                const studentInAll = allStudents.find(st => st.id === s.id);
+                if (studentInAll) {
+                    studentInAll.attendance = status;
+                }
+            });
+            saveToLocalStorage();
+            renderSeats();
+        }
+
+        // 打开评价弹窗
+        function openEvaluateModal(student) {
+            currentStudent = student;
+            selectedScore = 0;
+            selectedType = '';
+            
+            document.getElementById('modalTitle').textContent = `评价 ${student.name}`;
+            document.getElementById('evaluateModal').style.display = 'flex';
+            
+            // 清除选中状态
+            updateScoreBtns();
+            updateTypeBtns();
+        }
+
+        // 关闭弹窗
+        function closeEvaluateModal() {
+            document.getElementById('evaluateModal').style.display = 'none';
+            currentStudent = null;
+            selectedScore = 0;
+            selectedType = '';
+            selectedStudents = []; // 清除批量选择
+        }
+
+        // 选择分数
+        function selectScore(score) {
+            selectedScore = score;
+            updateScoreBtns();
+        }
+
+        // 更新分数按钮状态
+        function updateScoreBtns() {
+            document.querySelectorAll('.score-btn').forEach(btn => {
+                btn.classList.remove('active');
+                const btnScore = parseInt(btn.textContent);
+                if (btnScore === selectedScore) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // 选择评价类型
+        function selectType(element, type) {
+            selectedType = type;
+            updateTypeBtns();
+        }
+
+        // 更新评价类型按钮状态
+        function updateTypeBtns() {
+            document.querySelectorAll('.eval-type').forEach(el => {
+                el.classList.remove('active');
+                if (el.textContent.includes(selectedType.replace('发言', '').replace('作业', '').replace('纪律', '').replace('其他', ''))) {
+                    el.classList.add('active');
+                }
+            });
+        }
+
+        // 确认评价功能已移至下方，支持批量评价
+
+        // 随机点名
+        function randomCall() {
+            if (students.length === 0) {
+                alert('请先导入学生名单');
+                return;
+            }
+
+            const presentStudents = students.filter(s => s.attendance === 'present' || s.attendance === '');
+            if (presentStudents.length === 0) {
+                alert('没有可点名的学生（建议标记出勤状态）');
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * presentStudents.length);
+            const selected = presentStudents[randomIndex];
+            
+            document.getElementById('calledName').textContent = selected.name;
+        }
+
+        // 批量评价
+        function batchEvaluate() {
+            if (students.length === 0) {
+                alert('请先导入学生名单');
+                return;
+            }
+
+            const score = parseInt(prompt('请输入要添加的分数（可以是负数）:', '1'));
+            if (isNaN(score) || score === 0) return;
+
+            const type = prompt('请输入评价类型:', '发言');
+            if (!type) return;
+
+            const count = students.length;
+            students.forEach(student => {
+                student.score += score;
+                student.evaluationCount = (student.evaluationCount || 0) + 1;
+                if (!student.evaluations) student.evaluations = [];
+                student.evaluations.push({
+                    score: score,
+                    type: type,
+                    time: new Date().toLocaleString()
+                });
+                
+                // 同步更新 allStudents 中的相同学生
+                const studentInAll = allStudents.find(s => s.id === student.id);
+                if (studentInAll) {
+                    studentInAll.score = student.score;
+                    studentInAll.evaluationCount = student.evaluationCount;
+                    studentInAll.evaluations = student.evaluations;
+                }
+            });
+
+            saveToLocalStorage();
+            renderEvaluateGrid();
+            renderRanking();
+            alert(`批量评价成功！为 ${count} 名学生各${score > 0 ? '+' : ''}${score}分`);
+        }
+
+        // 导出数据
+        function exportData() {
+            // 导出所有学生数据
+            if (allStudents.length === 0) {
+                alert('没有数据可导出');
+                return;
+            }
+
+            const data = allStudents.map(s => ({
+                '姓名': s.name,
+                '性别': s.gender || '',
+                '班级': s.class || '',
+                '总分': s.score,
+                '考勤状态': s.attendance === 'present' ? '出勤' : s.attendance === 'absent' ? '缺勤' : s.attendance === 'leave' ? '请假' : '未标记',
+                '评价次数': s.evaluationCount || 0
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, '学生数据');
+            
+            const className = document.getElementById('classTitle').value.replace(/过程性评价系统/g, '');
+            XLSX.writeFile(wb, `${className}_评价数据_${new Date().toLocaleDateString()}.xlsx`);
+        }
+
+        // 导出报告
+        function exportReport() {
+            // 导出所有学生的报告
+            if (allStudents.length === 0) {
+                alert('没有数据可导出');
+                return;
+            }
+
+            const sorted = [...allStudents].sort((a, b) => b.score - a.score);
+            const avgScore = allStudents.reduce((sum, s) => sum + s.score, 0) / allStudents.length;
+            const maxScore = sorted[0].score;
+            const minScore = sorted[sorted.length - 1].score;
+
+            const reportData = sorted.map((s, index) => {
+                const participation = s.evaluationCount > avgScore ? '高' : s.evaluationCount < avgScore * 0.5 ? '低' : '中';
+                const trend = s.score > avgScore ? '优秀' : s.score < avgScore * 0.5 ? '需关注' : '良好';
+                
+                return {
+                    '排名': index + 1,
+                    '姓名': s.name,
+                    '班级': s.class || '',
+                    '总分': s.score,
+                    '评价次数': s.evaluationCount || 0,
+                    '参与度': participation,
+                    '综合表现': trend,
+                    '最近评价': s.evaluations && s.evaluations.length > 0 
+                        ? `${s.evaluations[s.evaluations.length - 1].type} ${s.evaluations[s.evaluations.length - 1].score}分`
+                        : '暂无'
+                };
+            });
+
+            const ws = XLSX.utils.json_to_sheet(reportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, '学生画像报告');
+            
+            const className = document.getElementById('classTitle').value.replace(/过程性评价系统/g, '');
+            XLSX.writeFile(wb, `${className}_学生画像报告_${new Date().toLocaleDateString()}.xlsx`);
+        }
+
+        // 切换多选模式
+        function toggleMultiSelect() {
+            multiSelectMode = !multiSelectMode;
+            selectedStudents = [];
+            updateMultiSelectUI();
+            renderEvaluateGrid();
+        }
+
+        // 更新多选UI状态
+        function updateMultiSelectUI() {
+            const btnText = document.getElementById('multiSelectBtnText');
+            const batchBtn = document.getElementById('batchEvalBtn');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            if (multiSelectMode) {
+                btnText.textContent = '✗ 关闭多选';
+                batchBtn.style.display = 'inline-block';
+            } else {
+                btnText.textContent = '✓ 开启多选';
+                batchBtn.style.display = 'none';
+            }
+            
+            if (selectedStudents.length > 0) {
+                selectedCount.textContent = `已选择: ${selectedStudents.length} 人`;
+            } else {
+                selectedCount.textContent = '';
+            }
+        }
+
+        // 切换学生选中状态
+        function toggleStudentSelect(studentId) {
+            const index = selectedStudents.indexOf(studentId);
+            if (index > -1) {
+                selectedStudents.splice(index, 1);
+            } else {
+                selectedStudents.push(studentId);
+            }
+            updateMultiSelectUI();
+            renderEvaluateGrid();
+        }
+
+        // 批量评价选中的学生
+        function batchEvaluateSelected() {
+            if (selectedStudents.length === 0) {
+                alert('请先选择要评价的学生');
+                return;
+            }
+            
+            // 显示评价弹窗
+            document.getElementById('evaluateModal').style.display = 'flex';
+            document.getElementById('modalTitle').textContent = `批量评价 (已选${selectedStudents.length}人)`;
+            selectedScore = 0;
+            selectedType = '';
+            updateScoreBtns();
+            updateTypeBtns();
+        }
+
+        // 修改确认评价函数，支持批量评价
+        function confirmEvaluate() {
+            if (selectedScore === 0 || !selectedType) {
+                alert('请选择分数和评价类型');
+                return;
+            }
+
+            const timestamp = new Date().toLocaleString('zh-CN');
+
+            // 如果是批量评价模式
+            if (selectedStudents.length > 0) {
+                selectedStudents.forEach(studentId => {
+                    const student = students.find(s => s.id === studentId);
+                    if (student) {
+                        student.score += selectedScore;
+                        student.evaluationCount = (student.evaluationCount || 0) + 1;
+                        
+                        if (!student.evaluations) student.evaluations = [];
+                        student.evaluations.push({
+                            type: selectedType,
+                            score: selectedScore,
+                            time: timestamp
+                        });
+                        
+                        // 同步到allStudents
+                        const studentInAll = allStudents.find(s => s.id === student.id);
+                        if (studentInAll) {
+                            studentInAll.score = student.score;
+                            studentInAll.evaluationCount = student.evaluationCount;
+                            studentInAll.evaluations = student.evaluations;
+                        }
+                    }
+                });
+
+                alert(`批量评价成功！已为 ${selectedStudents.length} 名学生评价`);
+                selectedStudents = [];
+                multiSelectMode = false;
+                updateMultiSelectUI();
+            } else if (currentStudent) {
+                // 单个学生评价
+                currentStudent.score += selectedScore;
+                currentStudent.evaluationCount = (currentStudent.evaluationCount || 0) + 1;
+                
+                if (!currentStudent.evaluations) currentStudent.evaluations = [];
+                currentStudent.evaluations.push({
+                    type: selectedType,
+                    score: selectedScore,
+                    time: timestamp
+                });
+                
+                // 同步到allStudents
+                const studentInAll = allStudents.find(s => s.id === currentStudent.id);
+                if (studentInAll) {
+                    studentInAll.score = currentStudent.score;
+                    studentInAll.evaluationCount = currentStudent.evaluationCount;
+                    studentInAll.evaluations = currentStudent.evaluations;
+                }
+            }
+
+            closeEvaluateModal();
+            renderEvaluateGrid();
+            renderRanking();
+            saveToLocalStorage();
+        }
+
+        // 清空数据
+        function clearData() {
+            if (!confirm('确定要清空所有数据吗？此操作不可恢复！')) return;
+            
+            allStudents = [];
+            students = [];
+            currentClass = 'all';
+            selectedStudents = [];
+            multiSelectMode = false;
+            localStorage.removeItem('allStudents');
+            localStorage.removeItem('currentClass');
+            
+            updateClassFilter();
+            renderSeats();
+            renderEvaluateGrid();
+            renderRanking();
+            updateStudentCount();
+            
+            alert('数据已清空');
+        }
+
+        // 保存到本地存储
+        function saveToLocalStorage() {
+            localStorage.setItem('allStudents', JSON.stringify(allStudents));
+            localStorage.setItem('currentClass', currentClass);
+        }
+
+        // 从本地存储加载
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('allStudents');
+            if (saved) {
+                try {
+                    allStudents = JSON.parse(saved);
+                    const savedClass = localStorage.getItem('currentClass') || 'all';
+                    currentClass = savedClass;
+                    
+                    // 应用筛选
+                    if (currentClass === 'all') {
+                        students = [...allStudents];
+                    } else {
+                        students = allStudents.filter(s => s.class === currentClass);
+                    }
+                    
+                    // 更新筛选器
+                    updateClassFilter();
+                } catch (e) {
+                    console.error('加载数据失败', e);
+                    allStudents = [];
+                    students = [];
+                }
+            }
+        }
+
+        // 更新学生数量
+        function updateStudentCount() {
+            document.getElementById('studentCount').textContent = `学生人数: ${allStudents.length}`;
+        }
+
+        // 保存班级名称
+        document.getElementById('classTitle').addEventListener('change', function() {
+            localStorage.setItem('classTitle', this.value);
+        });
+
+        // 加载班级名称
+        const savedTitle = localStorage.getItem('classTitle');
+        if (savedTitle) {
+            document.getElementById('classTitle').value = savedTitle;
+        }
+    </script>
+</body>
+</html>

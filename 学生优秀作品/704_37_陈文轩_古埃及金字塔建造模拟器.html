@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>古埃及金字塔建造模拟器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        // 配置Tailwind自定义主题
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sand: '#E8D9B7',
+                        desert: '#C2A76F',
+                        pyramid: '#D4B483',
+                        nile: '#2A6F97',
+                        papyrus: '#F5F1E4',
+                        stone: '#8C7E6B',
+                        sunset: '#D97706',
+                    },
+                    fontFamily: {
+                        egyptian: ['"Segoe UI"', 'Roboto', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .animate-float {
+                animation: float 3s ease-in-out infinite;
+            }
+            .animate-rock {
+                animation: rock 2s ease-in-out infinite;
+            }
+            .animate-flow {
+                animation: flow 4s linear infinite;
+            }
+            .stage-active {
+                @apply ring-4 ring-sunset ring-opacity-80 scale-105;
+            }
+            .stage-completed {
+                @apply ring-4 ring-green-500 ring-opacity-80;
+            }
+            .btn-primary {
+                @apply bg-sunset hover:bg-sunset/90 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg;
+            }
+            .btn-secondary {
+                @apply bg-nile hover:bg-nile/90 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes rock {
+            0%, 100% { transform: rotate(-2deg); }
+            50% { transform: rotate(2deg); }
+        }
+
+        @keyframes flow {
+            0% { background-position: 0 0; }
+            100% { background-position: 100px 0; }
+        }
+
+        .water-bg {
+            background-image: linear-gradient(90deg, #2A6F97 0%, #3B82F6 50%, #2A6F97 100%);
+            background-size: 200px 100%;
+        }
+
+        .stone-pile {
+            position: relative;
+            height: 60px;
+        }
+
+        .stone {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #8C7E6B;
+            border-radius: 4px;
+            transform: rotate(var(--rotate, 0deg));
+        }
+
+        .pyramid-layer {
+            display: flex;
+            justify-content: center;
+            margin: 0 auto;
+            transition: all 1s ease-in-out;
+        }
+
+        .pyramid-block {
+            width: 30px;
+            height: 30px;
+            background-color: #D4B483;
+            margin: 0 2px;
+            border-radius: 2px;
+            transition: all 0.5s ease;
+        }
+
+        .raft {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 80px;
+            height: 20px;
+            background-color: #92400E;
+            border-radius: 4px;
+            transition: left 5s linear;
+        }
+
+        .raft.stone-loaded::after {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 25px;
+            width: 30px;
+            height: 15px;
+            background-color: #8C7E6B;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-sand min-h-screen font-egyptian text-stone">
+    <!-- 顶部标题区域 -->
+    <header class="bg-desert/80 py-4 px-6 text-center shadow-md">
+        <h1 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-white text-shadow">古埃及金字塔建造模拟器</h1>
+        <p class="text-[clamp(1rem,2vw,1.2rem)] text-papyrus mt-2">通过互动体验，探索金字塔建造的奥秘</p>
+    </header>
+
+    <!-- 主内容区域 -->
+    <main class="container mx-auto px-4 py-8 max-w-5xl">
+        <!-- 进度条区域 -->
+        <div class="mb-8 bg-papyrus rounded-lg p-4 shadow-md">
+            <div class="flex justify-between items-center mb-2">
+                <span class="font-bold text-lg">建造进度</span>
+                <span id="progress-percent" class="font-bold text-nile text-lg">0%</span>
+            </div>
+            <div class="w-full h-4 bg-stone/20 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-sunset transition-all duration-500 w-0"></div>
+            </div>
+        </div>
+
+        <!-- 阶段选择区域 -->
+        <div id="stage-selection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <!-- 采石场选石 -->
+            <div id="stage-1" class="stage bg-papyrus rounded-xl p-4 shadow-lg cursor-pointer transition-all duration-300 flex flex-col items-center text-center hover:shadow-xl">
+                <div class="w-20 h-20 bg-stone/30 rounded-full flex items-center justify-center mb-3">
+                    <i class="fa fa-hammer text-3xl text-stone"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">采石场选石</h3>
+                <p class="text-sm text-stone/70">开采坚硬的石灰岩</p>
+                <div class="mt-3 hidden" id="stage-1-check">
+                    <i class="fa fa-check-circle text-green-500"></i>
+                </div>
+            </div>
+
+            <!-- 尼罗河运输 -->
+            <div id="stage-2" class="stage bg-papyrus rounded-xl p-4 shadow-lg cursor-pointer transition-all duration-300 flex flex-col items-center text-center hover:shadow-xl opacity-50 pointer-events-none">
+                <div class="w-20 h-20 bg-nile/30 rounded-full flex items-center justify-center mb-3">
+                    <i class="fa fa-ship text-3xl text-nile"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">尼罗河运输</h3>
+                <p class="text-sm text-stone/70">利用河流运输巨石</p>
+                <div class="mt-3 hidden" id="stage-2-check">
+                    <i class="fa fa-check-circle text-green-500"></i>
+                </div>
+            </div>
+
+            <!-- 金字塔基座砌筑 -->
+            <div id="stage-3" class="stage bg-papyrus rounded-xl p-4 shadow-lg cursor-pointer transition-all duration-300 flex flex-col items-center text-center hover:shadow-xl opacity-50 pointer-events-none">
+                <div class="w-20 h-20 bg-pyramid/30 rounded-full flex items-center justify-center mb-3">
+                    <i class="fa fa-square text-3xl text-pyramid"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">基座砌筑</h3>
+                <p class="text-sm text-stone/70">建造稳固的正方形基座</p>
+                <div class="mt-3 hidden" id="stage-3-check">
+                    <i class="fa fa-check-circle text-green-500"></i>
+                </div>
+            </div>
+
+            <!-- 石块堆叠 -->
+            <div id="stage-4" class="stage bg-papyrus rounded-xl p-4 shadow-lg cursor-pointer transition-all duration-300 flex flex-col items-center text-center hover:shadow-xl opacity-50 pointer-events-none">
+                <div class="w-20 h-20 bg-sunset/30 rounded-full flex items-center justify-center mb-3">
+                    <i class="fa fa-cubes text-3xl text-sunset"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">石块堆叠</h3>
+                <p class="text-sm text-stone/70">逐层堆叠形成金字塔</p>
+                <div class="mt-3 hidden" id="stage-4-check">
+                    <i class="fa fa-check-circle text-green-500"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 阶段场景区域 -->
+        <div id="stage-scene" class="bg-papyrus rounded-2xl p-6 shadow-xl mb-8 hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="scene-title" class="text-2xl font-bold text-nile"></h2>
+                <button id="back-to-overview" class="text-stone hover:text-nile transition-colors">
+                    <i class="fa fa-arrow-left mr-1"></i> 返回总览
+                </button>
+            </div>
+
+            <!-- 场景内容 -->
+            <div id="scene-content" class="min-h-[300px] flex flex-col items-center justify-center relative mb-8">
+                <!-- 场景图片/动画将通过JS动态生成 -->
+            </div>
+
+            <!-- 操作按钮 -->
+            <div id="scene-actions" class="flex justify-center gap-4 mb-6">
+                <!-- 操作按钮将通过JS动态生成 -->
+            </div>
+
+            <!-- 知识点提示 -->
+            <div id="scene-tip" class="bg-desert/10 rounded-lg p-4 text-center hidden">
+                <h3 class="font-bold text-nile mb-2">核心知识点</h3>
+                <p id="tip-content" class="text-stone"></p>
+            </div>
+
+            <!-- 阶段完成提示 -->
+            <div id="stage-completed" class="bg-green-500/10 rounded-lg p-4 text-center hidden">
+                <h3 class="font-bold text-green-600 mb-2">阶段完成！</h3>
+                <p id="completed-message" class="text-stone"></p>
+                <button id="next-stage" class="btn-secondary mt-4">继续下一个阶段</button>
+            </div>
+        </div>
+
+        <!-- 完成总览 -->
+        <div id="final-overview" class="bg-papyrus rounded-2xl p-8 shadow-xl text-center hidden">
+            <div class="w-32 h-32 bg-sunset/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fa fa-trophy text-5xl text-sunset"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-nile mb-4">金字塔建造完成！</h2>
+            <p class="text-stone mb-8 max-w-2xl mx-auto">
+                恭喜你成功模拟了古埃及金字塔的建造过程！通过采石、运输、基座砌筑和石块堆叠四个关键阶段，
+                你已经理解了金字塔建造的核心逻辑。古埃及人的智慧和创造力令人惊叹！
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="bg-desert/10 rounded-lg p-4">
+                    <h3 class="font-bold text-nile mb-2">采石技术</h3>
+                    <p class="text-sm">利用铜制工具开采坚硬石灰岩</p>
+                </div>
+                <div class="bg-desert/10 rounded-lg p-4">
+                    <h3 class="font-bold text-nile mb-2">运输智慧</h3>
+                    <p class="text-sm">借助尼罗河和滚木减少摩擦力</p>
+                </div>
+                <div class="bg-desert/10 rounded-lg p-4">
+                    <h3 class="font-bold text-nile mb-2">精确测量</h3>
+                    <p class="text-sm">利用星象和几何知识确保方正</p>
+                </div>
+                <div class="bg-desert/10 rounded-lg p-4">
+                    <h3 class="font-bold text-nile mb-2">堆叠技术</h3>
+                    <p class="text-sm">逐层内缩形成稳定的金字塔结构</p>
+                </div>
+            </div>
+            <button id="restart-game" class="btn-primary">重新体验建造过程</button>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-desert/80 py-4 px-6 text-center text-papyrus mt-10">
+        <p>© 2025 古埃及文明互动学习 | 让历史学习更有趣</p>
+    </footer>
+
+    <script>
+        // 游戏状态管理
+        const gameState = {
+            currentStage: 0, // 0: 总览, 1-4: 对应四个阶段
+            completedStages: [],
+            progress: 0
+        };
+
+        // 阶段数据
+        const stages = [
+            {
+                id: 1,
+                title: "采石场选石",
+                description: "在古埃及的采石场，工人们需要开采坚硬的石灰岩作为建造金字塔的主要材料",
+                actions: [
+                    {
+                        text: "开采石块",
+                        callback: "quarryStone"
+                    }
+                ],
+                tip: "古埃及人使用铜制工具和木楔开采石块，利用热胀冷缩原理使岩石开裂",
+                completedMessage: "你成功开采了足够的石灰岩，这些石块将被用于建造金字塔的基础"
+            },
+            {
+                id: 2,
+                title: "尼罗河运输",
+                description: "开采好的巨石需要通过尼罗河运输到建造地点，这是最具挑战性的环节之一",
+                actions: [
+                    {
+                        text: "装载石块",
+                        callback: "loadStone"
+                    },
+                    {
+                        text: "启动木筏",
+                        callback: "startRaft"
+                    }
+                ],
+                tip: "古埃及人利用尼罗河的水流和滚木减少运输摩擦力，使巨石能够长距离运输",
+                completedMessage: "巨石成功运输到目的地！接下来将开始金字塔基座的砌筑工作"
+            },
+            {
+                id: 3,
+                title: "金字塔基座砌筑",
+                description: "金字塔的基座必须非常稳固且精确，这是整个建筑的基础",
+                actions: [
+                    {
+                        text: "测量放线",
+                        callback: "measureBase"
+                    },
+                    {
+                        text: "放置基石",
+                        callback: "placeCornerstones"
+                    }
+                ],
+                tip: "古埃及人利用星象观测和简单的几何原理，确保金字塔基座是完美的正方形",
+                completedMessage: "基座砌筑完成！四个角的基石已经精确放置，为后续建造奠定了基础"
+            },
+            {
+                id: 4,
+                title: "石块堆叠",
+                description: "从基座开始，逐层向上堆叠石块，最终形成标志性的金字塔形状",
+                actions: [
+                    {
+                        text: "逐层堆叠",
+                        callback: "stackStones"
+                    }
+                ],
+                tip: "金字塔采用逐层内缩的堆叠方式，每层石块都经过精确切割，确保结构稳定",
+                completedMessage: "所有石块都已成功堆叠！一座宏伟的金字塔就此诞生"
+            }
+        ];
+
+        // DOM元素
+        const elements = {
+            progressBar: document.getElementById('progress-bar'),
+            progressPercent: document.getElementById('progress-percent'),
+            stageSelection: document.getElementById('stage-selection'),
+            stageScene: document.getElementById('stage-scene'),
+            sceneTitle: document.getElementById('scene-title'),
+            sceneContent: document.getElementById('scene-content'),
+            sceneActions: document.getElementById('scene-actions'),
+            sceneTip: document.getElementById('scene-tip'),
+            tipContent: document.getElementById('tip-content'),
+            stageCompleted: document.getElementById('stage-completed'),
+            completedMessage: document.getElementById('completed-message'),
+            nextStage: document.getElementById('next-stage'),
+            backToOverview: document.getElementById('back-to-overview'),
+            finalOverview: document.getElementById('final-overview'),
+            restartGame: document.getElementById('restart-game')
+        };
+
+        // 初始化
+        function init() {
+            // 设置初始阶段激活状态
+            document.getElementById('stage-1').classList.add('stage-active');
+            
+            // 绑定阶段选择事件
+            document.querySelectorAll('.stage').forEach(stage => {
+                stage.addEventListener('click', () => {
+                    const stageId = parseInt(stage.id.split('-')[1]);
+                    if (!gameState.completedStages.includes(stageId) && stageId === gameState.completedStages.length + 1) {
+                        enterStage(stageId);
+                    }
+                });
+            });
+            
+            // 绑定返回总览事件
+            elements.backToOverview.addEventListener('click', backToOverview);
+            
+            // 绑定下阶段事件
+            elements.nextStage.addEventListener('click', nextStage);
+            
+            // 绑定重新开始事件
+            elements.restartGame.addEventListener('click', restartGame);
+            
+            // 更新进度
+            updateProgress();
+        }
+
+        // 进入某个阶段
+        function enterStage(stageId) {
+            gameState.currentStage = stageId;
+            const stage = stages.find(s => s.id === stageId);
+            
+            // 更新场景标题
+            elements.sceneTitle.textContent = stage.title;
+            
+            // 清空场景内容和操作按钮
+            elements.sceneContent.innerHTML = '';
+            elements.sceneActions.innerHTML = '';
+            
+            // 隐藏提示和完成信息
+            elements.sceneTip.classList.add('hidden');
+            elements.stageCompleted.classList.add('hidden');
+            
+            // 创建场景内容
+            createSceneContent(stageId);
+            
+            // 创建操作按钮
+            stage.actions.forEach(action => {
+                const button = document.createElement('button');
+                button.className = 'btn-primary';
+                button.textContent = action.text;
+                button.addEventListener('click', () => {
+                    window[action.callback](stageId);
+                });
+                elements.sceneActions.appendChild(button);
+            });
+            
+            // 显示场景，隐藏总览
+            elements.stageSelection.classList.add('hidden');
+            elements.stageScene.classList.remove('hidden');
+            elements.finalOverview.classList.add('hidden');
+        }
+
+        // 返回总览
+        function backToOverview() {
+            gameState.currentStage = 0;
+            
+            // 显示总览，隐藏场景
+            elements.stageSelection.classList.remove('hidden');
+            elements.stageScene.classList.add('hidden');
+            elements.finalOverview.classList.add('hidden');
+        }
+
+        // 下一个阶段
+        function nextStage() {
+            const currentStage = gameState.currentStage;
+            
+            // 标记当前阶段为已完成
+            gameState.completedStages.push(currentStage);
+            
+            // 更新阶段状态
+            document.getElementById(`stage-${currentStage}`).classList.remove('stage-active');
+            document.getElementById(`stage-${currentStage}`).classList.add('stage-completed');
+            document.getElementById(`stage-${currentStage}-check`).classList.remove('hidden');
+            
+            // 检查是否所有阶段都已完成
+            if (gameState.completedStages.length === 4) {
+                showFinalOverview();
+                return;
+            }
+            
+            // 解锁下一个阶段
+            const nextStageId = currentStage + 1;
+            const nextStageElement = document.getElementById(`stage-${nextStageId}`);
+            nextStageElement.classList.remove('opacity-50', 'pointer-events-none');
+            nextStageElement.classList.add('stage-active');
+            
+            // 更新进度
+            updateProgress();
+            
+            // 返回总览
+            backToOverview();
+        }
+
+        // 显示最终总览
+        function showFinalOverview() {
+            elements.stageSelection.classList.add('hidden');
+            elements.stageScene.classList.add('hidden');
+            elements.finalOverview.classList.remove('hidden');
+            
+            // 更新进度为100%
+            gameState.progress = 100;
+            elements.progressBar.style.width = '100%';
+            elements.progressPercent.textContent = '100%';
+        }
+
+        // 重新开始游戏
+        function restartGame() {
+            // 重置游戏状态
+            gameState.currentStage = 0;
+            gameState.completedStages = [];
+            gameState.progress = 0;
+            
+            // 重置阶段状态
+            document.querySelectorAll('.stage').forEach((stage, index) => {
+                stage.classList.remove('stage-active', 'stage-completed');
+                document.getElementById(`stage-${index+1}-check`).classList.add('hidden');
+                
+                if (index === 0) {
+                    stage.classList.add('stage-active');
+                    stage.classList.remove('opacity-50', 'pointer-events-none');
+                } else {
+                    stage.classList.add('opacity-50', 'pointer-events-none');
+                }
+            });
+            
+            // 更新进度
+            updateProgress();
+            
+            // 返回总览
+            backToOverview();
+        }
+
+        // 更新进度
+        function updateProgress() {
+            gameState.progress = (gameState.completedStages.length / 4) * 100;
+            elements.progressBar.style.width = `${gameState.progress}%`;
+            elements.progressPercent.textContent = `${Math.round(gameState.progress)}%`;
+        }
+
+        // 创建场景内容
+        function createSceneContent(stageId) {
+            switch(stageId) {
+                case 1:
+                    // 采石场场景
+                    elements.sceneContent.innerHTML = `
+                        <div class="w-full max-w-2xl">
+                            <div class="bg-desert/20 rounded-lg p-4 mb-6">
+                                <p class="text-stone">${stages[0].description}</p>
+                            </div>
+                            <div class="flex justify-center items-end h-60">
+                                <div class="w-60 h-40 bg-stone/30 rounded-lg relative">
+                                    <div class="absolute top-2 left-2 text-sm font-bold">采石场</div>
+                                    <div id="quarry-rock" class="w-40 h-30 bg-stone/60 absolute bottom-0 left-10 rounded-t-lg animate-rock"></div>
+                                    <div id="stone-pile" class="stone-pile absolute bottom-0 right-10 hidden">
+                                        <div class="stone" style="--rotate: 5deg; top: 0; left: 0;"></div>
+                                        <div class="stone" style="--rotate: -3deg; top: 15px; left: 10px;"></div>
+                                        <div class="stone" style="--rotate: 7deg; top: 30px; left: 5px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 2:
+                    // 尼罗河运输场景
+                    elements.sceneContent.innerHTML = `
+                        <div class="w-full max-w-2xl">
+                            <div class="bg-desert/20 rounded-lg p-4 mb-6">
+                                <p class="text-stone">${stages[1].description}</p>
+                            </div>
+                            <div class="flex justify-center items-end h-60 relative">
+                                <div class="w-full h-40 bg-nile/10 rounded-lg overflow-hidden relative">
+                                    <div class="absolute top-2 left-2 text-sm font-bold">尼罗河</div>
+                                    <div class="water-bg h-20 absolute bottom-0 left-0 w-full animate-flow"></div>
+                                    <div id="raft" class="raft"></div>
+                                    <div id="harbor" class="w-20 h-10 bg-stone/30 absolute bottom-20 right-10 rounded-t-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 3:
+                    // 基座砌筑场景
+                    elements.sceneContent.innerHTML = `
+                        <div class="w-full max-w-2xl">
+                            <div class="bg-desert/20 rounded-lg p-4 mb-6">
+                                <p class="text-stone">${stages[2].description}</p>
+                            </div>
+                            <div class="flex justify-center items-end h-60">
+                                <div class="w-60 h-10 bg-stone/20 rounded-lg relative">
+                                    <div class="absolute top-2 left-2 text-sm font-bold">建造地点</div>
+                                    <div id="base-markers" class="w-full h-full relative">
+                                        <div class="w-4 h-4 bg-red-500 absolute top-0 left-0 rounded-full"></div>
+                                        <div class="w-4 h-4 bg-red-500 absolute top-0 right-0 rounded-full"></div>
+                                        <div class="w-4 h-4 bg-red-500 absolute bottom-0 left-0 rounded-full"></div>
+                                        <div class="w-4 h-4 bg-red-500 absolute bottom-0 right-0 rounded-full"></div>
+                                        <div id="base-lines" class="hidden absolute top-0 left-0 w-full h-full">
+                                            <div class="h-0.5 bg-red-500 absolute top-0 left-0 w-full"></div>
+                                            <div class="h-0.5 bg-red-500 absolute bottom-0 left-0 w-full"></div>
+                                            <div class="w-0.5 bg-red-500 absolute top-0 left-0 h-full"></div>
+                                            <div class="w-0.5 bg-red-500 absolute top-0 right-0 h-full"></div>
+                                        </div>
+                                        <div id="cornerstones" class="hidden absolute top-0 left-0 w-full h-full">
+                                            <div class="w-8 h-8 bg-stone absolute top-0 left-0 rounded"></div>
+                                            <div class="w-8 h-8 bg-stone absolute top-0 right-0 rounded"></div>
+                                            <div class="w-8 h-8 bg-stone absolute bottom-0 left-0 rounded"></div>
+                                            <div class="w-8 h-8 bg-stone absolute bottom-0 right-0 rounded"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 4:
+                    // 石块堆叠场景
+                    elements.sceneContent.innerHTML = `
+                        <div class="w-full max-w-2xl">
+                            <div class="bg-desert/20 rounded-lg p-4 mb-6">
+                                <p class="text-stone">${stages[3].description}</p>
+                            </div>
+                            <div class="flex justify-center items-center h-80">
+                                <div id="pyramid" class="w-full flex flex-col items-center">
+                                    <div class="pyramid-layer" style="width: 240px;">
+                                        ${Array(8).fill('<div class="pyramid-block"></div>').join('')}
+                                    </div>
+                                    <div class="pyramid-layer" style="width: 210px;">
+                                        ${Array(7).fill('<div class="pyramid-block"></div>').join('')}
+                                    </div>
+                                    <div class="pyramid-layer" style="width: 180px;">
+                                        ${Array(6).fill('<div class="pyramid-block"></div>').join('')}
+                                    </div>
+                                    <div class="pyramid-layer" style="width: 150px;">
+                                        ${Array(5).fill('<div class="pyramid-block"></div>').join('')}
+                                    </div>
+                                    <div class="pyramid-layer" style="width: 120px;">
+                                        ${Array(4).fill('<div class="pyramid-block"></div>').join('')}
+                                    </div>
+                                    <div class="pyramid-layer" style="width: 90px;">
+                                        ${Array(3).fill('<div class="pyramid-block"></div>').join('')}
+                                    </div>
+                                    <div class="pyramid-layer" style="width: 60px;">
+                                        ${Array(2).fill('<div class="pyramid-block"></div>').join('')}
+                                    </div>
+                                    <div class="pyramid-layer" style="width: 30px;">
+                                        <div class="pyramid-block"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 初始时隐藏所有石块
+                    document.querySelectorAll('.pyramid-block').forEach(block => {
+                        block.classList.add('opacity-0');
+                    });
+                    break;
+            }
+        }
+
+        // 阶段1：开采石块
+        function quarryStone() {
+            const quarryRock = document.getElementById('quarry-rock');
+            const stonePile = document.getElementById('stone-pile');
+            
+            // 添加开采动画
+            quarryRock.classList.add('animate-pulse');
+            
+            setTimeout(() => {
+                quarryRock.classList.remove('animate-pulse');
+                quarryRock.classList.add('opacity-50');
+                stonePile.classList.remove('hidden');
+                
+                // 显示知识点提示
+                elements.tipContent.textContent = stages[0].tip;
+                elements.sceneTip.classList.remove('hidden');
+                
+                // 显示阶段完成提示
+                elements.completedMessage.textContent = stages[0].completedMessage;
+                elements.stageCompleted.classList.remove('hidden');
+                
+                // 禁用操作按钮
+                elements.sceneActions.querySelectorAll('button').forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                });
+            }, 2000);
+        }
+
+        // 阶段2：装载石块
+        function loadStone() {
+            const raft = document.getElementById('raft');
+            raft.classList.add('stone-loaded');
+            
+            // 提示下一步
+            alert('石块已装载到木筏上，点击"启动木筏"开始运输');
+        }
+
+        // 阶段2：启动木筏
+        function startRaft() {
+            const raft = document.getElementById('raft');
+            if (!raft.classList.contains('stone-loaded')) {
+                alert('请先装载石块！');
+                return;
+            }
+            
+            // 木筏移动动画
+            raft.style.left = 'calc(100% - 100px)';
+            
+            setTimeout(() => {
+                // 显示知识点提示
+                elements.tipContent.textContent = stages[1].tip;
+                elements.sceneTip.classList.remove('hidden');
+                
+                // 显示阶段完成提示
+                elements.completedMessage.textContent = stages[1].completedMessage;
+                elements.stageCompleted.classList.remove('hidden');
+                
+                // 禁用操作按钮
+                elements.sceneActions.querySelectorAll('button').forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                });
+            }, 5000);
+        }
+
+        // 阶段3：测量放线
+        function measureBase() {
+            const baseLines = document.getElementById('base-lines');
+            baseLines.classList.remove('hidden');
+            
+            // 提示下一步
+            alert('测量完成！已标记出正方形基座的边界');
+        }
+
+        // 阶段3：放置基石
+        function placeCornerstones() {
+            const baseLines = document.getElementById('base-lines');
+            const cornerstones = document.getElementById('cornerstones');
+            
+            if (baseLines.classList.contains('hidden')) {
+                alert('请先进行测量放线！');
+                return;
+            }
+            
+            // 放置基石动画
+            cornerstones.classList.remove('hidden');
+            cornerstones.classList.add('animate-float');
+            
+            setTimeout(() => {
+                // 显示知识点提示
+                elements.tipContent.textContent = stages[2].tip;
+                elements.sceneTip.classList.remove('hidden');
+                
+                // 显示阶段完成提示
+                elements.completedMessage.textContent = stages[2].completedMessage;
+                elements.stageCompleted.classList.remove('hidden');
+                
+                // 禁用操作按钮
+                elements.sceneActions.querySelectorAll('button').forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                });
+            }, 1500);
+        }
+
+        // 阶段4：逐层堆叠
+        function stackStones() {
+            const blocks = document.querySelectorAll('.pyramid-block');
+            
+            // 逐层显示石块
+            blocks.forEach((block, index) => {
+                setTimeout(() => {
+                    block.classList.remove('opacity-0');
+                    block.classList.add('opacity-100', 'animate-float');
+                }, index * 100);
+            });
+            
+            setTimeout(() => {
+                // 显示知识点提示
+                elements.tipContent.textContent = stages[3].tip;
+                elements.sceneTip.classList.remove('hidden');
+                
+                // 显示阶段完成提示
+                elements.completedMessage.textContent = stages[3].completedMessage;
+                elements.stageCompleted.classList.remove('hidden');
+                
+                // 禁用操作按钮
+                elements.sceneActions.querySelectorAll('button').forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                });
+            }, blocks.length * 100 + 1000);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

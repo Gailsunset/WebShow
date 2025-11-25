@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>猜数字游戏</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f5f5f5;
+        }
+        .game-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 100px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #message {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            min-height: 20px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        #attempts {
+            margin: 15px 0;
+            font-weight: bold;
+            color: #333;
+        }
+        #history {
+            margin-top: 20px;
+            text-align: left;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .history-item {
+            margin: 5px 0;
+            padding: 5px;
+            background-color: white;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎯 猜数字游戏</h1>
+        <p>我想了一个1到100之间的数字，你能猜出来吗？</p>
+        <p>你有最多10次机会！</p>
+        
+        <div>
+            <input type="number" id="guessInput" min="1" max="100" placeholder="输入数字" required>
+            <button id="submitBtn" onclick="makeGuess()">提交猜测</button>
+            <button id="restartBtn" onclick="restartGame()" style="background-color: #008CBA;">重新开始</button>
+        </div>
+        
+        <div id="attempts">剩余机会: 10</div>
+        <div id="message" class="info">开始猜测吧！输入1-100之间的数字。</div>
+        
+        <div id="history">
+            <strong>猜测历史:</strong>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <script>
+        let targetNumber;
+        let attemptsLeft;
+        let gameOver;
+        let guessHistory;
+
+        function initGame() {
+            targetNumber = Math.floor(Math.random() * 100) + 1;
+            attemptsLeft = 10;
+            gameOver = false;
+            guessHistory = [];
+            
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guessInput').disabled = false;
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('attempts').textContent = `剩余机会: ${attemptsLeft}`;
+            document.getElementById('message').textContent = '开始猜测吧！输入1-100之间的数字。';
+            document.getElementById('message').className = 'info';
+            document.getElementById('historyList').innerHTML = '';
+            
+            console.log('目标数字:', targetNumber); // 调试用，实际游戏中应该删除
+        }
+
+        function makeGuess() {
+            if (gameOver) return;
+            
+            const guessInput = document.getElementById('guessInput');
+            const guess = parseInt(guessInput.value);
+            const messageDiv = document.getElementById('message');
+            const attemptsDiv = document.getElementById('attempts');
+            const historyList = document.getElementById('historyList');
+            
+            // 验证输入
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                messageDiv.textContent = '请输入1到100之间的有效数字！';
+                messageDiv.className = 'error';
+                return;
+            }
+            
+            attemptsLeft--;
+            guessHistory.push(guess);
+            
+            // 更新剩余机会显示
+            attemptsDiv.textContent = `剩余机会: ${attemptsLeft}`;
+            
+            // 添加到历史记录
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.textContent = `第${11 - attemptsLeft}次: ${guess} - `;
+            
+            if (guess === targetNumber) {
+                // 猜对了
+                messageDiv.textContent = `🎉 恭喜你！答案就是 ${targetNumber}！你用了 ${11 - attemptsLeft} 次就猜对了！`;
+                messageDiv.className = 'success';
+                gameOver = true;
+                guessInput.disabled = true;
+                document.getElementById('submitBtn').disabled = true;
+                historyItem.textContent += '✅ 正确！';
+            } else if (attemptsLeft === 0) {
+                // 机会用完了
+                messageDiv.textContent = `😔 游戏结束！答案是 ${targetNumber}。再试一次吧！`;
+                messageDiv.className = 'error';
+                gameOver = true;
+                guessInput.disabled = true;
+                document.getElementById('submitBtn').disabled = true;
+                historyItem.textContent += guess < targetNumber ? '📈 太小了' : '📉 太大了';
+            } else if (guess < targetNumber) {
+                // 猜小了
+                messageDiv.textContent = `📈 太小了！试试更大的数字。`;
+                messageDiv.className = 'warning';
+                historyItem.textContent += '📈 太小了';
+            } else {
+                // 猜大了
+                messageDiv.textContent = `📉 太大了！试试更小的数字。`;
+                messageDiv.className = 'warning';
+                historyItem.textContent += '📉 太大了';
+            }
+            
+            historyList.appendChild(historyItem);
+            guessInput.value = '';
+            guessInput.focus();
+            
+            // 如果游戏还没结束，根据剩余机会调整提示
+            if (!gameOver && attemptsLeft > 0) {
+                if (attemptsLeft <= 3) {
+                    messageDiv.textContent += ` ⚠️ 只剩 ${attemptsLeft} 次机会了，加油！`;
+                }
+            }
+        }
+
+        function restartGame() {
+            initGame();
+        }
+
+        // 允许按Enter键提交
+        document.getElementById('guessInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                makeGuess();
+            }
+        });
+
+        // 初始化游戏
+        initGame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>能量转换过山车 - 科普小工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+        body {
+            background-color: #f5f8ff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c61d1;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        /* 过山车轨道样式 */
+        .track-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin: 30px 0;
+            background-color: #f0f5ff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .track {
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background-color: #666;
+        }
+        /* 轨道分段样式 */
+        .track-uphill {
+            position: absolute;
+            bottom: 50px;
+            left: 10%;
+            width: 30%;
+            height: 6px;
+            background-color: #666;
+            transform-origin: left bottom;
+            transform: rotate(20deg);
+        }
+        .track-downhill {
+            position: absolute;
+            bottom: 120px;
+            left: 40%;
+            width: 30%;
+            height: 6px;
+            background-color: #666;
+            transform-origin: left bottom;
+            transform: rotate(-25deg);
+        }
+        .track-flat {
+            position: absolute;
+            bottom: 50px;
+            left: 70%;
+            width: 25%;
+            height: 6px;
+            background-color: #666;
+        }
+        /* 小车样式 */
+        .cart {
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            background-color: #ff5722;
+            border-radius: 4px;
+            bottom: 50px;
+            left: 10%;
+            transform: translateY(-50%);
+            transition: all 0.1s linear;
+            z-index: 2;
+        }
+        .cart::after {
+            content: "";
+            position: absolute;
+            bottom: -6px;
+            left: 5px;
+            width: 20px;
+            height: 6px;
+            background-color: #333;
+            border-radius: 2px;
+        }
+        /* 能量标签样式 */
+        .energy-label {
+            position: absolute;
+            padding: 6px 12px;
+            background-color: rgba(44, 97, 209, 0.9);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 3;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .label-uphill {
+            top: 80px;
+            left: 25%;
+        }
+        .label-downhill {
+            top: 100px;
+            left: 55%;
+        }
+        .label-flat {
+            top: 60px;
+            left: 80%;
+        }
+        /* 控制按钮样式 */
+        .control-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 24px;
+            background-color: #2c61d1;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1a4bb8;
+        }
+        button:disabled {
+            background-color: #94b3f2;
+            cursor: not-allowed;
+        }
+        /* 能量转换示意图样式 */
+        .energy-schema {
+            margin: 30px 0;
+            padding: 15px;
+            background-color: #f0f5ff;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .schema-title {
+            color: #2c61d1;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .schema-content {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-size: 14px;
+            color: #333;
+        }
+        .schema-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .schema-arrow {
+            color: #666;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>能量转换过山车 - 探索动能与势能</h1>
+        
+        <!-- 能量转换简化示意图 -->
+        <div class="energy-schema">
+            <div class="schema-title">能量转换关键节点</div>
+            <div class="schema-content">
+                <div class="schema-node">
+                    <div>起点（静止）</div>
+                    <div>初始势能</div>
+                </div>
+                <div class="schema-arrow">→</div>
+                <div class="schema-node">
+                    <div>爬坡段</div>
+                    <div>动能→势能</div>
+                </div>
+                <div class="schema-arrow">→</div>
+                <div class="schema-node">
+                    <div>俯冲段</div>
+                    <div>势能→动能</div>
+                </div>
+                <div class="schema-arrow">→</div>
+                <div class="schema-node">
+                    <div>平直段</div>
+                    <div>动能为主</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 过山车轨道与小车 -->
+        <div class="track-container">
+            <!-- 轨道分段 -->
+            <div class="track-uphill"></div>
+            <div class="track-downhill"></div>
+            <div class="track-flat"></div>
+            <!-- 小车 -->
+            <div class="cart" id="cart"></div>
+            <!-- 能量标签 -->
+            <div class="energy-label label-uphill" id="labelUphill">重力势能</div>
+            <div class="energy-label label-downhill" id="labelDownhill">动能</div>
+            <div class="energy-label label-flat" id="labelFlat">混合能量</div>
+        </div>
+        
+        <!-- 控制按钮 -->
+        <div class="control-buttons">
+            <button id="startBtn">启动过山车</button>
+            <button id="resetBtn">重置</button>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const cart = document.getElementById('cart');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const labelUphill = document.getElementById('labelUphill');
+        const labelDownhill = document.getElementById('labelDownhill');
+        const labelFlat = document.getElementById('labelFlat');
+        
+        // 小车初始状态
+        let isRunning = false;
+        let cartPosition = { x: 10, y: 50 }; // 初始位置（百分比）
+        let animationId = null;
+        
+        // 初始化
+        function init() {
+            // 重置小车位置
+            cart.style.left = `${cartPosition.x}%`;
+            cart.style.bottom = `${cartPosition.y}%`;
+            // 隐藏所有能量标签
+            hideAllLabels();
+            // 启用启动按钮，禁用重置按钮（初始状态无需重置）
+            startBtn.disabled = false;
+            resetBtn.disabled = true;
+            isRunning = false;
+            // 清除动画
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        }
+        
+        // 隐藏所有能量标签
+        function hideAllLabels() {
+            labelUphill.style.opacity = '0';
+            labelDownhill.style.opacity = '0';
+            labelFlat.style.opacity = '0';
+        }
+        
+        // 显示指定能量标签
+        function showLabel(label) {
+            hideAllLabels();
+            label.style.opacity = '1';
+        }
+        
+        // 小车运行动画
+        function runCart() {
+            // 轨道关键节点位置（x轴百分比，y轴百分比）
+            const keyPoints = [
+                { x: 10, y: 50 },   // 起点
+                { x: 40, y: 120 },  // 爬坡顶点（势能最高）
+                { x: 70, y: 50 },   // 俯冲终点（动能最高）
+                { x: 95, y: 50 },   // 平直段终点（混合能量）
+                { x: 10, y: 50 }    // 回到起点（完成一圈）
+            ];
+            
+            let currentPoint = 0; // 当前目标节点索引
+            let progress = 0;     // 节点间移动进度（0-1）
+            const speed = 0.01;   // 移动速度
+            
+            function animate() {
+                if (!isRunning) return;
+                
+                // 更新进度
+                progress += speed;
+                
+                // 到达当前节点，切换到下一个节点
+                if (progress >= 1) {
+                    progress = 0;
+                    currentPoint++;
+                    
+                    // 完成一圈，停止动画
+                    if (currentPoint >= keyPoints.length) {
+                        isRunning = false;
+                        startBtn.disabled = false;
+                        resetBtn.disabled = false;
+                        showLabel(labelFlat); // 最终位置显示混合能量
+                        return;
+                    }
+                }
+                
+                // 计算当前位置（线性插值）
+                const prevPoint = keyPoints[currentPoint];
+                const nextPoint = keyPoints[currentPoint + 1] || keyPoints[0];
+                const currentX = prevPoint.x + (nextPoint.x - prevPoint.x) * progress;
+                const currentY = prevPoint.y + (nextPoint.y - prevPoint.y) * progress;
+                
+                // 更新小车位置
+                cart.style.left = `${currentX}%`;
+                cart.style.bottom = `${currentY}%`;
+                
+                // 根据位置显示对应能量标签
+                if (currentX < 30) { // 爬坡段（10%-40%）
+                    showLabel(labelUphill);
+                } else if (currentX < 60) { // 俯冲段（40%-70%）
+                    showLabel(labelDownhill);
+                } else { // 平直段（70%-95%）
+                    showLabel(labelFlat);
+                }
+                
+                // 继续动画
+                animationId = requestAnimationFrame(animate);
+            }
+            
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        // 事件监听
+        startBtn.addEventListener('click', () => {
+            if (isRunning) return;
+            
+            isRunning = true;
+            startBtn.disabled = true;
+            resetBtn.disabled = false;
+            runCart();
+        });
+        
+        resetBtn.addEventListener('click', init);
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
