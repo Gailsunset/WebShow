@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>学科互动项目与技术实现对照</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: { 500: '#3b82f6', 600: '#2563eb' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: color 0.3s, background-color 0.3s;
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .fade-in.appear {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .card-hover {
+      transition: all 0.3s ease;
+      border-width: 1px;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      border-color: #3b82f6;
+    }
+    .btn-hover {
+      transition: all 0.2s ease;
+    }
+    .btn-hover:hover {
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+  <!-- Theme Toggle -->
+  <button id="theme-toggle" class="fixed top-4 right-4 z-50 p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 shadow-md btn-hover">
+    <i id="theme-icon" class="fas fa-moon"></i>
+  </button>
+
+  <div class="max-w-7xl mx-auto px-4 py-12">
+    <!-- Header -->
+    <header class="text-center mb-16 fade-in">
+      <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+        学科互动项目与技术实现对照
+      </h1>
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">基于《各学科主题》与《技术实现方案》整合</p>
+    </header>
+
+    <!-- Two-column layout -->
+    <section class="mb-20 fade-in">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Left: 学科项目 (from 02.pdf) -->
+        <div class="space-y-6">
+          <div class="flex items-center gap-3 mb-4">
+            <i class="fas fa-book text-blue-500 text-xl"></i>
+            <h2 class="text-2xl font-bold">📘 各学科互动项目</h2>
+          </div>
+
+          <!-- Math -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-calculator text-blue-500"></i> 数学（中学）</h3>
+            <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <li>• 勾股定理验证（直角边拖拽）</li>
+              <li>• 二次函数图像绘制（参数调节）</li>
+              <li>• 掷骰子概率模拟</li>
+              <li>• 质数筛法可视化</li>
+            </ul>
+          </div>
+
+          <!-- Chinese -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-book-open text-red-500"></i> 语文</h3>
+            <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <li>• 汉字笔顺动画演示</li>
+              <li>• 病句修改互动</li>
+              <li>• 古诗填空</li>
+              <li>• 成语接龙游戏</li>
+            </ul>
+          </div>
+
+          <!-- English -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-language text-green-500"></i> 英语</h3>
+            <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <li>• 单词卡片翻转（图+词+发音）</li>
+              <li>• 听音选图（语音识别）</li>
+              <li>• 情景对话构建</li>
+              <li>• 单词拼写贪吃蛇</li>
+            </ul>
+          </div>
+
+          <!-- Physics -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-atom text-orange-500"></i> 物理</h3>
+            <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <li>• 斜面滑块实验（角度调节）</li>
+              <li>• 电路搭建实验室（拖拽连线）</li>
+              <li>• 凸透镜成像规律</li>
+              <li>• 弹簧振子模拟</li>
+            </ul>
+          </div>
+
+          <!-- Chemistry -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-flask text-pink-500"></i> 化学</h3>
+            <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <li>• 3D分子模型构建器</li>
+              <li>• 化学方程式配平游戏</li>
+              <li>• pH值彩虹条实验</li>
+              <li>• 焰色反应实验</li>
+            </ul>
+          </div>
+
+          <!-- Biology -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-dna text-emerald-500"></i> 生物</h3>
+            <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <li>• 3D细胞模型拆解</li>
+              <li>• 光合作用动态模拟</li>
+              <li>• DNA双螺旋结构搭建</li>
+              <li>• 食物链生态系统</li>
+            </ul>
+          </div>
+
+          <!-- Geography -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-map-marked-alt text-teal-500"></i> 地理</h3>
+            <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <li>• 地形剖面生成器</li>
+              <li>• 人口金字塔生成器</li>
+              <li>• 太阳系行星轨道模型</li>
+              <li>• 洋流系统拼图</li>
+            </ul>
+          </div>
+
+          <!-- History -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-landmark text-purple-500"></i> 历史</h3>
+            <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <li>• 朝代更迭时间线图谱</li>
+              <li>• 丝绸之路动态地图</li>
+              <li>• 历史事件排序游戏</li>
+              <li>• 文物修复虚拟实验室</li>
+            </ul>
+          </div>
+
+          <!-- Art -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-palette text-yellow-500"></i> 美术</h3>
+            <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <li>• 国画笔墨动态模拟</li>
+              <li>• 像素艺术在线编辑器</li>
+              <li>• 书法笔迹AI评分</li>
+              <li>• VR美术馆策展系统</li>
+            </ul>
+          </div>
+
+          <!-- Music -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-music text-indigo-500"></i> 音乐</h3>
+            <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <li>• 虚拟钢琴波形解剖</li>
+              <li>• 声波干涉动态模拟</li>
+              <li>• 节奏模式分形生成器</li>
+              <li>• 手势指挥动作捕捉</li>
+            </ul>
+          </div>
+
+          <!-- PE -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-running text-red-600"></i> 体育</h3>
+            <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <li>• 篮球投篮轨迹修正</li>
+              <li>• 人体关节活动度3D模型</li>
+              <li>• 足球阵型动态推演</li>
+              <li>• 运动损伤AI诊断</li>
+            </ul>
+          </div>
+
+          <!-- Elementary Science -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-seedling text-green-600"></i> 小学科学</h3>
+            <ul class="mt-2 text-sm text-gray-700 dark:text-gray-300 space-y-1">
+              <li>• 植物光合作用动态模拟</li>
+              <li>• 太阳系行星轨道比例模型</li>
+              <li>• 垃圾分类回收游戏</li>
+              <li>• 简单电路搭建模拟</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Right: 技术实现 (from 03.pdf) -->
+        <div class="space-y-6">
+          <div class="flex items-center gap-3 mb-4">
+            <i class="fas fa-microchip text-indigo-500 text-xl"></i>
+            <h2 class="text-2xl font-bold">⚙️ 对应技术实现方案</h2>
+          </div>
+
+          <!-- Math -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-calculator text-blue-500"></i> 数学</h3>
+            <p class="text-sm mt-2"><strong>核心技术：</strong>Canvas（函数图像）、Three.js（3D几何）、D3.js（统计图表）、MathJax（公式渲染）</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><strong>特色：</strong>滑块实时调节、动态轨迹绘制、交互式证明</p>
+          </div>
+
+          <!-- Chinese -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-book-open text-red-500"></i> 语文</h3>
+            <p class="text-sm mt-2"><strong>核心技术：</strong>Canvas（笔顺动画）、Web Audio API（朗读）、SVG（思维导图）、ContentEditable</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><strong>特色：</strong>笔画追踪、文本高亮、拖拽排序</p>
+          </div>
+
+          <!-- English -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-language text-green-500"></i> 英语</h3>
+            <p class="text-sm mt-2"><strong>核心技术：</strong>Web Audio API、Speech Recognition API、Canvas、LocalStorage</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><strong>特色：</strong>语音波形可视化、发音评分、情景对话构建</p>
+          </div>
+
+          <!-- Physics -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-atom text-orange-500"></i> 物理</h3>
+            <p class="text-sm mt-2"><strong>核心技术：</strong>Matter.js/Box2D（物理引擎）、Three.js（3D光学）、Canvas（波形）、Device Orientation API</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><strong>特色：</strong>多变量对比实验、手机陀螺仪控制</p>
+          </div>
+
+          <!-- Chemistry -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-flask text-pink-500"></i> 化学</h3>
+            <p class="text-sm mt-2"><strong>核心技术：</strong>Three.js、ChemDoodle/3Dmol.js、Canvas（反应曲线）、SVG</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><strong>特色：</strong>分子旋转观察、试剂混合变色、安全操作模拟</p>
+          </div>
+
+          <!-- Biology -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-dna text-emerald-500"></i> 生物</h3>
+            <p class="text-sm mt-2"><strong>核心技术：</strong>Three.js（3D解剖）、D3.js（进化树）、WebGL（微观世界）</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><strong>特色：</strong>可交互解剖、遗传图谱生成、生态系统模拟</p>
+          </div>
+
+          <!-- Geography -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-map-marked-alt text-teal-500"></i> 地理</h3>
+            <p class="text-sm mt-2"><strong>核心技术：</strong>Leaflet/Mapbox GL JS、Cesium（3D地球）、D3.js、Turf.js</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><strong>特色：</strong>地形3D剖面、AR地标识别、实时图层叠加</p>
+          </div>
+
+          <!-- History -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-landmark text-purple-500"></i> 历史</h3>
+            <p class="text-sm mt-2"><strong>核心技术：</strong>Timeline.js、D3.js（关系图）、Three.js（文物3D）、WebXR</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><strong>特色：</strong>多维时间轴、AR历史场景重现、虚拟博物馆</p>
+          </div>
+
+          <!-- Art -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-palette text-yellow-500"></i> 美术</h3>
+            <p class="text-sm mt-2"><strong>核心技术：</strong>Canvas（数字画板）、Three.js（3D艺术空间）、WebGL、TensorFlow.js</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><strong>特色：</strong>压力感应笔刷、AI风格迁移、AR艺术品预览</p>
+          </div>
+
+          <!-- Music -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-music text-indigo-500"></i> 音乐</h3>
+            <p class="text-sm mt-2"><strong>核心技术：</strong>Web Audio API、Tone.js/MIDI.js、Three.js（音波可视化）、Canvas</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><strong>特色：</strong>实时音高识别、声波干涉模拟、虚拟乐器</p>
+          </div>
+
+          <!-- PE -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-running text-red-600"></i> 体育</h3>
+            <p class="text-sm mt-2"><strong>核心技术：</strong>TensorFlow.js（动作识别）、Three.js（3D运动分析）、Web Bluetooth、WebXR</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><strong>特色：</strong>运动轨迹追踪、AR训练辅助、生理数据监控</p>
+          </div>
+
+          <!-- Elementary Science -->
+          <div class="card-hover bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fas fa-seedling text-green-600"></i> 小学科学</h3>
+            <p class="text-sm mt-2"><strong>核心技术：</strong>p5.js、Matter.js、Canvas、WebXR</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><strong>特色：</strong>卡通化界面、分步骤引导、传感器数据实时显示</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="pt-8 border-t border-gray-200 dark:border-gray-700 fade-in">
+      <div class="text-center space-y-2">
+        <p class="font-medium">作者姓名：吴铭英</p>
+        <p>单位：深圳市龙岗教师发展中心 · 仙田外国语学校</p>
+        <p class="text-gray-500 dark:text-gray-400 text-sm">
+          © 2025 版权所有。整合自《各学科主题》与《技术实现方案》。
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Theme toggle
+    const toggleBtn = document.getElementById('theme-toggle');
+    const icon = document.getElementById('theme-icon');
+    const html = document.documentElement;
+
+    const saved = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (saved === 'dark' || (!saved && prefersDark)) {
+      html.classList.add('dark');
+      icon.className = 'fas fa-sun';
+    } else {
+      html.classList.remove('dark');
+      icon.className = 'fas fa-moon';
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      const isDark = html.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    });
+
+    // Fade-in on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('appear');
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
