@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学科互动项目技术实现方案</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #7209b7;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --math: #4361ee;
+            --chinese: #f72585;
+            --english: #4cc9f0;
+            --physics: #7209b7;
+            --chemistry: #3a0ca3;
+            --biology: #2ec4b6;
+            --geography: #ff9e00;
+            --history: #e71d36;
+            --art: #ff5400;
+            --music: #9b5de5;
+            --pe: #00bbf9;
+            --science: #06d6a0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .subject-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .subject-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .subject-header {
+            padding: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .subject-icon {
+            font-size: 2rem;
+        }
+        
+        .subject-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .subject-content {
+            padding: 20px;
+        }
+        
+        .project-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .project-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .project-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .tech-tag {
+            background: #f1f3f9;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--dark);
+        }
+        
+        .math .subject-header { background-color: var(--math); }
+        .chinese .subject-header { background-color: var(--chinese); }
+        .english .subject-header { background-color: var(--english); }
+        .physics .subject-header { background-color: var(--physics); }
+        .chemistry .subject-header { background-color: var(--chemistry); }
+        .biology .subject-header { background-color: var(--biology); }
+        .geography .subject-header { background-color: var(--geography); }
+        .history .subject-header { background-color: var(--history); }
+        .art .subject-header { background-color: var(--art); }
+        .music .subject-header { background-color: var(--music); }
+        .pe .subject-header { background-color: var(--pe); }
+        .science .subject-header { background-color: var(--science); }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .subject-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>学科互动项目技术实现方案</h1>
+            <p class="subtitle">各学科经典可视化项目及其对应的前端技术实现方案</p>
+        </header>
+        
+        <div class="subject-grid">
+            <!-- 数学 -->
+            <div class="subject-card math">
+                <div class="subject-header">
+                    <div class="subject-icon">🧮</div>
+                    <div class="subject-title">数学</div>
+                </div>
+                <div class="subject-content">
+                    <div class="project-item">
+                        <div class="project-name">勾股定理验证</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">圆形面积与周长</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">SVG</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">掷骰子概率模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">Chart.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">一元一次方程求解</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">MathJax</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">二次函数图像绘制</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">Three.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">等差数列生成器</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">质数筛法可视化</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">几何图形分类游戏</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Drag & Drop API</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">统计图表纠错</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Chart.js</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">数学魔术算法</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 语文 -->
+            <div class="subject-card chinese">
+                <div class="subject-header">
+                    <div class="subject-icon">📚</div>
+                    <div class="subject-title">语文</div>
+                </div>
+                <div class="subject-content">
+                    <div class="project-item">
+                        <div class="project-name">多音字选择题</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">Web Audio API</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">汉字笔顺动画</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">病句修改互动</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">ContentEditable</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">古诗填空</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">LocalStorage</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">修辞手法分类</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Drag & Drop API</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">段落结构可视化</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">成语接龙游戏</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">LocalStorage</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">写作逻辑推理</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">SVG</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">阅读理解主旨归纳</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">Highlight API</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">字谜互动解答</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 英语 -->
+            <div class="subject-card english">
+                <div class="subject-header">
+                    <div class="subject-icon">🌐</div>
+                    <div class="subject-title">英语</div>
+                </div>
+                <div class="subject-content">
+                    <div class="project-item">
+                        <div class="project-name">单词卡片翻转</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">CSS 3D变换</span>
+                            <span class="tech-tag">Web Audio API</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">时态时间轴拖拽</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Drag & Drop API</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">听音选图</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Web Audio API</span>
+                            <span class="tech-tag">Canvas</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">句子成分颜色标记</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">CSS高亮</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">情景对话构建</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">LocalStorage</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">发音口型动画</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">阅读理解关键词云</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">语法错误诊断</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">ContentEditable</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">单词拼写贪吃蛇</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">文化差异选择题</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 物理 -->
+            <div class="subject-card physics">
+                <div class="subject-header">
+                    <div class="subject-icon">⚛️</div>
+                    <div class="subject-title">物理</div>
+                </div>
+                <div class="subject-content">
+                    <div class="project-item">
+                        <div class="project-name">斜面滑块实验</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Matter.js</span>
+                            <span class="tech-tag">Canvas</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">电路搭建实验室</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">SVG</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">凸透镜成像规律</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">Three.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">动量守恒碰撞演示</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Matter.js</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">光的色散模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">弹簧振子模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Matter.js</span>
+                            <span class="tech-tag">Canvas</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">电磁铁强度测试</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">声音振动波纹生成</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">Web Audio API</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">能量转换过山车</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">Matter.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">火箭发射参数优化</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">Three.js</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 化学 -->
+            <div class="subject-card chemistry">
+                <div class="subject-header">
+                    <div class="subject-icon">🧪</div>
+                    <div class="subject-title">化学</div>
+                </div>
+                <div class="subject-content">
+                    <div class="project-item">
+                        <div class="project-name">物质状态变化模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">Canvas</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">3D分子模型构建器</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">3Dmol.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">化学方程式配平游戏</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">Drag & Drop API</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">pH值彩虹条实验</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">CSS渐变</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">元素周期表交互探索</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">晶体生长计时器</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">氧化还原电子转移</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">SVG</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">实验安全操作模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">Canvas</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">化学与生活清洁剂</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">焰色反应实验</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 生物 -->
+            <div class="subject-card biology">
+                <div class="subject-header">
+                    <div class="subject-icon">🔬</div>
+                    <div class="subject-title">生物</div>
+                </div>
+                <div class="subject-content">
+                    <div class="project-item">
+                        <div class="project-name">3D细胞模型拆解</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">DNA双螺旋结构搭建</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">Drag & Drop API</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">光合作用动态模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">人体消化系统漫游</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">自然选择模拟器</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">遗传密码转盘翻译</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">SVG</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">生态系统食物链</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">显微镜使用模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">病毒结构组装游戏</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Drag & Drop API</span>
+                            <span class="tech-tag">Three.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">进化树构建</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 学科互动项目技术实现方案 | 设计用于教育目的</p>
+        </footer>
+    </div>
+</body>
+</html>
