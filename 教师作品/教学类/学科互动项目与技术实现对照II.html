@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>学科互动项目技术实现方案</title>
+    <title>学科互动项目技术实现方案 - 完整版</title>
     <style>
         :root {
             --primary: #4361ee;
@@ -25,6 +25,7 @@
             --music: #9b5de5;
             --pe: #00bbf9;
             --science: #06d6a0;
+            --politics: #3a86ff;
         }
         
         * {
@@ -142,6 +143,7 @@
             color: var(--dark);
         }
         
+        /* 学科颜色 */
         .math .subject-header { background-color: var(--math); }
         .chinese .subject-header { background-color: var(--chinese); }
         .english .subject-header { background-color: var(--english); }
@@ -154,6 +156,7 @@
         .music .subject-header { background-color: var(--music); }
         .pe .subject-header { background-color: var(--pe); }
         .science .subject-header { background-color: var(--science); }
+        .politics .subject-header { background-color: var(--politics); }
         
         footer {
             text-align: center;
@@ -177,7 +180,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>学科互动项目技术实现方案</h1>
+            <h1>学科互动项目技术实现方案 - 完整版</h1>
             <p class="subtitle">各学科经典可视化项目及其对应的前端技术实现方案</p>
         </header>
         
@@ -657,6 +660,566 @@
                         <div class="tech-tags">
                             <span class="tech-tag">D3.js</span>
                             <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 地理 -->
+            <div class="subject-card geography">
+                <div class="subject-header">
+                    <div class="subject-icon">🗺️</div>
+                    <div class="subject-title">地理</div>
+                </div>
+                <div class="subject-content">
+                    <div class="project-item">
+                        <div class="project-name">地形剖面生成器</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">太阳系行星轨道模型</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">气候类型互动测试</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Leaflet</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">人口金字塔生成器</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">Chart.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">等高线地图绘制</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Leaflet</span>
+                            <span class="tech-tag">Turf.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">洋流系统拼图</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">SVG</span>
+                            <span class="tech-tag">Drag & Drop API</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">城市扩张时间轴</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Leaflet</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">地震波传播动画</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">环保垃圾分类游戏</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Drag & Drop API</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">地图投影变形对比</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 历史 -->
+            <div class="subject-card history">
+                <div class="subject-header">
+                    <div class="subject-icon">📜</div>
+                    <div class="subject-title">历史</div>
+                </div>
+                <div class="subject-content">
+                    <div class="project-item">
+                        <div class="project-name">朝代更迭时间线图谱</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Timeline.js</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">丝绸之路动态地图</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Leaflet</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">金字塔建造过程模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">世界大战参战国统计</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">Chart.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">历史事件排序游戏</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Drag & Drop API</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">文物修复虚拟实验室</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">Canvas</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">历史人物关系图</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">革命历程AR重现</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">WebXR</span>
+                            <span class="tech-tag">Three.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">考古发掘模拟沙盒</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">历史数据词云生成器</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 美术 -->
+            <div class="subject-card art">
+                <div class="subject-header">
+                    <div class="subject-icon">🎨</div>
+                    <div class="subject-title">美术</div>
+                </div>
+                <div class="subject-content">
+                    <div class="project-item">
+                        <div class="project-name">国画笔墨动态模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">色环关系3D球体模型</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">像素艺术在线编辑器</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">名画色彩分析系统</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">书法笔迹AI评分</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">TensorFlow.js</span>
+                            <span class="tech-tag">Canvas</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">建筑比例黄金分割验证</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">视错觉原理拆解</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">环保海报生成工具</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">曼陀罗自动生成器</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">VR美术馆策展系统</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">WebXR</span>
+                            <span class="tech-tag">Three.js</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 音乐 -->
+            <div class="subject-card music">
+                <div class="subject-header">
+                    <div class="subject-icon">🎵</div>
+                    <div class="subject-title">音乐</div>
+                </div>
+                <div class="subject-content">
+                    <div class="project-item">
+                        <div class="project-name">动态音阶3D螺旋模型</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">Web Audio API</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">虚拟钢琴波形解剖</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Web Audio API</span>
+                            <span class="tech-tag">Canvas</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">节奏模式分形生成器</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">作曲家影响力网络图</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">声波干涉动态模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">Web Audio API</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">手势指挥动作捕捉</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">TensorFlow.js</span>
+                            <span class="tech-tag">Web Audio API</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">心率同步音乐生成</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Web Audio API</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">民族音乐DNA图谱</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">虚拟合唱团声像控制</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Web Audio API</span>
+                            <span class="tech-tag">Three.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">太空声景模拟系统</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Web Audio API</span>
+                            <span class="tech-tag">Three.js</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 体育 -->
+            <div class="subject-card pe">
+                <div class="subject-header">
+                    <div class="subject-icon">⚽</div>
+                    <div class="subject-title">体育</div>
+                </div>
+                <div class="subject-content">
+                    <div class="project-item">
+                        <div class="project-name">人体关节活动度3D模型</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">篮球投篮轨迹修正</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">Canvas</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">奥运发展史时空地图</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Leaflet</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">体质检测数据仪表盘</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">Chart.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">足球阵型动态推演</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">智能跑道数据追踪</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Web Bluetooth API</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">运动与艺术舞蹈轨迹</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">Canvas</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">微重力运动适应模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">健康习惯养成游戏</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">LocalStorage</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">运动损伤AI诊断</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">TensorFlow.js</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 科学 -->
+            <div class="subject-card science">
+                <div class="subject-header">
+                    <div class="subject-icon">🔍</div>
+                    <div class="subject-title">小学科学</div>
+                </div>
+                <div class="subject-content">
+                    <div class="project-item">
+                        <div class="project-name">植物光合作用动态模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">物质状态变化粒子模型</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">太阳系行星轨道比例模型</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">简单电路搭建模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">SVG</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">垃圾分类回收游戏</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Drag & Drop API</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">人体骨骼运动模型</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">科学发明时间螺旋图</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">实验变量控制训练</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">CSS动画</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">火星基地生态设计</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">纳米机器人医疗模拟</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">Canvas</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 政治 -->
+            <div class="subject-card politics">
+                <div class="subject-header">
+                    <div class="subject-icon">🏛️</div>
+                    <div class="subject-title">政治</div>
+                </div>
+                <div class="subject-content">
+                    <div class="project-item">
+                        <div class="project-name">政府机构3D结构模型</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">立法流程动态流程图</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">SVG</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">选举制度对比仪表盘</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">Chart.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">一带一路合作项目动态地图</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Leaflet</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">GDP增长动态折线对比图</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">Chart.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">垃圾分类政策实施效果图</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">Chart.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">改革开放大事记时间轴</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Timeline.js</span>
+                            <span class="tech-tag">D3.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">虚拟人大代表提案系统</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">LocalStorage</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">政治漫画创作工具</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-name">政治知识网关系统</div>
+                        <div class="tech-tags">
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">LocalStorage</span>
                         </div>
                     </div>
                 </div>
