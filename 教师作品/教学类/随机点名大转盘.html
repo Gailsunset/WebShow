@@ -11,448 +11,379 @@
         body {
             font-family: 'Noto Sans SC', sans-serif;
         }
-        .wheel-container {
-            position: relative;
-            width: 100%;
-            max-width: 400px;
-            aspect-ratio: 1/1;
-            margin: 0 auto;
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .pointer {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 30px solid #ef4444;
-            z-index: 10;
+        .result-animate {
+            animation: fadeInScale 0.5s ease-out;
         }
-        .wheel {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-        }
-        .start-btn {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, #4f46e5, #4338ca);
-            color: white;
-            font-weight: bold;
-            border: none;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            z-index: 5;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .start-btn:hover:not(:disabled) {
-            transform: translate(-50%, -50%) scale(1.05);
-            background: linear-gradient(145deg, #6366f1, #4f46e5);
-        }
-        .start-btn:active:not(:disabled) {
-            transform: translate(-50%, -50%) scale(0.98);
-        }
-        .start-btn:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-        }
-        .result-card {
-            transition: all 0.5s ease;
-            transform-origin: center;
-        }
-        .result-card.show {
-            animation: popIn 0.5s forwards;
-        }
-        @keyframes popIn {
-            0% {
-                transform: scale(0.8);
-                opacity: 0;
-            }
-            70% {
-                transform: scale(1.05);
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-        .fade-in {
-            animation: fadeIn 0.5s forwards;
-        }
-        @keyframes fadeIn {
+        @keyframes fadeInScale {
             from {
                 opacity: 0;
+                transform: scale(0.8);
             }
             to {
                 opacity: 1;
+                transform: scale(1);
             }
+        }
+        #wheelCanvas {
+            max-width: 100%;
+            height: auto;
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen py-8 px-4">
-    <div class="max-w-4xl mx-auto">
+<body class="bg-gray-50 min-h-screen py-8">
+    <div class="container mx-auto px-4 max-w-6xl">
         <!-- 标题 -->
-        <h1 class="text-4xl md:text-5xl font-black text-center mb-8 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-            随机点名大转盘
+        <h1 class="text-5xl font-black text-center mb-12 gradient-text">
+            🎯 随机点名大转盘
         </h1>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- 转盘和结果区域 -->
-            <div class="space-y-8">
-                <!-- 转盘容器 -->
-                <div class="wheel-container">
-                    <div class="pointer"></div>
-                    <canvas id="wheelCanvas" class="wheel"></canvas>
-                    <button id="startBtn" class="start-btn">开始</button>
-                </div>
-
-                <!-- 结果展示 -->
-                <div id="resultCard" class="result-card bg-white rounded-xl shadow-lg p-6 text-center hidden">
-                    <h2 class="text-xl font-bold text-gray-700 mb-2">抽奖结果</h2>
-                    <div id="resultName" class="text-3xl font-black text-indigo-600"></div>
+        <!-- 主体区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- 转盘区域 -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center justify-center">
+                <div class="relative w-full max-w-md aspect-square flex items-center justify-center">
+                    <!-- 指针 -->
+                    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
+                        <div class="w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-t-[40px] border-t-red-500 drop-shadow-lg"></div>
+                    </div>
+                    
+                    <!-- Canvas转盘 -->
+                    <canvas id="wheelCanvas" width="400" height="400" class="w-full h-full"></canvas>
+                    
+                    <!-- 开始按钮 -->
+                    <button id="startBtn" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-xl shadow-2xl border-4 border-white transition-all duration-200 hover:scale-105 active:scale-95 z-20">
+                        开始
+                    </button>
                 </div>
             </div>
 
-            <!-- 名单管理区域 -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <!-- 展示视图 -->
-                <div id="displayView" class="space-y-4">
-                    <h2 class="text-xl font-bold text-gray-700">当前名单</h2>
-                    <div id="nameList" class="border border-gray-200 rounded-lg p-4 min-h-[200px] max-h-[300px] overflow-y-auto">
-                        <p class="text-gray-500 text-center py-8">名单为空，请添加名字</p>
-                    </div>
-                    <button id="editBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition">
-                        更改名单
-                    </button>
+            <!-- 结果展示区 -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center justify-center">
+                <h2 class="text-2xl font-bold text-gray-700 mb-6">🎊 抽奖结果</h2>
+                <div id="resultDisplay" class="w-full h-48 flex items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl">
+                    <p class="text-gray-400 text-lg">点击"开始"按钮开始抽奖</p>
                 </div>
+            </div>
+        </div>
 
-                <!-- 编辑视图 -->
-                <div id="editView" class="space-y-4 hidden">
-                    <h2 class="text-xl font-bold text-gray-700">编辑名单</h2>
-                    <textarea id="nameInput" class="w-full h-48 border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="请输入名单，每行一个名字"></textarea>
-                    <div class="flex gap-3">
-                        <button id="saveBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition">
-                            保存名单
-                        </button>
-                        <button id="cancelBtn" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition">
-                            取消
-                        </button>
-                    </div>
+        <!-- 名单管理区 -->
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-700">📋 名单管理</h2>
+                <button id="editBtn" class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow transition-all duration-200">
+                    更改名单
+                </button>
+            </div>
+
+            <!-- 展示视图 -->
+            <div id="displayView">
+                <div id="namesList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    <!-- 名单将动态生成 -->
+                </div>
+                <p id="emptyHint" class="text-gray-400 text-center py-8 hidden">暂无名单，请点击"更改名单"添加</p>
+            </div>
+
+            <!-- 编辑视图 -->
+            <div id="editView" class="hidden">
+                <textarea id="namesInput" class="w-full h-64 p-4 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all resize-none mb-4" placeholder="请输入名单，每个名字占一行&#10;例如：&#10;张三&#10;李四&#10;王五"></textarea>
+                <div class="flex gap-4">
+                    <button id="saveBtn" class="flex-1 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow transition-all duration-200">
+                        ✓ 保存名单
+                    </button>
+                    <button id="cancelBtn" class="flex-1 px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow transition-all duration-200">
+                        ✕ 取消
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 初始化变量
-        let names = [];
+        // 全局变量
+        let studentNames = [];
         let isSpinning = false;
-        let colors = [
-            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
-            '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF',
-            '#4BC0C0', '#FF6384', '#36A2EB', '#FFCE56'
+        let currentRotation = 0;
+        let audioInitialized = false;
+
+        // DOM 元素
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const startBtn = document.getElementById('startBtn');
+        const resultDisplay = document.getElementById('resultDisplay');
+        const editBtn = document.getElementById('editBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const namesInput = document.getElementById('namesInput');
+        const displayView = document.getElementById('displayView');
+        const editView = document.getElementById('editView');
+        const namesList = document.getElementById('namesList');
+        const emptyHint = document.getElementById('emptyHint');
+
+        // 颜色数组
+        const colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+            '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52D3AA',
+            '#FF85A2', '#5DADE2'
         ];
-        let wheelCanvas, wheelCtx, startBtn, resultCard, resultName;
-        let nameList, editBtn, editView, displayView, nameInput, saveBtn, cancelBtn;
-        
-        // 音效
-        let spinSound, resultSound;
-        
-        // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 获取DOM元素
-            wheelCanvas = document.getElementById('wheelCanvas');
-            wheelCtx = wheelCanvas.getContext('2d');
-            startBtn = document.getElementById('startBtn');
-            resultCard = document.getElementById('resultCard');
-            resultName = document.getElementById('resultName');
-            nameList = document.getElementById('nameList');
-            editBtn = document.getElementById('editBtn');
-            editView = document.getElementById('editView');
-            displayView = document.getElementById('displayView');
-            nameInput = document.getElementById('nameInput');
-            saveBtn = document.getElementById('saveBtn');
-            cancelBtn = document.getElementById('cancelBtn');
-            
-            // 初始化音效
-            initAudio();
-            
-            // 加载保存的名单
-            loadNames();
-            
-            // 绘制初始转盘
+
+        // 初始化
+        function init() {
+            loadNamesFromStorage();
             drawWheel();
-            
-            // 事件监听
-            startBtn.addEventListener('click', startSpinning);
+            updateNamesList();
+            setupEventListeners();
+        }
+
+        // 设置事件监听
+        function setupEventListeners() {
+            startBtn.addEventListener('click', startSpin);
             editBtn.addEventListener('click', showEditView);
             saveBtn.addEventListener('click', saveNames);
             cancelBtn.addEventListener('click', showDisplayView);
-            
-            // 响应式调整Canvas大小
-            window.addEventListener('resize', function() {
-                drawWheel();
-            });
-        });
-        
-        // 初始化音效
-        function initAudio() {
-            // 旋转音效 - 模拟转盘旋转的滴答声
-            spinSound = new Tone.Synth({
-                oscillator: {
-                    type: "square"
-                },
-                envelope: {
-                    attack: 0.005,
-                    decay: 0.1,
-                    sustain: 0,
-                    release: 0.1
-                }
-            }).toDestination();
-            
-            // 结果音效 - 明亮的提示音
-            resultSound = new Tone.Synth({
-                oscillator: {
-                    type: "triangle"
-                },
-                envelope: {
-                    attack: 0.005,
-                    decay: 0.2,
-                    sustain: 0,
-                    release: 0.5
-                }
-            }).toDestination();
         }
-        
-        // 加载保存的名单
-        function loadNames() {
-            const savedNames = localStorage.getItem('studentNames');
-            if (savedNames) {
-                names = JSON.parse(savedNames);
-                updateNameListDisplay();
+
+        // 从 localStorage 加载名单
+        function loadNamesFromStorage() {
+            const saved = localStorage.getItem('studentNames');
+            if (saved) {
+                try {
+                    studentNames = JSON.parse(saved);
+                } catch (e) {
+                    studentNames = [];
+                }
             }
         }
-        
+
+        // 保存名单到 localStorage
+        function saveNamesToStorage() {
+            localStorage.setItem('studentNames', JSON.stringify(studentNames));
+        }
+
         // 更新名单显示
-        function updateNameListDisplay() {
-            nameList.innerHTML = '';
-            
-            if (names.length === 0) {
-                nameList.innerHTML = '<p class="text-gray-500 text-center py-8">名单为空，请添加名字</p>';
+        function updateNamesList() {
+            if (studentNames.length === 0) {
+                namesList.innerHTML = '';
+                emptyHint.classList.remove('hidden');
                 startBtn.disabled = true;
-                return;
+                startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                emptyHint.classList.add('hidden');
+                namesList.innerHTML = studentNames.map(name => 
+                    `<div class="px-4 py-2 bg-gradient-to-r from-purple-400 to-pink-400 text-white rounded-lg text-center font-semibold shadow">${name}</div>`
+                ).join('');
+                startBtn.disabled = false;
+                startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             }
-            
-            startBtn.disabled = false;
-            
-            names.forEach((name, index) => {
-                const nameItem = document.createElement('div');
-                nameItem.className = 'flex items-center py-2 border-b border-gray-100';
-                nameItem.innerHTML = `
-                    <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs mr-2" style="background-color: ${colors[index % colors.length]}">${index + 1}</div>
-                    <span>${name}</span>
-                `;
-                nameList.appendChild(nameItem);
-            });
         }
-        
+
         // 显示编辑视图
         function showEditView() {
+            namesInput.value = studentNames.join('\n');
             displayView.classList.add('hidden');
             editView.classList.remove('hidden');
-            nameInput.value = names.join('\n');
         }
-        
+
         // 显示展示视图
         function showDisplayView() {
-            editView.classList.add('hidden');
             displayView.classList.remove('hidden');
+            editView.classList.add('hidden');
         }
-        
+
         // 保存名单
         function saveNames() {
-            const inputText = nameInput.value.trim();
-            if (!inputText) {
-                names = [];
-            } else {
-                names = inputText.split('\n')
-                    .map(name => name.trim())
-                    .filter(name => name !== '');
-            }
+            const input = namesInput.value;
+            const names = input.split('\n')
+                .map(name => name.trim())
+                .filter(name => name !== '');
             
-            // 保存到本地存储
-            localStorage.setItem('studentNames', JSON.stringify(names));
-            
-            // 更新显示
-            updateNameListDisplay();
+            studentNames = names;
+            saveNamesToStorage();
+            updateNamesList();
             drawWheel();
-            
-            // 返回展示视图
             showDisplayView();
         }
-        
+
         // 绘制转盘
         function drawWheel() {
-            // 设置Canvas大小
-            const container = wheelCanvas.parentElement;
-            const size = container.offsetWidth;
-            wheelCanvas.width = size;
-            wheelCanvas.height = size;
-            
-            // 清除画布
-            wheelCtx.clearRect(0, 0, size, size);
-            
-            // 如果没有名字，显示空状态
-            if (names.length === 0) {
-                wheelCtx.fillStyle = '#d1d5db';
-                wheelCtx.beginPath();
-                wheelCtx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
-                wheelCtx.fill();
-                
-                wheelCtx.fillStyle = '#6b7280';
-                wheelCtx.font = 'bold 18px Noto Sans SC';
-                wheelCtx.textAlign = 'center';
-                wheelCtx.textBaseline = 'middle';
-                wheelCtx.fillText('请添加名单', size/2, size/2);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 10;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (studentNames.length === 0) {
+                // 绘制空状态
+                ctx.fillStyle = '#D1D5DB';
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.fillStyle = '#6B7280';
+                ctx.font = 'bold 24px "Noto Sans SC"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('请添加名单', centerX, centerY);
                 return;
             }
-            
-            // 计算每个扇形的角度
-            const anglePerSlice = (Math.PI * 2) / names.length;
-            const centerX = size / 2;
-            const centerY = size / 2;
-            const radius = size / 2;
-            
-            // 绘制每个扇形
-            for (let i = 0; i < names.length; i++) {
-                const startAngle = i * anglePerSlice;
-                const endAngle = (i + 1) * anglePerSlice;
-                
-                // 绘制扇形
-                wheelCtx.beginPath();
-                wheelCtx.moveTo(centerX, centerY);
-                wheelCtx.arc(centerX, centerY, radius, startAngle, endAngle);
-                wheelCtx.closePath();
-                
-                // 填充颜色
-                wheelCtx.fillStyle = colors[i % colors.length];
-                wheelCtx.fill();
-                
+
+            const anglePerSlice = (2 * Math.PI) / studentNames.length;
+
+            // 绘制扇形
+            studentNames.forEach((name, index) => {
+                const startAngle = currentRotation + index * anglePerSlice;
+                const endAngle = startAngle + anglePerSlice;
+
+                // 填充扇形
+                ctx.fillStyle = colors[index % colors.length];
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fill();
+
+                // 绘制边框
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
                 // 绘制文字
-                wheelCtx.save();
-                wheelCtx.translate(centerX, centerY);
-                wheelCtx.rotate(startAngle + anglePerSlice / 2);
-                wheelCtx.textAlign = 'right';
-                wheelCtx.fillStyle = 'white';
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + anglePerSlice / 2);
+                
+                ctx.fillStyle = '#FFFFFF';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 3;
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 1;
                 
                 // 动态调整字体大小
-                const fontSize = Math.min(18, radius / 5);
-                wheelCtx.font = `bold ${fontSize}px Noto Sans SC`;
+                const maxLength = Math.max(...studentNames.map(n => n.length));
+                const fontSize = Math.max(16, Math.min(24, radius / maxLength * 1.5));
+                ctx.font = `bold ${fontSize}px "Noto Sans SC"`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
                 
-                // 添加文字阴影
-                wheelCtx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-                wheelCtx.shadowBlur = 2;
-                wheelCtx.shadowOffsetX = 1;
-                wheelCtx.shadowOffsetY = 1;
-                
-                wheelCtx.fillText(names[i], radius - 20, 5);
-                wheelCtx.restore();
-            }
-            
+                ctx.fillText(name, radius * 0.65, 0);
+                ctx.restore();
+            });
+
             // 绘制中心圆
-            wheelCtx.beginPath();
-            wheelCtx.arc(centerX, centerY, 20, 0, Math.PI * 2);
-            wheelCtx.fillStyle = 'white';
-            wheelCtx.fill();
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 50, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.strokeStyle = '#E5E7EB';
+            ctx.lineWidth = 3;
+            ctx.stroke();
         }
-        
-        // 开始旋转
-        function startSpinning() {
-            if (isSpinning || names.length === 0) return;
-            
-            // 激活音频上下文（用户首次交互）
-            if (Tone.context.state !== 'running') {
-                Tone.context.resume();
+
+        // 初始化音频
+        async function initAudio() {
+            if (!audioInitialized) {
+                await Tone.start();
+                audioInitialized = true;
             }
-            
+        }
+
+        // 播放旋转音效
+        function playSpinSound() {
+            const synth = new Tone.Synth({
+                oscillator: { type: 'triangle' },
+                envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 }
+            }).toDestination();
+
+            const interval = setInterval(() => {
+                if (!isSpinning) {
+                    clearInterval(interval);
+                    return;
+                }
+                synth.triggerAttackRelease('C5', '0.05');
+            }, 50);
+        }
+
+        // 播放结果音效
+        function playResultSound() {
+            const synth = new Tone.Synth({
+                oscillator: { type: 'sine' },
+                envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.5 }
+            }).toDestination();
+
+            synth.triggerAttackRelease('C6', '0.5');
+            setTimeout(() => synth.triggerAttackRelease('E6', '0.5'), 150);
+            setTimeout(() => synth.triggerAttackRelease('G6', '0.8'), 300);
+        }
+
+        // 开始旋转
+        async function startSpin() {
+            if (isSpinning || studentNames.length === 0) return;
+
+            await initAudio();
             isSpinning = true;
             startBtn.disabled = true;
-            resultCard.classList.add('hidden');
-            
-            // 随机选择中奖者
-            const winnerIndex = Math.floor(Math.random() * names.length);
-            const winnerName = names[winnerIndex];
-            
-            // 计算旋转角度（多转几圈后停在指定位置）
-            const anglePerSlice = (Math.PI * 2) / names.length;
-            const targetAngle = winnerIndex * anglePerSlice;
-            const extraRotations = 5; // 额外旋转圈数
-            const totalRotation = (Math.PI * 2) * extraRotations + (Math.PI * 2 - targetAngle);
-            
-            // 设置转盘初始角度
-            let currentRotation = 0;
-            const startTime = Date.now();
+            startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            // 清空之前的结果
+            resultDisplay.innerHTML = '<p class="text-gray-400 text-lg">转盘旋转中...</p>';
+
+            // 随机选择一个中奖者
+            const winnerIndex = Math.floor(Math.random() * studentNames.length);
+            const winner = studentNames[winnerIndex];
+
+            // 计算目标角度
+            const anglePerSlice = (2 * Math.PI) / studentNames.length;
+            const targetAngle = -(winnerIndex * anglePerSlice + anglePerSlice / 2);
+            const spins = 5; // 旋转5圈
+            const totalRotation = spins * 2 * Math.PI + targetAngle;
             const duration = 4000; // 4秒
-            
-            // 播放旋转音效
-            let tickCount = 0;
-            const tickInterval = setInterval(() => {
-                spinSound.triggerAttackRelease("C5", "16n");
-                tickCount++;
-                if (tickCount > 20) clearInterval(tickInterval);
-            }, 100);
-            
-            // 旋转动画
+            const startTime = Date.now();
+
+            playSpinSound();
+
+            // 动画循环
             function animate() {
                 const elapsed = Date.now() - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                
-                // 缓出函数
+
+                // 缓出效果
                 const easeOut = 1 - Math.pow(1 - progress, 3);
-                
-                // 计算当前角度
-                currentRotation = totalRotation * easeOut;
-                
-                // 应用旋转
-                wheelCanvas.style.transform = `rotate(${currentRotation}rad)`;
-                
+                currentRotation = easeOut * totalRotation;
+
+                drawWheel();
+
                 if (progress < 1) {
                     requestAnimationFrame(animate);
                 } else {
-                    // 动画结束
                     isSpinning = false;
+                    showResult(winner);
                     startBtn.disabled = false;
-                    clearInterval(tickInterval);
-                    
-                    // 播放结果音效
-                    resultSound.triggerAttackRelease("G6", "1n");
-                    
-                    // 显示结果
-                    resultName.textContent = winnerName;
-                    resultCard.classList.remove('hidden');
-                    resultCard.classList.add('show');
-                    
-                    // 重置转盘位置（为了下次旋转）
-                    setTimeout(() => {
-                        wheelCanvas.style.transform = 'rotate(0rad)';
-                        resultCard.classList.remove('show');
-                    }, 3000);
+                    startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
             }
-            
-            animate();
+
+            requestAnimationFrame(animate);
         }
+
+        // 显示结果
+        function showResult(winner) {
+            playResultSound();
+            resultDisplay.innerHTML = `
+                <div class="result-animate text-center">
+                    <p class="text-6xl mb-4">🎉</p>
+                    <p class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">${winner}</p>
+                    <p class="text-xl text-gray-600 mt-4">恭喜中奖！</p>
+                </div>
+            `;
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
